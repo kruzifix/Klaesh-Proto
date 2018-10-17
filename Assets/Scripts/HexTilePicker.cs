@@ -1,6 +1,5 @@
 ﻿using Klaesh.Core;
 using Klaesh.Core.Message;
-using Klaesh.Hex;
 using UnityEngine;
 
 public class HexTilePicker : MonoBehaviour
@@ -8,10 +7,10 @@ public class HexTilePicker : MonoBehaviour
     private IMessageBus _bus;
     private HexMap _map;
 
-    private void Start()
+    private void Awake()
     {
         _bus = ServiceLocator.Instance.GetService<IMessageBus>();
-        _map = FindObjectOfType<HexMap>();
+        _bus.Subscribe<HexMapInitializedMessage>(OnHexMapInitialized);
     }
 
     private void Update()
@@ -25,8 +24,7 @@ public class HexTilePicker : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit))
             {
-                var root = hit.transform.parent;
-                var tile = root.GetComponent<HexTile>();
+                var tile = hit.transform.GetComponent<HexTile>();
 
                 if (tile != null)
                 {
@@ -50,5 +48,10 @@ public class HexTilePicker : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void OnHexMapInitialized(HexMapInitializedMessage msg)
+    {
+        _map = msg.Content;
     }
 }

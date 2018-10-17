@@ -16,16 +16,16 @@ public class HexTile : MonoBehaviour
 
     private const float heightScale = 0.5f;
 
-    private void Awake()
+    private void Start()
     {
         _renderer = model.GetComponent<MeshRenderer>();
     }
 
     public void Refresh()
     {
-        var scale = model.transform.localScale;
-        scale.z = height * heightScale;
-        model.transform.localScale = scale;
+        var scale = transform.localScale;
+        scale.y = height * heightScale;
+        transform.localScale = scale;
     }
 
     public void SetColor(Color color)

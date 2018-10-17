@@ -4,14 +4,25 @@ ModelImporter:
   serializedVersion: 23
   fileIDToRecycleName:
     100000: //RootNode
+    100002: Camera
+    100004: HoneyComb
+    100006: Lamp
     400000: //RootNode
+    400002: Camera
+    400004: HoneyComb
+    400006: Lamp
+    2000000: Camera
     2100000: No Name
     2300000: //RootNode
+    2300002: HoneyComb
     3300000: //RootNode
+    3300002: HoneyComb
     4300000: Circle
+    4300002: HoneyComb
+    10800000: Lamp
   externalObjects: {}
   materials:
-    importMaterials: 1
+    importMaterials: 0
     materialName: 0
     materialSearch: 1
     materialLocation: 1
@@ -59,7 +70,7 @@ ModelImporter:
     secondaryUVAreaDistortion: 15.000001
     secondaryUVHardAngle: 88
     secondaryUVPackMargin: 4
-    useFileScale: 0
+    useFileScale: 1
     previousCalculatedGlobalScale: 1
     hasPreviousCalculatedGlobalScale: 0
   tangentSpace:
@@ -67,7 +78,7 @@ ModelImporter:
     normalImportMode: 0
     tangentImportMode: 3
     normalCalculationMode: 4
-  importAnimation: 1
+  importAnimation: 0
   copyAvatar: 0
   humanDescription:
     serializedVersion: 2

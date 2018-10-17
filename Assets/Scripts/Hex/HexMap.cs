@@ -1,4 +1,6 @@
-﻿using Klaesh.Hex;
+﻿using Klaesh.Core;
+using Klaesh.Core.Message;
+using Klaesh.Hex;
 using System;
 using System.Collections.Generic;
 using UnityEditor;
@@ -21,6 +23,8 @@ public class HexMap : MonoBehaviour
     private void Start()
     {
         BuildMap();
+
+        ServiceLocator.Instance.GetService<IMessageBus>().Publish(new HexMapInitializedMessage(this, this));
     }
 
     public void BuildMap()
