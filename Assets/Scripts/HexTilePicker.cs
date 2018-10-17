@@ -5,10 +5,12 @@ using UnityEngine;
 
 public class HexTilePicker : MonoBehaviour
 {
+    private IMessageBus _bus;
     private HexMap _map;
 
     private void Start()
     {
+        _bus = ServiceLocator.Instance.GetService<IMessageBus>();
         _map = FindObjectOfType<HexMap>();
     }
 
@@ -28,7 +30,7 @@ public class HexTilePicker : MonoBehaviour
 
                 if (tile != null)
                 {
-                    ServiceLocator.Instance.GetService<IMessageBus>().Publish(new HexTileSelectedMessage(this, tile));
+                    _bus.Publish(new FocusCameraMessage(this, tile.GetTop()));
 
                     tile.SetColor(Color.red);
 

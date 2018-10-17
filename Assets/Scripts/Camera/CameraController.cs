@@ -20,6 +20,11 @@ public class CameraController : MonoBehaviour
     public float minPitch = 20f;
     public float maxPitch = 70f;
 
+    public float Yaw => _yaw;
+    public float Pitch => _pitch;
+    public float Distance => _distance;
+    public Vector3 TargetPos => _rootTargetPos;
+
     private Vector3 _lastMousePos;
     private float _yaw = 0f;
     private float _yawTarget = 0f;
@@ -36,7 +41,7 @@ public class CameraController : MonoBehaviour
         _targetDistance = Vector3.Distance(transform.position, _rootTargetPos);
 
         var bus = ServiceLocator.Instance.GetService<IMessageBus>();
-        bus.Subscribe<HexTileSelectedMessage>(OnHexTileSelected);
+        bus.Subscribe<FocusCameraMessage>(OnFocusCamera);
     }
 
     private void LateUpdate()
@@ -55,7 +60,7 @@ public class CameraController : MonoBehaviour
             Vector3 delta = mousePos - _lastMousePos;
 
             _yawTarget = _yawTarget + delta.x * rotationSensivity;
-            _pitchTarget = Mathf.Clamp(_pitchTarget + delta.y * rotationSensivity, minPitch, maxPitch);
+            _pitchTarget = Mathf.Clamp(_pitchTarget - delta.y * rotationSensivity, minPitch, maxPitch);
 
             _lastMousePos = mousePos;
         }
@@ -73,8 +78,10 @@ public class CameraController : MonoBehaviour
         transform.LookAt(root);
     }
 
-    private void OnHexTileSelected(HexTileSelectedMessage msg)
+    private void OnFocusCamera(FocusCameraMessage msg)
     {
-        _rootTargetPos = msg.Content.transform.position + new Vector3(0f, msg.Content.height * 0.5f, 0f);
+        _rootTargetPos = msg.Position;
+        if (!msg.InterpolatePosition)
+            root.transform.position = msg.Position;
     }
 }

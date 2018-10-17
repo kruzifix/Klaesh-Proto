@@ -14,6 +14,8 @@ public class HexTile : MonoBehaviour
 
     private MeshRenderer _renderer;
 
+    private const float heightScale = 0.5f;
+
     private void Awake()
     {
         _renderer = model.GetComponent<MeshRenderer>();
@@ -22,12 +24,17 @@ public class HexTile : MonoBehaviour
     public void Refresh()
     {
         var scale = model.transform.localScale;
-        scale.z = height * 0.5f;
+        scale.z = height * heightScale;
         model.transform.localScale = scale;
     }
 
     public void SetColor(Color color)
     {
         _renderer.material.color = color;
+    }
+
+    public Vector3 GetTop()
+    {
+        return model.transform.position + new Vector3(0, height * heightScale, 0);
     }
 }

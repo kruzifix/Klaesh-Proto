@@ -190,7 +190,7 @@ GameObject:
   m_Layer: 0
   m_Name: CameraRoot
   m_TagString: Untagged
-  m_Icon: {fileID: 7250588514170254948, guid: 0000000000000000d000000000000000, type: 0}
+  m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -307,8 +307,8 @@ MonoBehaviour:
   zoomLerpConst: 0.3
   minDistance: 1
   maxDistance: 10
-  minPitch: 30
-  maxPitch: 70
+  minPitch: 20
+  maxPitch: 75
 --- !u!114 &534669907
 MonoBehaviour:
   m_ObjectHideFlags: 0
