@@ -1,6 +1,8 @@
 ﻿using System;
+using Klaesh;
 using Klaesh.Core;
 using Klaesh.Core.Message;
+using Klaesh.Entity;
 using UnityEngine;
 
 public class Bootstrap : MonoBehaviour
@@ -25,11 +27,22 @@ public class Bootstrap : MonoBehaviour
 
         _eventBus = _serviceLocator.GetService<IMessageBus>();
 
-
         DontDestroyOnLoad(gameObject);
 
+        _serviceLocator.GetService<IObjectPicker>().RegisterHandler<HexTile>(KeyCode.B, "HexTile", (tile, hit) =>
+        {
+            if (tile.HasEntityOnTop)
+                return;
 
-        //_eventBus.Publish(new ShowLoadingScreenMessage());
+            var em = _serviceLocator.GetService<EntityManager>();
+            var brute = em.CreateEntity("cube-brute");
+            brute.MoveTo(tile.coord);
+        });
+
+        _serviceLocator.GetService<IObjectPicker>().RegisterHandler<Entity>(KeyCode.Mouse0, "Entity", (e, hit) =>
+        {
+            Debug.LogFormat("PICKED ENTITY at: {0}", e.Position);
+        });
     }
 
     private void Create()

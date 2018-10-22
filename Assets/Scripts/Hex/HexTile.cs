@@ -1,8 +1,11 @@
-﻿using Klaesh.Hex;
+﻿using Klaesh.Entity;
+using Klaesh.Hex;
 using UnityEngine;
 
 public class HexTile : MonoBehaviour
 {
+    private const float heightScale = 0.5f;
+
     public GameObject model;
 
     [HideInInspector]
@@ -10,11 +13,10 @@ public class HexTile : MonoBehaviour
     [HideInInspector]
     public HexCubeCoord coord;
 
-    public HexMap Map { get; set; }
-
     private MeshRenderer _renderer;
 
-    private const float heightScale = 0.5f;
+    public Entity Entity { get; set; }
+    public bool HasEntityOnTop { get { return Entity != null; } }
 
     private void Start()
     {

@@ -1,4 +1,5 @@
-﻿using Klaesh.Core;
+﻿using Klaesh;
+using Klaesh.Core;
 using Klaesh.Core.Message;
 using Klaesh.Hex;
 using System;
@@ -6,7 +7,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-public class HexMap : MonoBehaviour
+public class HexMap : MonoBehaviour, IPickHandler<HexTile>
 {
     private const float Sqrt3 = 1.732f;
 
@@ -20,11 +21,50 @@ public class HexMap : MonoBehaviour
 
     private HexTile[,] _tiles;
 
+    #region Mono-Events
+
+    private void Awake()
+    {
+        ServiceLocator.Instance.RegisterSingleton<HexMap, HexMap>(this);
+    }
+
     private void Start()
     {
         BuildMap();
 
+        ServiceLocator.Instance.GetService<IObjectPicker>().RegisterHandler(KeyCode.Mouse0, "HexTile", this);
         ServiceLocator.Instance.GetService<IMessageBus>().Publish(new HexMapInitializedMessage(this, this));
+    }
+
+    private void OnDestroy()
+    {
+        ServiceLocator.Instance.DeregisterSingleton<HexMap>();
+    }
+
+    #endregion
+
+    public void OnPick(HexTile comp, RaycastHit hit)
+    {
+        var _bus = ServiceLocator.Instance.GetService<IMessageBus>();
+        _bus.Publish(new FocusCameraMessage(this, comp.GetTop()));
+
+        DeselectAll();
+
+        comp.SetColor(Color.red);
+
+        var colorStrings = new[] {
+            "#299AFF", "#5879BF", "#B6373F", "#E61600",
+        };
+
+        var colors = new Color[colorStrings.Length];
+        for (int i = 0; i < colors.Length; i++)
+            ColorUtility.TryParseHtmlString(colorStrings[i], out colors[i]);
+
+        int maxDist = 2;
+        foreach (var n in GetReachableTiles(comp.coord, maxDist, 1))
+        {
+            n.Item1.SetColor(colors[n.Item2 - 1]);
+        }
     }
 
     public void BuildMap()
@@ -49,7 +89,6 @@ public class HexMap : MonoBehaviour
                 float height = Mathf.PerlinNoise(c * noiseScale, r * noiseScale);
                 tile.height = Mathf.CeilToInt(height * 6f);
                 tile.coord = new HexOffsetCoord(c, r).ToCube();
-                tile.Map = this;
                 tile.Refresh();
 
                 float offset = (r % 2) * CellWidth * 0.5f;
@@ -157,4 +196,5 @@ public class HexMap : MonoBehaviour
             }
         }
     }
+
 }

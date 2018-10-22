@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
+using System.Linq;
 
 namespace Klaesh.Core
 {
@@ -14,12 +13,18 @@ namespace Klaesh.Core
             _entries = new Dictionary<Type, object>();
         }
 
+        public bool HasService<T>()
+        {
+            return _entries.ContainsKey(typeof(T));
+        }
+
         public T GetService<T>()
         {
             return (T)GetInstance(typeof(T));
         }
 
-        public void RegisterSingleton<TService, TImplementation>(TImplementation singleton) where TImplementation : TService
+        public void RegisterSingleton<TService, TImplementation>(TImplementation singleton)
+            where TImplementation : TService
         {
             Type t = typeof(TService);
             if (_entries.ContainsKey(t))
@@ -29,10 +34,20 @@ namespace Klaesh.Core
             _entries.Add(t, singleton);
         }
 
+        public void DeregisterSingleton<TService>()
+        {
+            _entries.Remove(typeof(TService));
+        }
+
         private object GetInstance(Type type)
         {
             if (!_entries.ContainsKey(type))
             {
+                bool isInitializable = type.CustomAttributes.Any(a => a.AttributeType == typeof(InitializableFromServiceManager));
+
+                if (!isInitializable)
+                    throw new Exception("No service registered and can't create one lazyly");
+
                 // create service!
                 _entries[type] = Activator.CreateInstance(type);
             }
