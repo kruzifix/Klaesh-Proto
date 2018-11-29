@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Klaesh.Core;
+using Klaesh.Core.Message;
 using UnityEngine;
 
 namespace Klaesh.Entity
@@ -24,6 +25,8 @@ namespace Klaesh.Entity
         {
             _entities = new List<GameEntity>();
             _descriptors = Resources.LoadAll<GameEntityDescriptor>("Entities").ToDictionary(d => d.entityId);
+
+            ServiceLocator.Instance.GetService<IMessageBus>().Publish(new GameEntityDescriptorsLoadedMessage(this));
         }
 
         private void OnDestroy()

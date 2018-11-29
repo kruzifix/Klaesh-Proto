@@ -3,6 +3,7 @@ using Klaesh;
 using Klaesh.Core;
 using Klaesh.Core.Message;
 using Klaesh.Entity;
+using Klaesh.Hex;
 using UnityEngine;
 
 namespace Klaesh
@@ -30,15 +31,43 @@ namespace Klaesh
 
             DontDestroyOnLoad(gameObject);
 
-            _serviceLocator.GetService<IObjectPicker>().RegisterHandler<HexTile>(KeyCode.B, "HexTile", (tile, hit) =>
+            // setup game board
+            _eventBus.Subscribe<GameEntityDescriptorsLoadedMessage>(msg =>
             {
-                if (tile.HasEntityOnTop)
-                    return;
+                var em = msg.Sender as GameEntityManager;
+                var map = _serviceLocator.GetService<HexMap>();
 
-                var em = _serviceLocator.GetService<GameEntityManager>();
-                var brute = em.CreateEntity("cube-brute");
-                brute.MoveTo(tile.coord);
+                int marg = 1;
+
+                var cube = em.CreateEntity("cube-brute");
+                cube.MoveTo(new HexOffsetCoord(marg, marg).ToCube());
+
+                cube = em.CreateEntity("cube-brute");
+                cube.MoveTo(new HexOffsetCoord(map.mapColumns / 2, marg).ToCube());
+
+                cube = em.CreateEntity("cube-brute");
+                cube.MoveTo(new HexOffsetCoord(map.mapColumns - marg - 1, marg).ToCube());
+
+                var round = em.CreateEntity("round-brute");
+                round.MoveTo(new HexOffsetCoord(marg, map.mapRows - marg - 1).ToCube());
+
+                round = em.CreateEntity("round-brute");
+                round.MoveTo(new HexOffsetCoord(map.mapColumns / 2, map.mapRows - marg - 1).ToCube());
+
+                round = em.CreateEntity("round-brute");
+                round.MoveTo(new HexOffsetCoord(map.mapColumns - marg - 1, map.mapRows - marg - 1).ToCube());
+
+                _eventBus.Publish(new FocusCameraMessage(this, map.GetTile(map.mapColumns / 2, map.mapRows / 2).GetTop()));
             });
+            //_serviceLocator.GetService<IObjectPicker>().RegisterHandler<HexTile>(KeyCode.B, "HexTile", (tile, hit) =>
+            //{
+            //    if (tile.HasEntityOnTop)
+            //        return;
+
+            //    var em = _serviceLocator.GetService<GameEntityManager>();
+            //    var brute = em.CreateEntity("cube-brute");
+            //    brute.MoveTo(tile.coord);
+            //});
 
             _serviceLocator.GetService<IObjectPicker>().RegisterHandler<GameEntity>(KeyCode.Mouse0, "Entity", (e, hit) =>
             {
