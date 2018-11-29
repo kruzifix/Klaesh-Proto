@@ -12,3 +12,30 @@
 - InputSystem (InputMode, MoveInput, AttackInput, ...)
 - Preview System for Inputs
 - Turn based Game Simulator
+
+
+ignore this:
+
+### Game Simulator
+reference to map and entities/manager
+
+Execute(IEnumerable<IAction>)
+? should Actions be simulated sequentially/parallel
+
+
+enum ActionExecutionState
+    Idle
+    Executing
+    Finished
+
+IAction
+    target: IEntity
+
+    state : ActionExecutionState
+
+    StartExecution() : Coroutine
+
+    Animations?
+
+    ??
+    waitFor/executeAfter : IAction
