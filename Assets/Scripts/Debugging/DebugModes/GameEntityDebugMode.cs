@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using Klaesh.Entity;
-using UnityEditor;
 using UnityEngine;
 
 namespace Klaesh.Debugging
@@ -23,37 +22,36 @@ namespace Klaesh.Debugging
 
         public override void PrintScrollContent()
         {
-            GUILayout.Label("Descriptors", EditorStyles.boldLabel);
+            GUILayout.Label("Descriptors", DStyles.boldLabel);
             foreach (var desc in _manager.Descriptors)
             {
-                GUILayout.BeginVertical(EditorStyles.helpBox);
+                GUILayout.BeginVertical(DStyles.box);
 
-                GUILayout.Label($"Name: {desc.Value.name}", EditorStyles.miniBoldLabel);
+                GUILayout.Label($"Name: {desc.Value.name}", DStyles.miniBoldLabel);
 
-                GUILayout.Label($"Entity Id: {desc.Value.entityId}", EditorStyles.miniLabel);
-                GUILayout.Label($"Entity Name: {desc.Value.entityName}", EditorStyles.miniLabel);
+                GUILayout.Label($"Entity Id: {desc.Value.entityId}", DStyles.miniLabel);
+                GUILayout.Label($"Entity Name: {desc.Value.entityName}", DStyles.miniLabel);
                 GUILayout.Space(5f);
 
-                GUILayout.Label($"Mesh Prefab: {desc.Value.meshPrefab.name}", EditorStyles.miniLabel);
-                GUILayout.Label($"Mesh Offset: {desc.Value.meshOffset}", EditorStyles.miniLabel);
+                GUILayout.Label($"Mesh Prefab: {desc.Value.meshPrefab.name}", DStyles.miniLabel);
+                GUILayout.Label($"Mesh Offset: {desc.Value.meshOffset}", DStyles.miniLabel);
                 GUILayout.Space(5f);
 
-                GUILayout.Label($"Max Distance: {desc.Value.maxDistance}", EditorStyles.miniLabel);
-                GUILayout.Label($"Jump Height: {desc.Value.jumpHeight}", EditorStyles.miniLabel);
+                GUILayout.Label($"Max Distance: {desc.Value.maxDistance}", DStyles.miniLabel);
+                GUILayout.Label($"Jump Height: {desc.Value.jumpHeight}", DStyles.miniLabel);
 
                 GUILayout.EndVertical();
             }
 
-            GUILayout.Label("Entities", EditorStyles.boldLabel);
+            GUILayout.Label("Entities", DStyles.boldLabel);
             foreach (var ent in _manager.Entities)
             {
-                GUILayout.BeginVertical(EditorStyles.helpBox);
+                GUILayout.BeginVertical(DStyles.box);
 
-                GUILayout.Label($"Id: {ent.Id}", EditorStyles.miniBoldLabel);
-                //GUILayout.Space(8f);
+                GUILayout.Label($"Id: {ent.Id}", DStyles.miniBoldLabel);
 
-                GUILayout.Label($"Descriptor: {ent.Descriptor.name}", EditorStyles.miniLabel);
-                GUILayout.Label($"Position: {ent.Position}", EditorStyles.miniLabel);
+                GUILayout.Label($"Descriptor: {ent.Descriptor.name}", DStyles.miniLabel);
+                GUILayout.Label($"Position: {ent.Position}", DStyles.miniLabel);
 
                 GUILayout.EndVertical();
             }

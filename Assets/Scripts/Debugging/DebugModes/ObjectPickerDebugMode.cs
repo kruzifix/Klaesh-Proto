@@ -1,6 +1,5 @@
 ﻿using System;
 using Klaesh.Utility;
-using UnityEditor;
 using UnityEngine;
 
 namespace Klaesh.Debugging
@@ -29,22 +28,21 @@ namespace Klaesh.Debugging
 
         public override void Init()
         {
-            _groupStyle = new GUIStyle(EditorStyles.helpBox);
+            _groupStyle = new GUIStyle(DStyles.box);
 
-            _keyStyle = new GUIStyle(EditorStyles.largeLabel);
+            _keyStyle = new GUIStyle(DStyles.largeLabel);
             _keyStyle.normal.textColor = Color.black;
 
-            _tagStyle = new GUIStyle(EditorStyles.boldLabel);
+            _tagStyle = new GUIStyle(DStyles.boldLabel);
             _tagStyle.normal.textColor = Color.HSVToRGB(0.7f, 0.8f, 0.7f);
 
             _handlerStyle = new GUIStyle();
             _handlerStyle.normal.textColor = Color.HSVToRGB(0.9f, 0.7f, 0.4f);
 
-            _btnStyle = new GUIStyle(EditorStyles.miniButtonMid);
+            _btnStyle = new GUIStyle(DStyles.sqrBtn);
             _btnStyle.fixedWidth = 20f;
             _btnStyle.margin.top = 0;
             _btnStyle.margin.right = 10;
-            //_btnStyle.margin.bottom = 15;
         }
 
         public override void PrintScrollContent()
