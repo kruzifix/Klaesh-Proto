@@ -15,7 +15,7 @@ public class HexTile : MonoBehaviour
 
     private MeshRenderer _renderer;
 
-    public Entity Entity { get; set; }
+    public GameEntity Entity { get; set; }
     public bool HasEntityOnTop { get { return Entity != null; } }
 
     private void Start()

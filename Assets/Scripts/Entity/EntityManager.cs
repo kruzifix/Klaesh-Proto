@@ -12,8 +12,8 @@ namespace Klaesh.Entity
 
         public GameObject entityPrefab;
 
-        private Dictionary<string, EntityDescriptor> _descriptors;
-        private List<Entity> _entities;
+        private Dictionary<string, GameEntityDescriptor> _descriptors;
+        private List<GameEntity> _entities;
 
         private void Awake()
         {
@@ -22,8 +22,8 @@ namespace Klaesh.Entity
 
         private void Start()
         {
-            _entities = new List<Entity>();
-            _descriptors = Resources.LoadAll<EntityDescriptor>("Entities").ToDictionary(d => d.entityId);
+            _entities = new List<GameEntity>();
+            _descriptors = Resources.LoadAll<GameEntityDescriptor>("Entities").ToDictionary(d => d.entityId);
         }
 
         private void OnDestroy()
@@ -31,7 +31,7 @@ namespace Klaesh.Entity
             ServiceLocator.Instance.DeregisterSingleton<EntityManager>();
         }
 
-        public Entity CreateEntity(string id)
+        public GameEntity CreateEntity(string id)
         {
             if (!_descriptors.ContainsKey(id))
                 throw new Exception(string.Format("no entity descriptor with id '{0}'", id));
@@ -39,7 +39,7 @@ namespace Klaesh.Entity
             var desc = _descriptors[id];
 
             var go = Instantiate(entityPrefab, transform);
-            var entity = go.GetComponent<Entity>();
+            var entity = go.GetComponent<GameEntity>();
             entity.Initialize(desc);
 
             _entities.Add(entity);

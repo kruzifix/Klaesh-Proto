@@ -3,7 +3,7 @@
 namespace Klaesh.Entity
 {
     [CreateAssetMenu(fileName = "New Entity", menuName = "Entity/Descriptor", order = 1)]
-    public class EntityDescriptor : ScriptableObject
+    public class GameEntityDescriptor : ScriptableObject
     {
         public string entityId = "entity1";
         public string entityName = "My Entity";

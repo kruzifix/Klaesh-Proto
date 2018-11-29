@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace Klaesh.Entity
 {
-    public class Entity : MonoBehaviour
+    public class GameEntity : MonoBehaviour
     {
-        private EntityDescriptor _descriptor;
+        private GameEntityDescriptor _descriptor;
         private GameObject _mesh;
 
         private bool _firstMove = true;
@@ -35,7 +35,7 @@ namespace Klaesh.Entity
             return true;
         }
 
-        public void Initialize(EntityDescriptor descriptor)
+        public void Initialize(GameEntityDescriptor descriptor)
         {
             _descriptor = descriptor;
 
