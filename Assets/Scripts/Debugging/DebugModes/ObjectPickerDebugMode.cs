@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using Klaesh.Utility;
 using UnityEditor;
 using UnityEngine;
@@ -42,10 +40,11 @@ namespace Klaesh.Debugging
             _handlerStyle = new GUIStyle();
             _handlerStyle.normal.textColor = Color.HSVToRGB(0.9f, 0.7f, 0.4f);
 
-            _btnStyle = new GUIStyle(EditorStyles.miniButton);
-            _btnStyle.fixedWidth = 17f;
+            _btnStyle = new GUIStyle(EditorStyles.miniButtonMid);
+            _btnStyle.fixedWidth = 20f;
+            _btnStyle.margin.top = 0;
             _btnStyle.margin.right = 10;
-            _btnStyle.margin.bottom = 15;
+            //_btnStyle.margin.bottom = 15;
         }
 
         public override void PrintScrollContent()

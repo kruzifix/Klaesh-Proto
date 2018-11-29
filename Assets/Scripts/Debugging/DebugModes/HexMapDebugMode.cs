@@ -1,5 +1,6 @@
 ﻿using Klaesh.Core;
 using Klaesh.Core.Message;
+using Klaesh.Hex;
 using UnityEngine;
 
 namespace Klaesh.Debugging
@@ -9,7 +10,7 @@ namespace Klaesh.Debugging
         public override string Name => "HexMap";
         public override string Description => "Debug Methods for Map";
 
-        private HexMap _currentMap;
+        private IHexMap _currentMap;
 
         public override void RegisterServices()
         {

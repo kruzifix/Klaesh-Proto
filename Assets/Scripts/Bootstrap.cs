@@ -34,30 +34,30 @@ namespace Klaesh
             // setup game board
             _eventBus.Subscribe<GameEntityDescriptorsLoadedMessage>(msg =>
             {
-                var em = msg.Sender as GameEntityManager;
-                var map = _serviceLocator.GetService<HexMap>();
+                var em = msg.Sender as IGameEntityManager;
+                var map = _serviceLocator.GetService<IHexMap>();
 
                 int marg = 1;
 
                 var cube = em.CreateEntity("cube-brute");
-                cube.MoveTo(new HexOffsetCoord(marg, marg).ToCube());
+                cube.TryMoveTo(new HexOffsetCoord(marg, marg).ToCube());
 
                 cube = em.CreateEntity("cube-brute");
-                cube.MoveTo(new HexOffsetCoord(map.mapColumns / 2, marg).ToCube());
+                cube.TryMoveTo(new HexOffsetCoord(map.Columns / 2, marg).ToCube());
 
                 cube = em.CreateEntity("cube-brute");
-                cube.MoveTo(new HexOffsetCoord(map.mapColumns - marg - 1, marg).ToCube());
+                cube.TryMoveTo(new HexOffsetCoord(map.Columns - marg - 1, marg).ToCube());
 
                 var round = em.CreateEntity("round-brute");
-                round.MoveTo(new HexOffsetCoord(marg, map.mapRows - marg - 1).ToCube());
+                round.TryMoveTo(new HexOffsetCoord(marg, map.Rows - marg - 1).ToCube());
 
                 round = em.CreateEntity("round-brute");
-                round.MoveTo(new HexOffsetCoord(map.mapColumns / 2, map.mapRows - marg - 1).ToCube());
+                round.TryMoveTo(new HexOffsetCoord(map.Columns / 2, map.Rows - marg - 1).ToCube());
 
                 round = em.CreateEntity("round-brute");
-                round.MoveTo(new HexOffsetCoord(map.mapColumns - marg - 1, map.mapRows - marg - 1).ToCube());
+                round.TryMoveTo(new HexOffsetCoord(map.Columns - marg - 1, map.Rows - marg - 1).ToCube());
 
-                _eventBus.Publish(new FocusCameraMessage(this, map.GetTile(map.mapColumns / 2, map.mapRows / 2).GetTop()));
+                _eventBus.Publish(new FocusCameraMessage(this, map.GetTile(map.Columns / 2, map.Rows / 2).GetTop()));
             });
             //_serviceLocator.GetService<IObjectPicker>().RegisterHandler<HexTile>(KeyCode.B, "HexTile", (tile, hit) =>
             //{

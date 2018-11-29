@@ -1,42 +1,44 @@
 ﻿using Klaesh.Entity;
-using Klaesh.Hex;
 using UnityEngine;
 
-public class HexTile : MonoBehaviour
+namespace Klaesh.Hex
 {
-    private const float heightScale = 0.5f;
-
-    public GameObject model;
-
-    [HideInInspector]
-    public int height;
-    [HideInInspector]
-    public HexCubeCoord coord;
-
-    private MeshRenderer _renderer;
-
-    public GameEntity Entity { get; set; }
-    public bool HasEntityOnTop { get { return Entity != null; } }
-
-    private void Start()
+    public class HexTile : MonoBehaviour
     {
-        _renderer = model.GetComponent<MeshRenderer>();
-    }
+        private const float heightScale = 0.5f;
 
-    public void Refresh()
-    {
-        var scale = transform.localScale;
-        scale.y = height * heightScale;
-        transform.localScale = scale;
-    }
+        public GameObject model;
 
-    public void SetColor(Color color)
-    {
-        _renderer.material.color = color;
-    }
+        [HideInInspector]
+        public int height;
+        [HideInInspector]
+        public HexCubeCoord coord;
 
-    public Vector3 GetTop()
-    {
-        return model.transform.position + new Vector3(0, height * heightScale, 0);
+        private MeshRenderer _renderer;
+
+        public GameEntity Entity { get; set; }
+        public bool HasEntityOnTop { get { return Entity != null; } }
+
+        private void Start()
+        {
+            _renderer = model.GetComponent<MeshRenderer>();
+        }
+
+        public void Refresh()
+        {
+            var scale = transform.localScale;
+            scale.y = height * heightScale;
+            transform.localScale = scale;
+        }
+
+        public void SetColor(Color color)
+        {
+            _renderer.material.color = color;
+        }
+
+        public Vector3 GetTop()
+        {
+            return model.transform.position + new Vector3(0, height * heightScale, 0);
+        }
     }
 }

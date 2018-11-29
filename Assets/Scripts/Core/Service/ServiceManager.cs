@@ -46,7 +46,7 @@ namespace Klaesh.Core
                 bool isInitializable = type.CustomAttributes.Any(a => a.AttributeType == typeof(InitializableFromServiceManager));
 
                 if (!isInitializable)
-                    throw new Exception("No service registered and can't create one lazyly");
+                    throw new Exception($"No service of Type {type.FullName} registered and can't create one lazyly");
 
                 // create service!
                 _entries[type] = Activator.CreateInstance(type);

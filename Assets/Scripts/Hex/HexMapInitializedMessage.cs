@@ -1,8 +1,11 @@
 ﻿using Klaesh.Core.Message;
 
-public class HexMapInitializedMessage : GenericMessage<HexMap>
+namespace Klaesh.Hex
 {
-    public HexMapInitializedMessage(object sender, HexMap content)
-        : base(sender, content)
-    { }
+    public class HexMapInitializedMessage : GenericMessage<IHexMap>
+    {
+        public HexMapInitializedMessage(object sender, IHexMap content)
+            : base(sender, content)
+        { }
+    }
 }

@@ -1,21 +1,38 @@
-﻿using Klaesh.Core;
+﻿using System;
+using Klaesh.Core;
 using Klaesh.Hex;
 using UnityEngine;
 
 namespace Klaesh.Entity
 {
-    public class GameEntity : MonoBehaviour
+    public interface IGameEntity
     {
-        private GameEntityDescriptor _descriptor;
+        int Id { get; }
+        HexCubeCoord Position { get; }
+        GameEntityDescriptor Descriptor { get; }
+
+        void Initialize(int id, GameEntityDescriptor descriptor);
+
+        bool TryMoveTo(HexCubeCoord position);
+    }
+
+    public class GameEntity : MonoBehaviour, IGameEntity
+    {
         private GameObject _mesh;
 
+        private bool _initialized = false;
         private bool _firstMove = true;
 
+        public int Id { get; private set; }
         public HexCubeCoord Position { get; private set; }
+        public GameEntityDescriptor Descriptor { get; private set; }
 
-        public bool MoveTo(HexCubeCoord position)
+        public bool TryMoveTo(HexCubeCoord position)
         {
-            var map = ServiceLocator.Instance.GetService<HexMap>();
+            if (!_initialized)
+                throw new Exception("GameEntity needs to be initialized before moving");
+
+            var map = ServiceLocator.Instance.GetService<IHexMap>();
             var tile = map.GetTile(position.ToOffset());
 
             if (tile.HasEntityOnTop)
@@ -35,9 +52,14 @@ namespace Klaesh.Entity
             return true;
         }
 
-        public void Initialize(GameEntityDescriptor descriptor)
+        public void Initialize(int id, GameEntityDescriptor descriptor)
         {
-            _descriptor = descriptor;
+            if (_initialized)
+                throw new Exception("GameEntity already initialized");
+
+            _initialized = true;
+            Id = id;
+            Descriptor = descriptor;
 
             CreateMesh();
         }
@@ -53,8 +75,8 @@ namespace Klaesh.Entity
                     Destroy(c);
             }
 
-            _mesh = Instantiate(_descriptor.meshPrefab, transform);
-            _mesh.transform.localPosition = _descriptor.meshOffset;
+            _mesh = Instantiate(Descriptor.meshPrefab, transform);
+            _mesh.transform.localPosition = Descriptor.meshOffset;
 
             MoveBoxColliders(_mesh, gameObject);
         }
@@ -66,7 +88,7 @@ namespace Klaesh.Entity
             foreach (var c in comps)
             {
                 var newComp = destination.AddComponent<BoxCollider>();
-                newComp.center = c.center + _descriptor.meshOffset;
+                newComp.center = c.center + Descriptor.meshOffset;
                 newComp.size = c.size;
                 newComp.material = c.material;
                 newComp.isTrigger = c.isTrigger;

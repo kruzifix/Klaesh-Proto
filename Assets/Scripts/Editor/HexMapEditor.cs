@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using Klaesh.Hex;
 
 [CustomEditor(typeof(HexMap))]
 public class HexMapEditor : Editor
