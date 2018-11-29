@@ -10,6 +10,10 @@ namespace Klaesh
 {
     public interface IObjectPicker
     {
+        IDictionary<KeyCode, HandlerDict> Handlers { get; }
+
+        bool Enabled { get; set; }
+
         void RegisterHandler(KeyCode key, string tag, IPickHandler handler);
         void RegisterHandler<T>(KeyCode key, string tag, IPickHandler<T> handler) where T : MonoBehaviour;
         void RegisterHandler<T>(KeyCode key, string tag, Action<T, RaycastHit> handler) where T : MonoBehaviour;
@@ -19,6 +23,10 @@ namespace Klaesh
     {
         private Dictionary<KeyCode, HandlerDict> _handlers;
 
+        public IDictionary<KeyCode, HandlerDict> Handlers => _handlers;
+
+        public bool Enabled { get; set; } = true;
+
         private void Awake()
         {
             _handlers = new Dictionary<KeyCode, HandlerDict>();
@@ -27,9 +35,12 @@ namespace Klaesh
 
         private void Update()
         {
+            if (!Enabled)
+                return;
             var pressedKeys = _handlers.Keys.Where(k => Input.GetKeyDown(k));
             if (pressedKeys.Count() > 0)
             {
+                // TODO: check that mousePosition is inside screen/limits!
                 var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
                 RaycastHit hit;
@@ -42,7 +53,10 @@ namespace Klaesh
                     {
                         if (dict.ContainsKey(tag))
                         {
-                            dict[tag].ForEach(h => h.OnPick(hit.transform.gameObject, hit));
+                            dict[tag].ForEach(h => {
+                                if (h.Enabled)
+                                    h.OnPick(hit.transform.gameObject, hit);
+                                });
                         }
                     }
                 }
@@ -65,6 +79,8 @@ namespace Klaesh
 
             var list = dict[tag];
             list.Add(handler);
+
+            handler.Enabled = true;
         }
 
         public void RegisterHandler<T>(KeyCode key, string tag, IPickHandler<T> handler)

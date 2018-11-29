@@ -31,6 +31,13 @@ namespace Klaesh.Debugging
             DontDestroyOnLoad(this);
 
             CreateViews();
+
+            _modes.ForEach(m => m.RegisterServices());
+        }
+
+        private void Start()
+        {
+            _modes.ForEach(m => m.Init());
         }
 
         private void Update()
@@ -92,6 +99,7 @@ namespace Klaesh.Debugging
         private void ToggleEnable()
         {
             _enabled = !_enabled;
+            _modes.ForEach(m => m.DebugViewToggled(_enabled));
         }
 
         private void CreateViews()

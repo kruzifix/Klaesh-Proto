@@ -9,12 +9,12 @@ namespace Klaesh.Debugging
         public override string Name => "HexMap";
         public override string Description => "Debug Methods for Map";
 
-        private IMessageBus _bus;
         private HexMap _currentMap;
 
-        public HexMapDebugMode()
+        public override void RegisterServices()
         {
-            _bus = ServiceLocator.Instance.GetService<IMessageBus>();
+            base.RegisterServices();
+
             _bus.Subscribe<HexMapInitializedMessage>(OnHexMapInitialized);
         }
 

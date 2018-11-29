@@ -5,52 +5,54 @@ using Klaesh.Core.Message;
 using Klaesh.Entity;
 using UnityEngine;
 
-public class Bootstrap : MonoBehaviour
+namespace Klaesh
 {
-    public static Bootstrap Instance { get; private set; }
-
-    private ServiceManager _serviceLocator;
-    private IMessageBus _eventBus;
-
-    private void Awake()
+    public class Bootstrap : MonoBehaviour
     {
-        if (Instance != null)
-            throw new Exception("multiple Bootstrap instances!");
-        Instance = this;
+        public static Bootstrap Instance { get; private set; }
 
-        Create();
-    }
+        private ServiceManager _serviceLocator;
+        private IMessageBus _eventBus;
 
-    private void Start()
-    {
-        Application.targetFrameRate = 60;
-
-        _eventBus = _serviceLocator.GetService<IMessageBus>();
-
-        DontDestroyOnLoad(gameObject);
-
-        _serviceLocator.GetService<IObjectPicker>().RegisterHandler<HexTile>(KeyCode.B, "HexTile", (tile, hit) =>
+        private void Awake()
         {
-            if (tile.HasEntityOnTop)
-                return;
+            if (Instance != null)
+                throw new Exception("multiple Bootstrap instances!");
+            Instance = this;
+            Create();
+        }
 
-            var em = _serviceLocator.GetService<EntityManager>();
-            var brute = em.CreateEntity("cube-brute");
-            brute.MoveTo(tile.coord);
-        });
-
-        _serviceLocator.GetService<IObjectPicker>().RegisterHandler<Entity>(KeyCode.Mouse0, "Entity", (e, hit) =>
+        private void Start()
         {
-            Debug.LogFormat("PICKED ENTITY at: {0}", e.Position);
-        });
-    }
+            Application.targetFrameRate = 60;
 
-    private void Create()
-    {
-        // load config
+            _eventBus = _serviceLocator.GetService<IMessageBus>();
 
-        _serviceLocator = new ServiceManager();
-        ServiceLocator.Instance = _serviceLocator;
-        _serviceLocator.RegisterSingleton<IMessageBus, MessageBus>(new MessageBus());
+            DontDestroyOnLoad(gameObject);
+
+            _serviceLocator.GetService<IObjectPicker>().RegisterHandler<HexTile>(KeyCode.B, "HexTile", (tile, hit) =>
+            {
+                if (tile.HasEntityOnTop)
+                    return;
+
+                var em = _serviceLocator.GetService<EntityManager>();
+                var brute = em.CreateEntity("cube-brute");
+                brute.MoveTo(tile.coord);
+            });
+
+            _serviceLocator.GetService<IObjectPicker>().RegisterHandler<GameEntity>(KeyCode.Mouse0, "Entity", (e, hit) =>
+            {
+                Debug.LogFormat("PICKED ENTITY at: {0}", e.Position);
+            });
+        }
+
+        private void Create()
+        {
+            // load config
+
+            _serviceLocator = new ServiceManager();
+            ServiceLocator.Instance = _serviceLocator;
+            _serviceLocator.RegisterSingleton<IMessageBus, MessageBus>(new MessageBus());
+        }
     }
 }

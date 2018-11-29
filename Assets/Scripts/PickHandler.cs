@@ -5,6 +5,8 @@ namespace Klaesh
 {
     public interface IPickHandler
     {
+        bool Enabled { get; set; }
+
         void OnPick(GameObject go, RaycastHit hit);
     }
 
@@ -18,6 +20,8 @@ namespace Klaesh
         where T : MonoBehaviour
     {
         private IPickHandler<T> _handler;
+
+        public bool Enabled { get; set; }
 
         public PickHandlerBridge(IPickHandler<T> handler)
         {
@@ -38,6 +42,8 @@ namespace Klaesh
         where T : MonoBehaviour
     {
         private Action<T, RaycastHit> _action;
+
+        public bool Enabled { get; set; }
 
         public PickHandlerAction(Action<T, RaycastHit> action)
         {
