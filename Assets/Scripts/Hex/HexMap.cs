@@ -30,6 +30,7 @@ public class HexMap : MonoBehaviour, IPickHandler<HexTile>
 
     private void Start()
     {
+        ClearMap();
         BuildMap();
 
         ServiceLocator.Instance.GetService<IObjectPicker>().RegisterHandler(KeyCode.Mouse0, "HexTile", this);
