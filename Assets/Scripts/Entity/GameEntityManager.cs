@@ -6,9 +6,9 @@ using UnityEngine;
 
 namespace Klaesh.Entity
 {
-    public class EntityManager : MonoBehaviour
+    public class GameEntityManager : MonoBehaviour
     {
-        public static EntityManager Instance { get; private set; }
+        public static GameEntityManager Instance { get; private set; }
 
         public GameObject entityPrefab;
 
@@ -17,7 +17,7 @@ namespace Klaesh.Entity
 
         private void Awake()
         {
-            ServiceLocator.Instance.RegisterSingleton<EntityManager, EntityManager>(this);
+            ServiceLocator.Instance.RegisterSingleton<GameEntityManager, GameEntityManager>(this);
         }
 
         private void Start()
@@ -28,7 +28,7 @@ namespace Klaesh.Entity
 
         private void OnDestroy()
         {
-            ServiceLocator.Instance.DeregisterSingleton<EntityManager>();
+            ServiceLocator.Instance.DeregisterSingleton<GameEntityManager>();
         }
 
         public GameEntity CreateEntity(string id)

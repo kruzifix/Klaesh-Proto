@@ -35,7 +35,7 @@ namespace Klaesh
                 if (tile.HasEntityOnTop)
                     return;
 
-                var em = _serviceLocator.GetService<EntityManager>();
+                var em = _serviceLocator.GetService<GameEntityManager>();
                 var brute = em.CreateEntity("cube-brute");
                 brute.MoveTo(tile.coord);
             });
