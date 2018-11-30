@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Klaesh.Core;
 using Klaesh.Core.Message;
+using Klaesh.Entity.Module;
 using UnityEngine;
 
 namespace Klaesh.Entity
@@ -56,6 +57,12 @@ namespace Klaesh.Entity
             var go = Instantiate(entityPrefab, transform);
             var entity = go.GetComponent<GameEntity>();
             entity.Initialize(_idCounter, desc);
+
+            // TODO: do this a more generic way. configurable from descriptor for example
+            entity.AddModule(new HexPosModule());
+            var meshMod = new MeshModule();
+            entity.AddModule(meshMod);
+            meshMod.CreateMesh();
 
             _entities.Add(entity);
 

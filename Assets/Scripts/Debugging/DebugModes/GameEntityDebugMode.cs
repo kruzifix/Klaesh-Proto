@@ -49,9 +49,10 @@ namespace Klaesh.Debugging
                 GUILayout.BeginVertical(DStyles.box);
 
                 GUILayout.Label($"Id: {ent.Id}", DStyles.miniBoldLabel);
-
                 GUILayout.Label($"Descriptor: {ent.Descriptor.name}", DStyles.miniLabel);
-                GUILayout.Label($"Position: {ent.Position}", DStyles.miniLabel);
+
+                // TODO: show all modules and properties
+                //GUILayout.Label($"Position: {ent.Position}", DStyles.miniLabel);
 
                 GUILayout.EndVertical();
             }

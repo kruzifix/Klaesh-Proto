@@ -4,6 +4,7 @@ using System.Linq;
 using Klaesh.Core;
 using Klaesh.Core.Message;
 using Klaesh.Entity;
+using Klaesh.Entity.Module;
 using Klaesh.Hex;
 using Klaesh.Utility;
 using UnityEngine;
@@ -26,10 +27,12 @@ namespace Klaesh.Game
         {
             _map = ServiceLocator.Instance.GetService<IHexMap>();
 
-            var tile = _map.GetTile(Entity.Position);
+            var entityPos = Entity.GetModule<HexPosModule>().Position;
+
+            var tile = _map.GetTile(entityPos);
             tile.SetColor(Colors.TileOrigin);
 
-            _reachableTiles = _map.GetReachableTiles(Entity.Position, Entity.Descriptor.maxDistance, Entity.Descriptor.jumpHeight);
+            _reachableTiles = _map.GetReachableTiles(entityPos, Entity.Descriptor.maxDistance, Entity.Descriptor.jumpHeight);
             foreach (var t in _reachableTiles)
             {
                 t.Item1.SetColor(t.Item1.HasEntityOnTop ? Colors.TileOccupied : Colors.TileDistances[t.Item2 - 1]);
@@ -47,7 +50,7 @@ namespace Klaesh.Game
         {
             if (_reachableTiles.Any(tup => tup.Item1 == tile))
             {
-                if (!Entity.TryMoveTo(tile.coord))
+                if (!Entity.GetModule<HexPosModule>().TryMoveTo(tile.coord))
                 {
                     Debug.LogFormat("[EntitySelected Input] unable to move there.");
                     return null;

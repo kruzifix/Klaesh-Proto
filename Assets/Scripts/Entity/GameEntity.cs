@@ -1,6 +1,7 @@
 ﻿using System;
-using Klaesh.Core;
-using Klaesh.Hex;
+using System.Collections.Generic;
+using System.Linq;
+using Klaesh.Entity.Module;
 using UnityEngine;
 
 namespace Klaesh.Entity
@@ -8,49 +9,23 @@ namespace Klaesh.Entity
     public interface IGameEntity
     {
         int Id { get; }
-        HexCubeCoord Position { get; }
         GameEntityDescriptor Descriptor { get; }
 
         void Initialize(int id, GameEntityDescriptor descriptor);
 
-        bool TryMoveTo(HexCubeCoord position);
+        void AddModule(object module);
+        IEnumerable<T> GetModules<T>();
+        T GetModule<T>();
     }
 
     public class GameEntity : MonoBehaviour, IGameEntity
     {
-        private GameObject _mesh;
+        private List<object> _modules;
 
         private bool _initialized = false;
-        private bool _firstMove = true;
 
         public int Id { get; private set; }
-        public HexCubeCoord Position { get; private set; }
         public GameEntityDescriptor Descriptor { get; private set; }
-
-        public bool TryMoveTo(HexCubeCoord position)
-        {
-            if (!_initialized)
-                throw new Exception("GameEntity needs to be initialized before moving");
-
-            var map = ServiceLocator.Instance.GetService<IHexMap>();
-            var tile = map.GetTile(position.ToOffset());
-
-            if (tile.HasEntityOnTop)
-                return false;
-
-            if (!_firstMove)
-            {
-                var oldTile = map.GetTile(Position.ToOffset());
-                oldTile.Entity = null;
-            }
-            _firstMove = false;
-
-            Position = position;
-            tile.Entity = this;
-            transform.position = tile.GetTop();
-
-            return true;
-        }
 
         public void Initialize(int id, GameEntityDescriptor descriptor)
         {
@@ -61,39 +36,26 @@ namespace Klaesh.Entity
             Id = id;
             Descriptor = descriptor;
 
-            CreateMesh();
+            _modules = new List<object>();
         }
 
-        private void CreateMesh()
+        public void AddModule(object module)
         {
-            if (_mesh != null)
-            {
-                Destroy(_mesh);
-
-                var oldColliders = GetComponents<Collider>();
-                foreach (var c in oldColliders)
-                    Destroy(c);
-            }
-
-            _mesh = Instantiate(Descriptor.meshPrefab, transform);
-            _mesh.transform.localPosition = Descriptor.meshOffset;
-
-            MoveBoxColliders(_mesh, gameObject);
+            if (_modules.Contains(module))
+                return;
+            if (module is IGameEntityModule)
+                (module as IGameEntityModule).Owner = this;
+            _modules.Add(module);
         }
 
-        private void MoveBoxColliders(GameObject original, GameObject destination)
+        public IEnumerable<T> GetModules<T>()
         {
-            var comps = original.GetComponents<BoxCollider>();
+            return _modules.OfType<T>();
+        }
 
-            foreach (var c in comps)
-            {
-                var newComp = destination.AddComponent<BoxCollider>();
-                newComp.center = c.center + Descriptor.meshOffset;
-                newComp.size = c.size;
-                newComp.material = c.material;
-                newComp.isTrigger = c.isTrigger;
-                Destroy(c);
-            }
+        public T GetModule<T>()
+        {
+            return _modules.OfType<T>().FirstOrDefault();
         }
 
         //public static void CopyAllComponents<T>(GameObject original, GameObject destination)
