@@ -15,5 +15,5 @@ MonoBehaviour:
   entityName: Round Brute
   meshPrefab: {fileID: 1826046235792634, guid: fbdd3c14ae7833445bbb795a488f47df, type: 2}
   meshOffset: {x: 0, y: 0, z: 0}
-  maxDistance: 2
-  jumpHeight: 1
+  maxDistance: 1
+  jumpHeight: 2
