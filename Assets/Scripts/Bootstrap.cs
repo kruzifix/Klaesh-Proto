@@ -59,20 +59,6 @@ namespace Klaesh
 
                 _eventBus.Publish(new FocusCameraMessage(this, map.GetTile(map.Columns / 2, map.Rows / 2).GetTop()));
             });
-            //_serviceLocator.GetService<IObjectPicker>().RegisterHandler<HexTile>(KeyCode.B, "HexTile", (tile, hit) =>
-            //{
-            //    if (tile.HasEntityOnTop)
-            //        return;
-
-            //    var em = _serviceLocator.GetService<GameEntityManager>();
-            //    var brute = em.CreateEntity("cube-brute");
-            //    brute.MoveTo(tile.coord);
-            //});
-
-            _serviceLocator.GetService<IObjectPicker>().RegisterHandler<GameEntity>(KeyCode.Mouse0, "Entity", (e, hit) =>
-            {
-                Debug.LogFormat("PICKED ENTITY at: {0}", e.Position);
-            });
         }
 
         private void Create()

@@ -14,11 +14,14 @@ namespace Klaesh.Hex
 
         HexTile GetTile(int col, int row);
         HexTile GetTile(HexOffsetCoord coord);
+        HexTile GetTile(HexCubeCoord cube);
         List<HexTile> GetNeighbors(HexCubeCoord origin);
         List<Tuple<HexTile, int>> GetReachableTiles(HexCubeCoord origin, int maxDistance, int maxHeightDifference);
+
+        void DeselectAllTiles();
     }
 
-    public class HexMap : MonoBehaviour, IHexMap, IPickHandler<HexTile>
+    public class HexMap : ManagerBehaviour, IHexMap//, IPickHandler<HexTile>
     {
         private const float Sqrt3 = 1.732f;
 
@@ -37,9 +40,9 @@ namespace Klaesh.Hex
 
         #region Mono-Events
 
-        private void Awake()
+        protected override void OnAwake()
         {
-            ServiceLocator.Instance.RegisterSingleton<IHexMap, HexMap>(this);
+            _locator.RegisterSingleton<IHexMap, HexMap>(this);
         }
 
         private void Start()
@@ -47,40 +50,39 @@ namespace Klaesh.Hex
             ClearMap();
             BuildMap();
 
-            ServiceLocator.Instance.GetService<IObjectPicker>().RegisterHandler(KeyCode.Mouse0, "HexTile", this);
-            ServiceLocator.Instance.GetService<IMessageBus>().Publish(new HexMapInitializedMessage(this, this));
+            //_locator.GetService<IObjectPicker>().RegisterHandler(KeyCode.Mouse0, "HexTile", this);
+            _bus.Publish(new HexMapInitializedMessage(this, this));
         }
 
         private void OnDestroy()
         {
-            ServiceLocator.Instance.DeregisterSingleton<IHexMap>();
+            _locator.DeregisterSingleton<IHexMap>();
         }
 
         #endregion
 
-        public void OnPick(HexTile comp, RaycastHit hit)
-        {
-            var _bus = ServiceLocator.Instance.GetService<IMessageBus>();
-            _bus.Publish(new FocusCameraMessage(this, comp.GetTop()));
+        //public void OnPick(HexTile comp, RaycastHit hit)
+        //{
+        //    _bus.Publish(new FocusCameraMessage(this, comp.GetTop()));
 
-            DeselectAll();
+        //    DeselectAll();
 
-            comp.SetColor(Color.red);
+        //    comp.SetColor(Color.red);
 
-            var colorStrings = new[] {
-            "#299AFF", "#5879BF", "#B6373F", "#E61600",
-        };
+        //    var colorStrings = new[] {
+        //    "#299AFF", "#5879BF", "#B6373F", "#E61600",
+        //};
 
-            var colors = new Color[colorStrings.Length];
-            for (int i = 0; i < colors.Length; i++)
-                ColorUtility.TryParseHtmlString(colorStrings[i], out colors[i]);
+        //    var colors = new Color[colorStrings.Length];
+        //    for (int i = 0; i < colors.Length; i++)
+        //        ColorUtility.TryParseHtmlString(colorStrings[i], out colors[i]);
 
-            int maxDist = 2;
-            foreach (var n in GetReachableTiles(comp.coord, maxDist, 1))
-            {
-                n.Item1.SetColor(colors[n.Item2 - 1]);
-            }
-        }
+        //    int maxDist = 2;
+        //    foreach (var n in GetReachableTiles(comp.coord, maxDist, 1))
+        //    {
+        //        n.Item1.SetColor(colors[n.Item2 - 1]);
+        //    }
+        //}
 
         public void BuildMap()
         {
@@ -134,6 +136,11 @@ namespace Klaesh.Hex
         public HexTile GetTile(HexOffsetCoord coord)
         {
             return GetTile(coord.col, coord.row);
+        }
+
+        public HexTile GetTile(HexCubeCoord cube)
+        {
+            return GetTile(cube.ToOffset());
         }
 
         public List<HexTile> GetNeighbors(HexCubeCoord origin)
@@ -201,7 +208,7 @@ namespace Klaesh.Hex
             return result;
         }
 
-        public void DeselectAll()
+        public void DeselectAllTiles()
         {
             for (int r = 0; r < mapRows; r++)
             {

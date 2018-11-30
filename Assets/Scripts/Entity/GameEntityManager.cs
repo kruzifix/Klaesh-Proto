@@ -16,10 +16,8 @@ namespace Klaesh.Entity
         IGameEntity GetEntity(int id);
     }
 
-    public class GameEntityManager : MonoBehaviour, IGameEntityManager
+    public class GameEntityManager : ManagerBehaviour, IGameEntityManager
     {
-        public static IGameEntityManager Instance { get; private set; }
-
         public GameObject entityPrefab;
 
         private int _idCounter = 0;
@@ -30,9 +28,9 @@ namespace Klaesh.Entity
         public IDictionary<string, GameEntityDescriptor> Descriptors => _descriptors;
         public IList<IGameEntity> Entities => _entities;
 
-        private void Awake()
+        protected override void OnAwake()
         {
-            ServiceLocator.Instance.RegisterSingleton<IGameEntityManager, GameEntityManager>(this);
+            _locator.RegisterSingleton<IGameEntityManager, GameEntityManager>(this);
         }
 
         private void Start()
@@ -40,12 +38,12 @@ namespace Klaesh.Entity
             _entities = new List<IGameEntity>();
             _descriptors = Resources.LoadAll<GameEntityDescriptor>("Entities").ToDictionary(d => d.entityId);
 
-            ServiceLocator.Instance.GetService<IMessageBus>().Publish(new GameEntityDescriptorsLoadedMessage(this));
+            _bus.Publish(new GameEntityDescriptorsLoadedMessage(this));
         }
 
         private void OnDestroy()
         {
-            ServiceLocator.Instance.DeregisterSingleton<IGameEntityManager>();
+            _locator.DeregisterSingleton<IGameEntityManager>();
         }
 
         public IGameEntity CreateEntity(string id)

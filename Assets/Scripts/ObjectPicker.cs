@@ -19,7 +19,7 @@ namespace Klaesh
         void RegisterHandler<T>(KeyCode key, string tag, Action<T, RaycastHit> handler) where T : MonoBehaviour;
     }
 
-    public class ObjectPicker : MonoBehaviour, IObjectPicker
+    public class ObjectPicker : ManagerBehaviour, IObjectPicker
     {
         private Dictionary<KeyCode, HandlerDict> _handlers;
 
@@ -27,10 +27,10 @@ namespace Klaesh
 
         public bool Enabled { get; set; } = true;
 
-        private void Awake()
+        protected override void OnAwake()
         {
             _handlers = new Dictionary<KeyCode, HandlerDict>();
-            ServiceLocator.Instance.RegisterSingleton<IObjectPicker, ObjectPicker>(this);
+            _locator.RegisterSingleton<IObjectPicker, ObjectPicker>(this);
         }
 
         private void Update()
@@ -65,7 +65,7 @@ namespace Klaesh
 
         private void OnDestroy()
         {
-            ServiceLocator.Instance.DeregisterSingleton<IObjectPicker>();
+            _locator.DeregisterSingleton<IObjectPicker>();
         }
 
         public void RegisterHandler(KeyCode key, string tag, IPickHandler handler)
