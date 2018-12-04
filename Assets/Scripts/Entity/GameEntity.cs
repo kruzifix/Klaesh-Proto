@@ -10,6 +10,7 @@ namespace Klaesh.Entity
     {
         int Id { get; }
         GameEntityDescriptor Descriptor { get; }
+        Vector3 Position { get; }
 
         void Initialize(int id, GameEntityDescriptor descriptor);
 
@@ -26,6 +27,7 @@ namespace Klaesh.Entity
 
         public int Id { get; private set; }
         public GameEntityDescriptor Descriptor { get; private set; }
+        public Vector3 Position => transform.position;
 
         public void Initialize(int id, GameEntityDescriptor descriptor)
         {

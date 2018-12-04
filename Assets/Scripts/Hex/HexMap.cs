@@ -7,10 +7,22 @@ using UnityEngine;
 
 namespace Klaesh.Hex
 {
+    [Serializable]
+    public class HexMapGenParams
+    {
+        public int noiseOffset;
+        public float noiseScale;
+        public float heightScale;
+    }
+
     public interface IHexMap
     {
-        int Columns { get; }
-        int Rows { get; }
+        int Columns { get; set; }
+        int Rows { get; set; }
+
+        HexMapGenParams GenParams { get; }
+
+        void BuildMap();
 
         HexTile GetTile(int col, int row);
         HexTile GetTile(IHexCoord coord);
@@ -29,11 +41,24 @@ namespace Klaesh.Hex
         public int mapRows = 4;
         public GameObject cellPrefab;
 
+        public HexMapGenParams genParams;
+
         public float CellWidth => cellSize * 2f;
         public float CellHeight => cellSize * Sqrt3;
 
-        public int Columns => mapColumns;
-        public int Rows => mapRows;
+        public int Columns
+        {
+            get { return mapColumns; }
+            set { mapColumns = value; }
+        }
+
+        public int Rows
+        {
+            get { return mapRows; }
+            set { mapRows = value; }
+        }
+
+        public HexMapGenParams GenParams => genParams;
 
         private HexTile[,] _tiles;
 
@@ -47,10 +72,6 @@ namespace Klaesh.Hex
         private void Start()
         {
             ClearMap();
-            BuildMap();
-
-            //_locator.GetService<IObjectPicker>().RegisterHandler(KeyCode.Mouse0, "HexTile", this);
-            _bus.Publish(new HexMapInitializedMessage(this, this));
         }
 
         private void OnDestroy()
@@ -62,8 +83,8 @@ namespace Klaesh.Hex
 
         public void BuildMap()
         {
-            if (_tiles != null)
-                ClearMap();
+            ClearMap();
+
             _tiles = new HexTile[mapRows, mapColumns];
 
             for (int r = 0; r < mapRows; r++)
@@ -74,13 +95,12 @@ namespace Klaesh.Hex
                     var go = (GameObject)PrefabUtility.InstantiatePrefab(cellPrefab);
                     go.transform.SetParent(transform);
 #else
-                var go = Instantiate(cellPrefab, transform);
+                    var go = Instantiate(cellPrefab, transform);
 #endif
 
                     var tile = go.GetComponent<HexTile>();
-                    float noiseScale = 0.5f;
-                    float height = Mathf.PerlinNoise(c * noiseScale, r * noiseScale);
-                    tile.Height = Mathf.CeilToInt(height * 8f);
+                    float height = Mathf.PerlinNoise(genParams.noiseOffset + c * genParams.noiseScale, genParams.noiseOffset + r * genParams.noiseScale);
+                    tile.Height = Mathf.CeilToInt(height * genParams.heightScale);
                     tile.Position = new HexOffsetCoord(c, r).CubeCoord;
                     tile.Refresh();
 
@@ -92,6 +112,8 @@ namespace Klaesh.Hex
                     _tiles[r, c] = tile;
                 }
             }
+
+            _bus.Publish(new HexMapInitializedMessage(this, this));
         }
 
         public void ClearMap()

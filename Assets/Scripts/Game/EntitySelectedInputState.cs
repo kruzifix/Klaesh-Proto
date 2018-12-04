@@ -27,12 +27,13 @@ namespace Klaesh.Game
         {
             _map = ServiceLocator.Instance.GetService<IHexMap>();
 
-            var entityPos = Entity.GetModule<HexPosModule>().Position;
+            var hexMod = Entity.GetModule<HexPosModule>();
+            var moveMod = Entity.GetModule<MovementModule>();
 
-            var tile = _map.GetTile(entityPos);
+            var tile = _map.GetTile(hexMod.Position);
             tile.SetColor(Colors.TileOrigin);
 
-            _reachableTiles = _map.GetReachableTiles(entityPos, Entity.Descriptor.maxDistance, Entity.Descriptor.jumpHeight);
+            _reachableTiles = _map.GetReachableTiles(hexMod.Position, moveMod.MovementLeft, Entity.Descriptor.jumpHeight);
             foreach (var t in _reachableTiles)
             {
                 t.Item1.SetColor(t.Item1.HasEntityOnTop ? Colors.TileOccupied : Colors.TileDistances[t.Item2 - 1]);
@@ -50,7 +51,7 @@ namespace Klaesh.Game
         {
             if (_reachableTiles.Any(tup => tup.Item1 == tile))
             {
-                if (!Entity.GetModule<HexPosModule>().TryMoveTo(tile.Position))
+                if (!Entity.GetModule<MovementModule>().TryMoveTo(tile.Position))
                 {
                     Debug.LogFormat("[EntitySelected Input] unable to move there.");
                     return null;
@@ -59,7 +60,9 @@ namespace Klaesh.Game
                 return new IdleInputState();
             }
             Debug.LogFormat("[EntitySelected Input] can't move there. out of range");
-            return null;
+
+            ServiceLocator.Instance.GetService<IMessageBus>().Publish(new FocusCameraMessage(this, tile.GetTop()));
+            return new IdleInputState();
         }
 
         public override IInputState OnPickGameEntity(GameEntity entity, RaycastHit hit)

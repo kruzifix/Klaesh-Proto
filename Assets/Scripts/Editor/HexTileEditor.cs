@@ -10,9 +10,8 @@ public class HexTileEditor : Editor
 
         var tile = (HexTile)target;
 
-        EditorGUILayout.LabelField("height:", tile.height.ToString());
-        EditorGUILayout.LabelField("Cube Coords (x, y, z):", tile.coord.ToString());
-        //EditorGUILayout.LabelField("Axial Coords (q, r):", tile.coord.ToAxial().ToString());
-        EditorGUILayout.LabelField("Offset Coords (col, row):", tile.coord.ToOffset().ToString());
+        EditorGUILayout.LabelField("height:", tile.Height.ToString());
+        EditorGUILayout.LabelField("Cube Coords (x, y, z):", tile.Position.ToString());
+        EditorGUILayout.LabelField("Offset Coords (col, row):", tile.Position.OffsetCoord.ToString());
     }
 }

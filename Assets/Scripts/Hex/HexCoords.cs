@@ -131,6 +131,11 @@ namespace Klaesh.Hex
             return new HexCubeCoord(a.x + b.x, a.y + b.y, a.z + b.z);
         }
 
+        public static HexCubeCoord operator *(HexCubeCoord a, int b)
+        {
+            return new HexCubeCoord(a.x * b, a.y * b, a.z * b);
+        }
+
         public static bool operator ==(HexCubeCoord a, HexCubeCoord b)
         {
             return a.x == b.x && a.y == b.y && a.z == b.z;
@@ -156,6 +161,11 @@ namespace Klaesh.Hex
             new HexCubeCoord(0, -1, 1),
             new HexCubeCoord(-1, 0, 1)
         };
+
+        public static HexCubeCoord Offset(HexDirection dir, int dist)
+        {
+            return Offsets[(int)dir] * dist;
+        }
     }
 
     // https://www.redblobgames.com/grids/hexagons/#conversions

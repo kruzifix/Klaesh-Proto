@@ -64,6 +64,9 @@ namespace Klaesh.Entity
             entity.AddModule(meshMod);
             meshMod.CreateMesh();
 
+            // TODO: do this a more generic way. configurable from descriptor for example
+            entity.AddModule(new MovementModule());
+
             _entities.Add(entity);
 
             _idCounter++;
