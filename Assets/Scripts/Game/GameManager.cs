@@ -1,8 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using Klaesh.Core;
-using Klaesh.Entity;
-using Klaesh.Entity.Module;
+using Klaesh.GameEntity;
+using Klaesh.GameEntity.Module;
 using Klaesh.Game.Config;
 using Klaesh.Hex;
 using UnityEngine;
@@ -21,7 +21,7 @@ namespace Klaesh.Game
         bool IsPartOfActiveSquad(IGameEntity entity);
     }
 
-    public class GameManager : ManagerBehaviour, IGameManager, IPickHandler<GameEntity>, IPickHandler<HexTile>
+    public class GameManager : ManagerBehaviour, IGameManager, IPickHandler<GameEntity.GameEntity>, IPickHandler<HexTile>
     {
         private IGameEntityManager _gem;
         private IHexMap _map;
@@ -47,7 +47,7 @@ namespace Klaesh.Game
             _currentState = new IdleInputState();
 
             var picker = _locator.GetService<IObjectPicker>();
-            picker.RegisterHandler<GameEntity>(KeyCode.Mouse0, "Entity", this);
+            picker.RegisterHandler<GameEntity.GameEntity>(KeyCode.Mouse0, "Entity", this);
             picker.RegisterHandler<HexTile>(KeyCode.Mouse0, "HexTile", this);
 
             // TODO: Deregister Handler!!!
@@ -113,7 +113,7 @@ namespace Klaesh.Game
             SwitchTo(_currentState.OnPickHexTile(comp, hit));
         }
 
-        public void OnPick(GameEntity comp, RaycastHit hit)
+        public void OnPick(GameEntity.GameEntity comp, RaycastHit hit)
         {
             SwitchTo(_currentState.OnPickGameEntity(comp, hit));
         }

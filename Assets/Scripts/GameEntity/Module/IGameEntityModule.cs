@@ -1,5 +1,5 @@
 ﻿
-namespace Klaesh.Entity.Module
+namespace Klaesh.GameEntity.Module
 {
     public interface IGameEntityModule
     {

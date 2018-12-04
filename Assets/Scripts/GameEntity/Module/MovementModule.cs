@@ -2,13 +2,24 @@
 using Klaesh.Core;
 using Klaesh.Hex;
 
-namespace Klaesh.Entity.Module
+namespace Klaesh.GameEntity.Module
 {
     public class MovementModule : IGameEntityModule
     {
         public IGameEntity Owner { get; set; }
 
+        public int MaxDistance { get; }
+        public int JumpHeight { get; }
+
         public int MovementLeft { get; private set; }
+
+        public MovementModule(int maxDist, int jumpHeight)
+        {
+            MaxDistance = maxDist;
+            JumpHeight = jumpHeight;
+
+            MovementLeft = 0;
+        }
 
         public void Init()
         {
@@ -17,7 +28,7 @@ namespace Klaesh.Entity.Module
 
         public void Reset()
         {
-            MovementLeft = Owner.Descriptor.maxDistance;
+            MovementLeft = MaxDistance;
         }
 
         public bool TryMoveTo(IHexCoord position)
@@ -28,7 +39,7 @@ namespace Klaesh.Entity.Module
             var hexMod = Owner.GetModule<HexPosModule>();
 
             var map = ServiceLocator.Instance.GetService<IHexMap>();
-            var reachable = map.GetReachableTiles(hexMod.Position, MovementLeft, Owner.Descriptor.jumpHeight);
+            var reachable = map.GetReachableTiles(hexMod.Position, MovementLeft, JumpHeight);
 
             var tile = reachable.Where(t => t.Item1.Position == position.CubeCoord).FirstOrDefault();
             if (tile == null)

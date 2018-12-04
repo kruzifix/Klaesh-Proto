@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Klaesh.Entity;
+﻿using Klaesh.GameEntity;
 using UnityEngine;
 
 namespace Klaesh.Debugging
@@ -29,16 +27,16 @@ namespace Klaesh.Debugging
 
                 GUILayout.Label($"Name: {desc.Value.name}", DStyles.miniBoldLabel);
 
-                GUILayout.Label($"Entity Id: {desc.Value.entityId}", DStyles.miniLabel);
-                GUILayout.Label($"Entity Name: {desc.Value.entityName}", DStyles.miniLabel);
-                GUILayout.Space(5f);
+                //GUILayout.Label($"Entity Id: {desc.Value.entityId}", DStyles.miniLabel);
+                //GUILayout.Label($"Entity Name: {desc.Value.entityName}", DStyles.miniLabel);
+                //GUILayout.Space(5f);
 
-                GUILayout.Label($"Mesh Prefab: {desc.Value.meshPrefab.name}", DStyles.miniLabel);
-                GUILayout.Label($"Mesh Offset: {desc.Value.meshOffset}", DStyles.miniLabel);
-                GUILayout.Space(5f);
+                //GUILayout.Label($"Mesh Prefab: {desc.Value.meshPrefab.name}", DStyles.miniLabel);
+                //GUILayout.Label($"Mesh Offset: {desc.Value.meshOffset}", DStyles.miniLabel);
+                //GUILayout.Space(5f);
 
-                GUILayout.Label($"Max Distance: {desc.Value.maxDistance}", DStyles.miniLabel);
-                GUILayout.Label($"Jump Height: {desc.Value.jumpHeight}", DStyles.miniLabel);
+                //GUILayout.Label($"Max Distance: {desc.Value.maxDistance}", DStyles.miniLabel);
+                //GUILayout.Label($"Jump Height: {desc.Value.jumpHeight}", DStyles.miniLabel);
 
                 GUILayout.EndVertical();
             }

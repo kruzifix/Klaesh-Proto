@@ -1,7 +1,7 @@
 ﻿using Klaesh.Core;
 using Klaesh.Hex;
 
-namespace Klaesh.Entity.Module
+namespace Klaesh.GameEntity.Module
 {
     public class HexPosModule : IGameEntityModule
     {

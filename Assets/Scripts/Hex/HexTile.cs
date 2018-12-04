@@ -1,4 +1,4 @@
-﻿using Klaesh.Entity;
+﻿using Klaesh.GameEntity;
 using UnityEngine;
 
 namespace Klaesh.Hex

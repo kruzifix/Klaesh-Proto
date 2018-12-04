@@ -1,7 +1,8 @@
-﻿using Klaesh.Core;
+﻿using System.Linq;
+using Klaesh.Core;
 using Klaesh.Core.Message;
-using Klaesh.Entity;
-using Klaesh.Entity.Module;
+using Klaesh.GameEntity;
+using Klaesh.GameEntity.Module;
 using Klaesh.Hex;
 using UnityEngine;
 
@@ -20,6 +21,23 @@ namespace Klaesh.Game
             foreach (var unit in gm.ActiveSquad.Members)
             {
                 map.GetTile(unit.GetModule<HexPosModule>().Position).SetColor(gm.ActiveSquad.Config.Color);
+
+                foreach (var mod in unit.GetModules<MeshModule>().Where(m => m.Name == "WobblyCircle"))
+                {
+                    mod.Enabled = true;
+                }
+            }
+        }
+
+        public override void OnDisabled()
+        {
+            var gm = ServiceLocator.Instance.GetService<IGameManager>();
+            foreach (var unit in gm.ActiveSquad.Members)
+            {
+                foreach (var mod in unit.GetModules<MeshModule>().Where(m => m.Name == "WobblyCircle"))
+                {
+                    mod.Enabled = false;
+                }
             }
         }
 

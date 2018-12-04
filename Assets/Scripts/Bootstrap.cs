@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using Klaesh;
 using Klaesh.Core;
 using Klaesh.Core.Message;
-using Klaesh.Entity;
-using Klaesh.Entity.Module;
 using Klaesh.Game;
 using Klaesh.Game.Config;
 using Klaesh.Hex;
 using Klaesh.Utility;
 using UnityEngine;
+using Klaesh.GameEntity.Descriptor;
 
 namespace Klaesh
 {

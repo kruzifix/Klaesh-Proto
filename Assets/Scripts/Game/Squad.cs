@@ -1,8 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using Klaesh.Entity;
-using Klaesh.Entity.Module;
+using Klaesh.GameEntity.Module;
 using Klaesh.Game.Config;
+using Klaesh.GameEntity;
 using Klaesh.Hex;
 using UnityEngine;
 
@@ -37,12 +37,9 @@ namespace Klaesh.Game
 
             foreach (var unit in Config.Units)
             {
-                var ent = gem.CreateEntity(unit.EntityId);
-                ent.AddModule(this);
+                var ent = gem.CreateEntity(unit.EntityId, e => e.AddModule(this));
 
-                ent.InitModules();
-
-                ent.GetModule<HexPosModule>().TryMoveTo(Config.Origin.CubeCoord + unit.Position.CubeCoord);
+                ent.GetModule<HexPosModule>()?.TryMoveTo(Config.Origin.CubeCoord + unit.Position.CubeCoord);
 
                 Members.Add(ent);
             }

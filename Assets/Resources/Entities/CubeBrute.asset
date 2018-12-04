@@ -11,9 +11,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33c2b68e6b3c2f448b99e84359a32735, type: 3}
   m_Name: CubeBrute
   m_EditorClassIdentifier: 
-  entityId: cube-brute
-  entityName: Cube Brute
-  meshPrefab: {fileID: 1796190109976170, guid: 1b0af73ef35b50641b1f3849193f716a, type: 2}
-  meshOffset: {x: 0, y: 0, z: 0}
-  maxDistance: 2
-  jumpHeight: 1
+  type: cube-brute
+  modules:
+  - {fileID: 11400000, guid: b078b353134f824439c54121e6fad758, type: 2}
+  - {fileID: 11400000, guid: aa141f4bbdfbea843b94c89667225c2b, type: 2}
+  - {fileID: 11400000, guid: c99153f296fb7f34ab838700deddeaaa, type: 2}

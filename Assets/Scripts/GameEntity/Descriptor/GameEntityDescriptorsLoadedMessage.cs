@@ -1,6 +1,6 @@
 ﻿using Klaesh.Core.Message;
 
-namespace Klaesh.Entity
+namespace Klaesh.GameEntity.Descriptor
 {
     public class GameEntityDescriptorsLoadedMessage : MessageBase
     {

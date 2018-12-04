@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Klaesh.Entity.Module;
+using Klaesh.GameEntity.Module;
+using Klaesh.GameEntity.Descriptor;
 using UnityEngine;
 
-namespace Klaesh.Entity
+namespace Klaesh.GameEntity
 {
     public interface IGameEntity
     {

@@ -11,9 +11,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33c2b68e6b3c2f448b99e84359a32735, type: 3}
   m_Name: RoundBrute
   m_EditorClassIdentifier: 
-  entityId: round-brute
-  entityName: Round Brute
-  meshPrefab: {fileID: 1826046235792634, guid: fbdd3c14ae7833445bbb795a488f47df, type: 2}
-  meshOffset: {x: 0, y: 0, z: 0}
-  maxDistance: 1
-  jumpHeight: 2
+  type: round-brute
+  modules:
+  - {fileID: 11400000, guid: eaff1a032c510a64b81eeabfa240e59e, type: 2}
+  - {fileID: 11400000, guid: 7129361c8a580f247ba99318cfff903e, type: 2}
+  - {fileID: 11400000, guid: c99153f296fb7f34ab838700deddeaaa, type: 2}

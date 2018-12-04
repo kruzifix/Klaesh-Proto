@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Klaesh.Core;
 using Klaesh.Core.Message;
-using Klaesh.Entity;
-using Klaesh.Entity.Module;
+using Klaesh.GameEntity;
+using Klaesh.GameEntity.Module;
 using Klaesh.Hex;
 using Klaesh.Utility;
 using UnityEngine;
@@ -35,7 +35,7 @@ namespace Klaesh.Game
             var tile = _map.GetTile(hexMod.Position);
             tile.SetColor(Colors.TileOrigin);
 
-            _reachableTiles = _map.GetReachableTiles(hexMod.Position, moveMod.MovementLeft, Entity.Descriptor.jumpHeight);
+            _reachableTiles = _map.GetReachableTiles(hexMod.Position, moveMod.MovementLeft, moveMod.JumpHeight);
             foreach (var t in _reachableTiles)
             {
                 t.Item1.SetColor(t.Item1.HasEntityOnTop ? Colors.TileOccupied : Colors.TileDistances[t.Item2 - 1]);
