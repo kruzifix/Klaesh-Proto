@@ -14,13 +14,21 @@ namespace Klaesh.Hex
         SouthWest
     }
 
-    [Serializable]
-    public struct HexOffsetCoord
+    public interface IHexCoord
+    {
+        HexCubeCoord CubeCoord { get; }
+        HexOffsetCoord OffsetCoord { get; }
+    }
+
+    public struct HexOffsetCoord : IHexCoord
     {
         // horizontal (Unity X axis)
-        public int col;
+        public int col { get; }
         // vertical (Unity Z axis)
-        public int row;
+        public int row { get; }
+
+        public HexCubeCoord CubeCoord => ToCube();
+        public HexOffsetCoord OffsetCoord => this;
 
         public HexOffsetCoord(int col, int row)
         {
@@ -33,7 +41,7 @@ namespace Klaesh.Hex
             return string.Format("({0}, {1})", col, row);
         }
 
-        public HexCubeCoord ToCube()
+        private HexCubeCoord ToCube()
         {
             //var x = hex.col - (hex.row - (hex.row & 1)) / 2
             //var z = hex.row
@@ -44,41 +52,44 @@ namespace Klaesh.Hex
             return new HexCubeCoord(x, y, z);
         }
 
-        public HexAxialCoord ToAxial()
-        {
-            int x = col - (row - (row & 1)) / 2;
-            int z = row;
-            return new HexAxialCoord(x, z);
-        }
+        //public HexAxialCoord ToAxial()
+        //{
+        //    int x = col - (row - (row & 1)) / 2;
+        //    int z = row;
+        //    return new HexAxialCoord(x, z);
+        //}
     }
 
-    public struct HexAxialCoord
-    {
-        // skewed vertical
-        public int q;
-        // horizontal (Unity X axis)
-        public int r;
+    //public struct HexAxialCoord
+    //{
+    //    // skewed vertical
+    //    public int q;
+    //    // horizontal (Unity X axis)
+    //    public int r;
 
-        public HexAxialCoord(int q, int r)
-        {
-            this.q = q;
-            this.r = r;
-        }
+    //    public HexAxialCoord(int q, int r)
+    //    {
+    //        this.q = q;
+    //        this.r = r;
+    //    }
 
-        public override string ToString()
-        {
-            return string.Format("({0}, {1})", q, r);
-        }
-    }
+    //    public override string ToString()
+    //    {
+    //        return string.Format("({0}, {1})", q, r);
+    //    }
+    //}
 
-    public struct HexCubeCoord
+    public struct HexCubeCoord : IHexCoord
     {
         // skewed vertical (to the left)
-        public int x;
+        public int x { get; }
         // skewed vertical (to the right)
-        public int y;
+        public int y { get; }
         // horizontal (Unity X axis)
-        public int z;
+        public int z { get; }
+
+        public HexCubeCoord CubeCoord => this;
+        public HexOffsetCoord OffsetCoord => ToOffset();
 
         public HexCubeCoord(int x, int y, int z)
         {
@@ -92,7 +103,7 @@ namespace Klaesh.Hex
             return string.Format("({0}, {1}, {2})", x, y, z);
         }
 
-        public HexOffsetCoord ToOffset()
+        private HexOffsetCoord ToOffset()
         {
             int col = x + (z - (z & 1)) / 2;
             int row = z;

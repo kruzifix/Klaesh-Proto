@@ -16,7 +16,7 @@ namespace Klaesh.Entity.Module
             Position = new HexCubeCoord();
         }
 
-        public bool TryMoveTo(HexCubeCoord position)
+        public bool TryMoveTo(IHexCoord position)
         {
             var map = ServiceLocator.Instance.GetService<IHexMap>();
             var tile = map.GetTile(position);
@@ -26,12 +26,12 @@ namespace Klaesh.Entity.Module
 
             if (!_firstMove)
             {
-                var oldTile = map.GetTile(Position.ToOffset());
+                var oldTile = map.GetTile(Position);
                 oldTile.Entity = null;
             }
             _firstMove = false;
 
-            Position = position;
+            Position = position.CubeCoord;
             tile.Entity = Owner;
             (Owner as GameEntity).transform.position = tile.GetTop();
 

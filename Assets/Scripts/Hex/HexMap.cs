@@ -13,15 +13,14 @@ namespace Klaesh.Hex
         int Rows { get; }
 
         HexTile GetTile(int col, int row);
-        HexTile GetTile(HexOffsetCoord coord);
-        HexTile GetTile(HexCubeCoord cube);
-        List<HexTile> GetNeighbors(HexCubeCoord origin);
-        List<Tuple<HexTile, int>> GetReachableTiles(HexCubeCoord origin, int maxDistance, int maxHeightDifference);
+        HexTile GetTile(IHexCoord coord);
+        List<HexTile> GetNeighbors(IHexCoord origin);
+        List<Tuple<HexTile, int>> GetReachableTiles(IHexCoord origin, int maxDistance, int maxHeightDifference);
 
         void DeselectAllTiles();
     }
 
-    public class HexMap : ManagerBehaviour, IHexMap//, IPickHandler<HexTile>
+    public class HexMap : ManagerBehaviour, IHexMap
     {
         private const float Sqrt3 = 1.732f;
 
@@ -61,29 +60,6 @@ namespace Klaesh.Hex
 
         #endregion
 
-        //public void OnPick(HexTile comp, RaycastHit hit)
-        //{
-        //    _bus.Publish(new FocusCameraMessage(this, comp.GetTop()));
-
-        //    DeselectAll();
-
-        //    comp.SetColor(Color.red);
-
-        //    var colorStrings = new[] {
-        //    "#299AFF", "#5879BF", "#B6373F", "#E61600",
-        //};
-
-        //    var colors = new Color[colorStrings.Length];
-        //    for (int i = 0; i < colors.Length; i++)
-        //        ColorUtility.TryParseHtmlString(colorStrings[i], out colors[i]);
-
-        //    int maxDist = 2;
-        //    foreach (var n in GetReachableTiles(comp.coord, maxDist, 1))
-        //    {
-        //        n.Item1.SetColor(colors[n.Item2 - 1]);
-        //    }
-        //}
-
         public void BuildMap()
         {
             if (_tiles != null)
@@ -104,14 +80,14 @@ namespace Klaesh.Hex
                     var tile = go.GetComponent<HexTile>();
                     float noiseScale = 0.5f;
                     float height = Mathf.PerlinNoise(c * noiseScale, r * noiseScale);
-                    tile.height = Mathf.CeilToInt(height * 8f);
-                    tile.coord = new HexOffsetCoord(c, r).ToCube();
+                    tile.Height = Mathf.CeilToInt(height * 8f);
+                    tile.Position = new HexOffsetCoord(c, r).CubeCoord;
                     tile.Refresh();
 
                     float offset = (r % 2) * CellWidth * 0.5f;
                     go.transform.position = new Vector3(c * CellWidth + offset, 0f, r * CellHeight);
 
-                    go.name = string.Format("Cell {0}", tile.coord);
+                    go.name = string.Format("Cell {0}", tile.Position);
 
                     _tiles[r, c] = tile;
                 }
@@ -133,23 +109,21 @@ namespace Klaesh.Hex
             return _tiles[row, col];
         }
 
-        public HexTile GetTile(HexOffsetCoord coord)
+        public HexTile GetTile(IHexCoord coord)
         {
-            return GetTile(coord.col, coord.row);
+            var offset = coord.OffsetCoord;
+            return GetTile(offset.col, offset.row);
         }
 
-        public HexTile GetTile(HexCubeCoord cube)
-        {
-            return GetTile(cube.ToOffset());
-        }
-
-        public List<HexTile> GetNeighbors(HexCubeCoord origin)
+        public List<HexTile> GetNeighbors(IHexCoord origin)
         {
             var tiles = new List<HexTile>();
 
+            var center = origin.CubeCoord;
+
             foreach (var offset in HexCubeCoord.Offsets)
             {
-                var c = (origin + offset).ToOffset();
+                var c = (center + offset);
                 var tile = GetTile(c);
                 if (tile != null)
                     tiles.Add(tile);
@@ -157,19 +131,19 @@ namespace Klaesh.Hex
             return tiles;
         }
 
-        public List<Tuple<HexTile, int>> GetReachableTiles(HexCubeCoord origin, int maxDistance, int maxHeightDifference)
+        public List<Tuple<HexTile, int>> GetReachableTiles(IHexCoord origin, int maxDistance, int maxHeightDifference)
         {
             var result = new List<Tuple<HexTile, int>>();
             var queue = new Queue<HexCubeCoord>();
-            queue.Enqueue(origin);
+            queue.Enqueue(origin.CubeCoord);
 
             var lookedAt = new Dictionary<HexCubeCoord, int>();
-            lookedAt.Add(origin, 0);
+            lookedAt.Add(origin.CubeCoord, 0);
 
             while (queue.Count > 0)
             {
                 var current = queue.Dequeue();
-                var tile = GetTile(current.ToOffset());
+                var tile = GetTile(current);
                 if (tile == null)
                     continue;
                 int distFromOrigin = lookedAt[current];
@@ -184,24 +158,24 @@ namespace Klaesh.Hex
                 var neighbors = GetNeighbors(current);
                 foreach (var n in neighbors)
                 {
-                    int heightDiff = Mathf.Abs(n.height - tile.height);
+                    int heightDiff = Mathf.Abs(n.Height - tile.Height);
                     if (heightDiff > maxHeightDifference)
                         continue;
 
-                    if (lookedAt.ContainsKey(n.coord))
+                    if (lookedAt.ContainsKey(n.Position))
                     {
-                        int previousDist = lookedAt[n.coord];
+                        int previousDist = lookedAt[n.Position];
                         if (previousDist <= distFromOrigin)
                             continue;
 
-                        lookedAt[n.coord] = distFromOrigin;
+                        lookedAt[n.Position] = distFromOrigin;
                     }
                     else
                     {
-                        lookedAt.Add(n.coord, distFromOrigin);
+                        lookedAt.Add(n.Position, distFromOrigin);
                     }
 
-                    queue.Enqueue(n.coord);
+                    queue.Enqueue(n.Position);
                 }
             }
 

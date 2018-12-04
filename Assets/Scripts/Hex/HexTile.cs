@@ -9,10 +9,8 @@ namespace Klaesh.Hex
 
         public GameObject model;
 
-        [HideInInspector]
-        public int height;
-        [HideInInspector]
-        public HexCubeCoord coord;
+        public int Height { get; set; }
+        public HexCubeCoord Position { get; set; }
 
         private MeshRenderer _renderer;
 
@@ -27,7 +25,7 @@ namespace Klaesh.Hex
         public void Refresh()
         {
             var scale = transform.localScale;
-            scale.y = height * heightScale;
+            scale.y = Height * heightScale;
             transform.localScale = scale;
         }
 
@@ -38,7 +36,7 @@ namespace Klaesh.Hex
 
         public Vector3 GetTop()
         {
-            return model.transform.position + new Vector3(0, height * heightScale, 0);
+            return model.transform.position + new Vector3(0, Height * heightScale, 0);
         }
     }
 }

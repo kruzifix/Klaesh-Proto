@@ -50,7 +50,7 @@ namespace Klaesh.Game
         {
             if (_reachableTiles.Any(tup => tup.Item1 == tile))
             {
-                if (!Entity.GetModule<HexPosModule>().TryMoveTo(tile.coord))
+                if (!Entity.GetModule<HexPosModule>().TryMoveTo(tile.Position))
                 {
                     Debug.LogFormat("[EntitySelected Input] unable to move there.");
                     return null;
