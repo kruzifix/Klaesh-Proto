@@ -17,6 +17,8 @@ namespace Klaesh.Game
 
         void StartNextTurn();
         void EndTurn();
+
+        bool IsPartOfActiveSquad(IGameEntity entity);
     }
 
     public class GameManager : ManagerBehaviour, IGameManager, IPickHandler<GameEntity>, IPickHandler<HexTile>
@@ -88,12 +90,22 @@ namespace Klaesh.Game
 
             ActiveSquad.Members.ForEach(ge => ge.GetModule<MovementModule>().Reset());
 
+            SwitchTo(new IdleInputState());
+
             _bus.Publish(new FocusCameraMessage(this, ActiveSquad.Members[0].Position));
         }
 
         public void EndTurn()
         {
+            StartNextTurn();
+        }
 
+        public bool IsPartOfActiveSquad(IGameEntity entity)
+        {
+            var eSquad = entity.GetModule<ISquad>();
+            if (eSquad == null)
+                return false;
+            return ActiveSquad == eSquad;
         }
 
         public void OnPick(HexTile comp, RaycastHit hit)

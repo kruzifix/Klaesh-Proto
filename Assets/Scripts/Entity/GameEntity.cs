@@ -14,6 +14,8 @@ namespace Klaesh.Entity
 
         void Initialize(int id, GameEntityDescriptor descriptor);
 
+        void InitModules();
+
         void AddModule(object module);
         IEnumerable<T> GetModules<T>();
         T GetModule<T>();
@@ -39,6 +41,12 @@ namespace Klaesh.Entity
             Descriptor = descriptor;
 
             _modules = new List<object>();
+        }
+
+        public void InitModules()
+        {
+            foreach (var mod in _modules.OfType<IGameEntityModule>())
+                mod.Init();
         }
 
         public void AddModule(object module)

@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using Klaesh.Game;
+using Klaesh.Utility;
+using UnityEngine;
 
 namespace Klaesh.Entity.Module
 {
@@ -8,7 +10,12 @@ namespace Klaesh.Entity.Module
 
         public IGameEntity Owner { get; set; }
 
-        public void CreateMesh()
+        public void Init()
+        {
+            CreateMesh();
+        }
+
+        private void CreateMesh()
         {
             var go = (Owner as GameEntity).gameObject;
 
@@ -23,6 +30,13 @@ namespace Klaesh.Entity.Module
 
             _mesh = Object.Instantiate(Owner.Descriptor.meshPrefab, go.transform);
             _mesh.transform.localPosition = Owner.Descriptor.meshOffset;
+
+            var squad = Owner.GetModule<ISquad>();
+            if (squad != null)
+            {
+                var colorizer = _mesh.GetComponent<ModelColorizer>();
+                colorizer?.Colorize(squad.Config.Color);
+            }
 
             MoveBoxColliders(_mesh, go);
         }

@@ -17,11 +17,6 @@ namespace Klaesh.Hex
         public IGameEntity Entity { get; set; }
         public bool HasEntityOnTop { get { return Entity != null; } }
 
-        private void Start()
-        {
-            _renderer = model.GetComponent<MeshRenderer>();
-        }
-
         public void Refresh()
         {
             var scale = transform.localScale;
@@ -31,6 +26,8 @@ namespace Klaesh.Hex
 
         public void SetColor(Color color)
         {
+            if (_renderer == null)
+                _renderer = model.GetComponent<MeshRenderer>();
             _renderer.material.color = color;
         }
 

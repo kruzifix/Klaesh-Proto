@@ -11,9 +11,9 @@ namespace Klaesh.Entity.Module
 
         public HexCubeCoord Position { get; private set; }
 
-        public HexPosModule()
+        public void Init()
         {
-            Position = new HexCubeCoord();
+
         }
 
         public bool TryMoveTo(IHexCoord position)

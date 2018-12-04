@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using Klaesh.Core;
 using Klaesh.Hex;
-using UnityEngine;
 
 namespace Klaesh.Entity.Module
 {
@@ -13,6 +9,11 @@ namespace Klaesh.Entity.Module
         public IGameEntity Owner { get; set; }
 
         public int MovementLeft { get; private set; }
+
+        public void Init()
+        {
+
+        }
 
         public void Reset()
         {

@@ -8,6 +8,7 @@ using Klaesh.Entity.Module;
 using Klaesh.Game;
 using Klaesh.Game.Config;
 using Klaesh.Hex;
+using Klaesh.Utility;
 using UnityEngine;
 
 namespace Klaesh
@@ -57,7 +58,7 @@ namespace Klaesh
                         new SquadConfiguration
                         {
                             Name = "Rowdy3",
-                            Color = Color.green,
+                            Color = Colors.SquadColors[0],
                             OffsetOrigin = new HexOffsetCoord(map.Columns / 2, marg),
                             UnitsConfig = new List<UnitConfiguration>
                             {
@@ -81,7 +82,7 @@ namespace Klaesh
                         new SquadConfiguration
                         {
                             Name = "Mighty Drei",
-                            Color = Color.red,
+                            Color = Colors.SquadColors[1],
                             OffsetOrigin = new HexOffsetCoord(map.Columns / 2, map.Rows - marg - 1),
                             UnitsConfig = new List<UnitConfiguration>
                             {

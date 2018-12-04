@@ -59,12 +59,9 @@ namespace Klaesh.Entity
             entity.Initialize(_idCounter, desc);
 
             // TODO: do this a more generic way. configurable from descriptor for example
+            // or with a factory!
             entity.AddModule(new HexPosModule());
-            var meshMod = new MeshModule();
-            entity.AddModule(meshMod);
-            meshMod.CreateMesh();
-
-            // TODO: do this a more generic way. configurable from descriptor for example
+            entity.AddModule(new MeshModule());
             entity.AddModule(new MovementModule());
 
             _entities.Add(entity);

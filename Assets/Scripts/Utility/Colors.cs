@@ -10,6 +10,8 @@ namespace Klaesh.Utility
         public static Color TileOccupied;
         public static Color[] TileDistances;
 
+        public static Color[] SquadColors = new Color[] { new Color32(66, 134, 244, 255), new Color32(244, 172, 65, 255) };
+
         static Colors()
         {
             ColorUtility.TryParseHtmlString("#6D80EC", out TileOrigin);

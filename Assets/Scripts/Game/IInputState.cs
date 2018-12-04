@@ -10,7 +10,7 @@ namespace Klaesh.Game
         void OnDisabled();
 
         IInputState OnPickHexTile(HexTile tile, RaycastHit hit);
-        IInputState OnPickGameEntity(GameEntity entity, RaycastHit hit);
+        IInputState OnPickGameEntity(IGameEntity entity, RaycastHit hit);
     }
 
     public abstract class BaseInputState : IInputState
@@ -19,12 +19,12 @@ namespace Klaesh.Game
 
         public virtual void OnEnabled() { }
 
-        public virtual IInputState OnPickGameEntity(GameEntity entity, RaycastHit hit)
+        public virtual IInputState OnPickHexTile(HexTile tile, RaycastHit hit)
         {
             return null;
         }
 
-        public virtual IInputState OnPickHexTile(HexTile tile, RaycastHit hit)
+        public virtual IInputState OnPickGameEntity(IGameEntity entity, RaycastHit hit)
         {
             return null;
         }

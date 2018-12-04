@@ -30,6 +30,8 @@ namespace Klaesh.Game
             var hexMod = Entity.GetModule<HexPosModule>();
             var moveMod = Entity.GetModule<MovementModule>();
 
+            _map.DeselectAllTiles();
+
             var tile = _map.GetTile(hexMod.Position);
             tile.SetColor(Colors.TileOrigin);
 
@@ -42,11 +44,6 @@ namespace Klaesh.Game
             ServiceLocator.Instance.GetService<IMessageBus>().Publish(new FocusCameraMessage(this, tile.GetTop()));
         }
 
-        public override void OnDisabled()
-        {
-            _map.DeselectAllTiles();
-        }
-
         public override IInputState OnPickHexTile(HexTile tile, RaycastHit hit)
         {
             if (_reachableTiles.Any(tup => tup.Item1 == tile))
@@ -54,6 +51,8 @@ namespace Klaesh.Game
                 if (!Entity.GetModule<MovementModule>().TryMoveTo(tile.Position))
                 {
                     Debug.LogFormat("[EntitySelected Input] unable to move there.");
+                    if (tile.HasEntityOnTop)
+                        return OnPickGameEntity(tile.Entity, hit);
                     return null;
                 }
                 ServiceLocator.Instance.GetService<IMessageBus>().Publish(new FocusCameraMessage(this, tile.GetTop()));
@@ -65,13 +64,17 @@ namespace Klaesh.Game
             return new IdleInputState();
         }
 
-        public override IInputState OnPickGameEntity(GameEntity entity, RaycastHit hit)
+        public override IInputState OnPickGameEntity(IGameEntity entity, RaycastHit hit)
         {
-            // TODO: add teams and do differentiation here
+            var gm = ServiceLocator.Instance.GetService<IGameManager>();
+            if (gm.IsPartOfActiveSquad(entity))
+            {
+                Entity = entity;
+                return this;
+            }
 
-            // (?) HAAACK (?)
-            Entity = entity;
-            return this;
+            // ATTAC other unit!
+            return null;
         }
     }
 }

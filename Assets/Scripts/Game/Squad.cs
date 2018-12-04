@@ -38,8 +38,11 @@ namespace Klaesh.Game
             foreach (var unit in Config.Units)
             {
                 var ent = gem.CreateEntity(unit.EntityId);
-                ent.GetModule<HexPosModule>().TryMoveTo(Config.Origin.CubeCoord + unit.Position.CubeCoord);
                 ent.AddModule(this);
+
+                ent.InitModules();
+
+                ent.GetModule<HexPosModule>().TryMoveTo(Config.Origin.CubeCoord + unit.Position.CubeCoord);
 
                 Members.Add(ent);
             }
