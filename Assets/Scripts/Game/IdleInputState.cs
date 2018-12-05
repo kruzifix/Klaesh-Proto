@@ -2,6 +2,7 @@
 using Klaesh.Core;
 using Klaesh.Core.Message;
 using Klaesh.GameEntity;
+using Klaesh.GameEntity.Component;
 using Klaesh.GameEntity.Module;
 using Klaesh.Hex;
 using UnityEngine;
@@ -20,28 +21,28 @@ namespace Klaesh.Game
             var gm = ServiceLocator.Instance.GetService<IGameManager>();
             foreach (var unit in gm.ActiveSquad.Members)
             {
-                map.GetTile(unit.GetModule<HexPosModule>().Position).SetColor(gm.ActiveSquad.Config.Color);
+                map.GetTile(unit.GetComponent<HexMovementComp>().Position).SetColor(gm.ActiveSquad.Config.Color);
 
-                foreach (var mod in unit.GetModules<MeshModule>().Where(m => m.Name == "WobblyCircle"))
-                {
-                    mod.Enabled = true;
-                }
+                //foreach (var mod in unit.GetModules<MeshModule>().Where(m => m.Name == "WobblyCircle"))
+                //{
+                //    mod.Enabled = true;
+                //}
             }
         }
 
         public override void OnDisabled()
         {
-            var gm = ServiceLocator.Instance.GetService<IGameManager>();
-            foreach (var unit in gm.ActiveSquad.Members)
-            {
-                foreach (var mod in unit.GetModules<MeshModule>().Where(m => m.Name == "WobblyCircle"))
-                {
-                    mod.Enabled = false;
-                }
-            }
+            //var gm = ServiceLocator.Instance.GetService<IGameManager>();
+            //foreach (var unit in gm.ActiveSquad.Members)
+            //{
+            //    foreach (var mod in unit.GetModules<MeshModule>().Where(m => m.Name == "WobblyCircle"))
+            //    {
+            //        mod.Enabled = false;
+            //    }
+            //}
         }
 
-        public override IInputState OnPickGameEntity(IGameEntity entity)
+        public override IInputState OnPickGameEntity(Entity entity)
         {
             var gm = ServiceLocator.Instance.GetService<IGameManager>();
             if (gm.IsPartOfActiveSquad(entity))

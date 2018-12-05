@@ -5,6 +5,7 @@ using Klaesh.Game.Config;
 using Klaesh.GameEntity;
 using Klaesh.Hex;
 using UnityEngine;
+using Klaesh.GameEntity.Component;
 
 namespace Klaesh.Game
 {
@@ -12,34 +13,35 @@ namespace Klaesh.Game
     {
         ISquadConfiguration Config { get; }
 
-        List<IGameEntity> Members { get; }
+        List<Entity> Members { get; }
 
-        void CreateMembers(IGameEntityManager man);
+        void CreateMembers(IEntityManager man);
     }
 
     public class Squad : ISquad
     {
         public ISquadConfiguration Config { get; private set; }
 
-        public List<IGameEntity> Members { get; private set; }
+        public List<Entity> Members { get; private set; }
 
         public Squad(ISquadConfiguration config)
         {
             Config = config;
         }
 
-        public void CreateMembers(IGameEntityManager gem)
+        public void CreateMembers(IEntityManager gem)
         {
             if (Members != null)
                 return;
 
-            Members = new List<IGameEntity>();
+            Members = new List<Entity>();
 
             foreach (var unit in Config.Units)
             {
                 var ent = gem.CreateEntity(unit.EntityId, e => e.AddModule(this));
 
-                ent.GetModule<HexPosModule>()?.TryMoveTo(Config.Origin.CubeCoord + unit.Position.CubeCoord);
+                ent.GetComponent<HexMovementComp>().SetPosition(Config.Origin.CubeCoord + unit.Position.CubeCoord);
+                // LOOK AT
 
                 Members.Add(ent);
             }

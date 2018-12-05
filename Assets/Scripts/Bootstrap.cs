@@ -86,17 +86,17 @@ namespace Klaesh
                             {
                                 new UnitConfiguration
                                 {
-                                    EntityId = "soldier",
+                                    EntityId = "skeleton",
                                     OffsetPos = new HexOffsetCoord()
                                 },
                                 new UnitConfiguration
                                 {
-                                    EntityId = "soldier",
+                                    EntityId = "skeleton",
                                     OffsetPos = HexCubeCoord.Offset(HexDirection.West, 2).OffsetCoord
                                 },
                                 new UnitConfiguration
                                 {
-                                    EntityId = "soldier",
+                                    EntityId = "skeleton",
                                     OffsetPos = HexCubeCoord.Offset(HexDirection.East, 2).OffsetCoord
                                 }
                             }

@@ -18,12 +18,12 @@ namespace Klaesh.Game
         void StartNextTurn();
         void EndTurn();
 
-        bool IsPartOfActiveSquad(IGameEntity entity);
+        bool IsPartOfActiveSquad(IEntity entity);
     }
 
     public class GameManager : ManagerBehaviour, IGameManager//, IPickHandler<GameEntity.GameEntity>, IPickHandler<HexTile>
     {
-        private IGameEntityManager _gem;
+        private IEntityManager _gem;
         private IHexMap _map;
 
         private IInputState _currentState;
@@ -41,7 +41,7 @@ namespace Klaesh.Game
 
         private void Start()
         {
-            _gem = _locator.GetService<IGameEntityManager>();
+            _gem = _locator.GetService<IEntityManager>();
             _map = _locator.GetService<IHexMap>();
 
             _currentState = new IdleInputState();
@@ -51,7 +51,7 @@ namespace Klaesh.Game
             //picker.RegisterHandler<HexTile>(KeyCode.Mouse0, "HexTile", this);
 
             var input = _locator.GetService<IGameInputComponent>();
-            input.RegisterHandler<GameEntity.GameEntity>("Entity", OnPickGameEntity);
+            input.RegisterHandler<Entity>("Entity", OnPickGameEntity);
             input.RegisterHandler<HexTile>("HexTile", OnPickHexTile);
 
             // TODO: Deregister Handler!!!
@@ -92,7 +92,8 @@ namespace Klaesh.Game
         {
             _activeSquadIndex = (_activeSquadIndex + 1) % _squads.Count;
 
-            ActiveSquad.Members.ForEach(ge => ge.GetModule<MovementModule>().Reset());
+            // TODO
+            //ActiveSquad.Members.ForEach(ge => ge.GetModule<MovementModule>().Reset());
 
             _currentState = new IdleInputState();
             _currentState.OnEnabled();
@@ -107,7 +108,7 @@ namespace Klaesh.Game
             StartNextTurn();
         }
 
-        public bool IsPartOfActiveSquad(IGameEntity entity)
+        public bool IsPartOfActiveSquad(IEntity entity)
         {
             var eSquad = entity.GetModule<ISquad>();
             if (eSquad == null)
@@ -120,7 +121,7 @@ namespace Klaesh.Game
             SwitchTo(_currentState.OnPickHexTile(comp));
         }
 
-        public void OnPickGameEntity(GameEntity.GameEntity comp)
+        public void OnPickGameEntity(Entity comp)
         {
             SwitchTo(_currentState.OnPickGameEntity(comp));
         }

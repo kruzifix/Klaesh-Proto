@@ -4,6 +4,7 @@ using System.Linq;
 using Klaesh.Core;
 using Klaesh.Core.Message;
 using Klaesh.GameEntity;
+using Klaesh.GameEntity.Component;
 using Klaesh.GameEntity.Module;
 using Klaesh.Hex;
 using Klaesh.Utility;
@@ -16,9 +17,9 @@ namespace Klaesh.Game
         private IHexMap _map;
         private List<Tuple<HexTile, int>> _reachableTiles;
 
-        public IGameEntity Entity { get; private set; }
+        public Entity Entity { get; private set; }
 
-        public EntitySelectedInputState(IGameEntity entity)
+        public EntitySelectedInputState(Entity entity)
         {
             Entity = entity;
         }
@@ -27,15 +28,14 @@ namespace Klaesh.Game
         {
             _map = ServiceLocator.Instance.GetService<IHexMap>();
 
-            var hexMod = Entity.GetModule<HexPosModule>();
-            var moveMod = Entity.GetModule<MovementModule>();
+            var moveComp = Entity.GetComponent<HexMovementComp>();
 
             _map.DeselectAllTiles();
 
-            var tile = _map.GetTile(hexMod.Position);
+            var tile = _map.GetTile(moveComp.Position);
             tile.SetColor(Colors.TileOrigin);
 
-            _reachableTiles = _map.GetReachableTiles(hexMod.Position, moveMod.MovementLeft, moveMod.JumpHeight);
+            _reachableTiles = _map.GetReachableTiles(moveComp.Position, moveComp.MovementLeft, moveComp.jumpHeight);
             foreach (var t in _reachableTiles)
             {
                 t.Item1.SetColor(t.Item1.HasEntityOnTop ? Colors.TileOccupied : Colors.TileDistances[t.Item2 - 1]);
@@ -48,13 +48,13 @@ namespace Klaesh.Game
         {
             if (_reachableTiles.Any(tup => tup.Item1 == tile))
             {
-                if (!Entity.GetModule<MovementModule>().TryMoveTo(tile.Position))
-                {
-                    Debug.LogFormat("[EntitySelected Input] unable to move there.");
-                    if (tile.HasEntityOnTop)
-                        return OnPickGameEntity(tile.Entity);
-                    return null;
-                }
+                //if (!Entity.GetModule<MovementModule>().TryMoveTo(tile.Position))
+                //{
+                //    Debug.LogFormat("[EntitySelected Input] unable to move there.");
+                //    if (tile.HasEntityOnTop)
+                //        return OnPickGameEntity(tile.Entity);
+                //    return null;
+                //}
                 ServiceLocator.Instance.GetService<IMessageBus>().Publish(new FocusCameraMessage(this, tile.GetTop()));
                 return new IdleInputState();
             }
@@ -64,7 +64,7 @@ namespace Klaesh.Game
             return new IdleInputState();
         }
 
-        public override IInputState OnPickGameEntity(IGameEntity entity)
+        public override IInputState OnPickGameEntity(Entity entity)
         {
             var gm = ServiceLocator.Instance.GetService<IGameManager>();
             if (gm.IsPartOfActiveSquad(entity))

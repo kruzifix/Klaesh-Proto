@@ -15,7 +15,7 @@ namespace Klaesh.Hex
 
         private MeshRenderer _renderer;
 
-        public IGameEntity Entity { get; set; }
+        public Entity Entity { get; set; }
         public bool HasEntityOnTop { get { return Entity != null; } }
 
         public void Refresh()
