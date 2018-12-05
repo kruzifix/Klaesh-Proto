@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b4123b421a6fe54ba5db1a67ce5d204, type: 3}
+  m_Name: KnightMeshModule
+  m_EditorClassIdentifier: 
+  meshPrefab: {fileID: 2144168652398996609, guid: 0378d05fb6037f54fb246957ad818b2b,
+    type: 3}
+  meshOffset: {x: 0, y: 0, z: 0}

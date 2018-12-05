@@ -62,17 +62,17 @@ namespace Klaesh
                             {
                                 new UnitConfiguration
                                 {
-                                    EntityId = "round-brute",
+                                    EntityId = "knight",
                                     OffsetPos = new HexOffsetCoord()
                                 },
                                 new UnitConfiguration
                                 {
-                                    EntityId = "cube-brute",
+                                    EntityId = "knight",
                                     OffsetPos = HexCubeCoord.Offset(HexDirection.West, 2).OffsetCoord
                                 },
                                 new UnitConfiguration
                                 {
-                                    EntityId = "cube-brute",
+                                    EntityId = "knight",
                                     OffsetPos = HexCubeCoord.Offset(HexDirection.East, 2).OffsetCoord
                                 }
                             }
@@ -86,17 +86,17 @@ namespace Klaesh
                             {
                                 new UnitConfiguration
                                 {
-                                    EntityId = "round-brute",
+                                    EntityId = "soldier",
                                     OffsetPos = new HexOffsetCoord()
                                 },
                                 new UnitConfiguration
                                 {
-                                    EntityId = "cube-brute",
+                                    EntityId = "soldier",
                                     OffsetPos = HexCubeCoord.Offset(HexDirection.West, 2).OffsetCoord
                                 },
                                 new UnitConfiguration
                                 {
-                                    EntityId = "cube-brute",
+                                    EntityId = "soldier",
                                     OffsetPos = HexCubeCoord.Offset(HexDirection.East, 2).OffsetCoord
                                 }
                             }
