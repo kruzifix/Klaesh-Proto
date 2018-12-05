@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Klaesh.Core;
 using Klaesh.Game;
@@ -53,16 +54,19 @@ namespace Klaesh.GameEntity.Component
             if (requiredMovement > MovementLeft)
                 return false;
 
-            if (!StartMovingToInternal(position, arrivalCallback))
+            // FALSCJ
+            var path = _map.GetPathTo(tile.Item1, reachable);
+
+            if (!StartMovingToInternal(path, arrivalCallback))
                 return false;
 
             MovementLeft -= requiredMovement;
             return true;
         }
 
-        private bool StartMovingToInternal(IHexCoord position, Action arrivalCallback)
+        private bool StartMovingToInternal(LinkedList<HexTile> path, Action arrivalCallback)
         {
-            var tile = _map.GetTile(position);
+            var tile = path.Last.Value;
 
             if (tile.HasEntityOnTop)
                 return false;
@@ -71,14 +75,31 @@ namespace Klaesh.GameEntity.Component
             oldTile.Entity = null;
 
             tile.Entity = _owner;
-            Position = position.CubeCoord;
+            Position = tile.Position;
 
-            StartCoroutine(AnimatedMoveTo(tile.GetTop(), arrivalCallback));
+            StartCoroutine(MoveAlongPath(path, arrivalCallback));
 
             return true;
         }
 
-        private IEnumerator AnimatedMoveTo(Vector3 target, Action callback)
+        private IEnumerator MoveAlongPath(LinkedList<HexTile> path, Action callback)
+        {
+            while (path.First != null)
+            {
+                var tile = path.First.Value;
+                path.RemoveFirst();
+
+                var move = AnimatedMoveTo(tile.GetTop());
+
+                yield return StartCoroutine(AnimatedMoveTo(tile.GetTop()));
+                //while (move.MoveNext())
+                //    yield return move.Current;
+            }
+
+            callback();
+        }
+
+        private IEnumerator AnimatedMoveTo(Vector3 target)
         {
             var anim = GetComponent<Animator>();
 
@@ -104,8 +125,6 @@ namespace Klaesh.GameEntity.Component
 
             transform.position = target;
             anim.SetBool("walking", false);
-
-            callback();
         }
     }
 }

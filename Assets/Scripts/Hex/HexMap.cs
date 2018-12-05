@@ -2,6 +2,7 @@
 using Klaesh.Core.Message;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -28,6 +29,7 @@ namespace Klaesh.Hex
         HexTile GetTile(IHexCoord coord);
         List<HexTile> GetNeighbors(IHexCoord origin);
         List<Tuple<HexTile, int>> GetReachableTiles(IHexCoord origin, int maxDistance, int maxHeightDifference);
+        LinkedList<HexTile> GetPathTo(HexTile target, List<Tuple<HexTile, int>> reachableTiles);
 
         void DeselectAllTiles();
     }
@@ -180,6 +182,8 @@ namespace Klaesh.Hex
                 var neighbors = GetNeighbors(current);
                 foreach (var n in neighbors)
                 {
+                    if (n.HasEntityOnTop)
+                        continue;
                     int heightDiff = Mathf.Abs(n.Height - tile.Height);
                     if (heightDiff > maxHeightDifference)
                         continue;
@@ -202,6 +206,25 @@ namespace Klaesh.Hex
             }
 
             return result;
+        }
+
+        public LinkedList<HexTile> GetPathTo(HexTile target, List<Tuple<HexTile, int>> reachableTiles)
+        {
+            var path = new LinkedList<HexTile>();
+
+            var current = reachableTiles.Where(t => t.Item1 == target).First();
+            path.AddFirst(current.Item1);
+
+            while (current.Item2 > 1)
+            {
+                var neighbors = GetNeighbors(current.Item1.Position);
+
+                int targetDist = current.Item2 - 1;
+                current = reachableTiles.Where(t => t.Item2 == targetDist && neighbors.Contains(t.Item1)).First();
+                path.AddFirst(current.Item1);
+            }
+
+            return path;
         }
 
         public void DeselectAllTiles()
