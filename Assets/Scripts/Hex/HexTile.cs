@@ -1,9 +1,10 @@
 ﻿using Klaesh.GameEntity;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace Klaesh.Hex
 {
-    public class HexTile : MonoBehaviour
+    public class HexTile : MonoBehaviour, IPointerEnterHandler
     {
         private const float heightScale = 0.5f;
 
@@ -34,6 +35,11 @@ namespace Klaesh.Hex
         public Vector3 GetTop()
         {
             return model.transform.position + new Vector3(0, Height * heightScale, 0);
+        }
+
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            //Debug.Log($"ENTER {name}");
         }
     }
 }

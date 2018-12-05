@@ -44,7 +44,7 @@ namespace Klaesh.Game
             ServiceLocator.Instance.GetService<IMessageBus>().Publish(new FocusCameraMessage(this, tile.GetTop()));
         }
 
-        public override IInputState OnPickHexTile(HexTile tile, RaycastHit hit)
+        public override IInputState OnPickHexTile(HexTile tile)
         {
             if (_reachableTiles.Any(tup => tup.Item1 == tile))
             {
@@ -52,7 +52,7 @@ namespace Klaesh.Game
                 {
                     Debug.LogFormat("[EntitySelected Input] unable to move there.");
                     if (tile.HasEntityOnTop)
-                        return OnPickGameEntity(tile.Entity, hit);
+                        return OnPickGameEntity(tile.Entity);
                     return null;
                 }
                 ServiceLocator.Instance.GetService<IMessageBus>().Publish(new FocusCameraMessage(this, tile.GetTop()));
@@ -60,11 +60,11 @@ namespace Klaesh.Game
             }
             Debug.LogFormat("[EntitySelected Input] can't move there. out of range");
 
-            ServiceLocator.Instance.GetService<IMessageBus>().Publish(new FocusCameraMessage(this, tile.GetTop()));
+            //ServiceLocator.Instance.GetService<IMessageBus>().Publish(new FocusCameraMessage(this, tile.GetTop()));
             return new IdleInputState();
         }
 
-        public override IInputState OnPickGameEntity(IGameEntity entity, RaycastHit hit)
+        public override IInputState OnPickGameEntity(IGameEntity entity)
         {
             var gm = ServiceLocator.Instance.GetService<IGameManager>();
             if (gm.IsPartOfActiveSquad(entity))

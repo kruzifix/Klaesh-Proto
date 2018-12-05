@@ -1,15 +1,70 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using Klaesh.Core;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace Klaesh
 {
-    public class GameInputComponent : MonoBehaviour, IPointerClickHandler
+    public interface IGameInputComponent
     {
-        public void OnPointerClick(PointerEventData eventData)
+        void RegisterHandler(string tag, Action<GameObject> handler);
+        void RegisterHandler<T>(string tag, Action<T> handler);
+    }
+
+    public class GameInputComponent : ManagerBehaviour, IGameInputComponent, IPointerDownHandler, IPointerUpHandler
+    {
+        private Dictionary<string, List<Action<GameObject>>> _handlers;
+
+        protected override void OnAwake()
         {
-            Debug.Log($"POINTER CLICK {eventData.pointerEnter.name}");
+            _handlers = new Dictionary<string, List<Action<GameObject>>>();
+            _locator.RegisterSingleton<IGameInputComponent>(this);
+        }
+
+        public void RegisterHandler(string tag, Action<GameObject> handler)
+        {
+            if (!_handlers.ContainsKey(tag))
+                _handlers.Add(tag, new List<Action<GameObject>>());
+            var list = _handlers[tag];
+
+            list.Add(handler);
+        }
+
+        public void RegisterHandler<T>(string tag, Action<T> handler)
+        {
+            RegisterHandler(tag, obj =>
+            {
+                var comp = obj.GetComponent<T>();
+                if (comp != null)
+                {
+                    handler(comp);
+                }
+            });
+        }
+
+        public void OnPointerDown(PointerEventData eventData)
+        {
+        }
+
+        public void OnPointerUp(PointerEventData eventData)
+        {
+            if (eventData.button == PointerEventData.InputButton.Left)
+            {
+                if (eventData.pointerEnter != null && eventData.rawPointerPress != null && eventData.pointerEnter == eventData.rawPointerPress)
+                {
+                    var tag = eventData.pointerEnter.tag;
+
+                    if (!_handlers.ContainsKey(tag))
+                        return;
+
+                    foreach (var handler in _handlers[tag])
+                    {
+                        handler(eventData.pointerEnter);
+                    }
+                }
+            }
         }
     }
 }

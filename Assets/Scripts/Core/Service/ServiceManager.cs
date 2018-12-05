@@ -23,8 +23,7 @@ namespace Klaesh.Core
             return (T)GetInstance(typeof(T));
         }
 
-        public void RegisterSingleton<TService, TImplementation>(TImplementation singleton)
-            where TImplementation : TService
+        public void RegisterSingleton<TService>(TService singleton)
         {
             Type t = typeof(TService);
             if (_entries.ContainsKey(t))

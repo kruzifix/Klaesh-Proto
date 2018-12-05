@@ -36,7 +36,7 @@ namespace Klaesh.GameEntity
 
         protected override void OnAwake()
         {
-            _locator.RegisterSingleton<IGameEntityManager, GameEntityManager>(this);
+            _locator.RegisterSingleton<IGameEntityManager>(this);
 
             _moduleFactory = new GameEntityModuleFactory();
             _moduleFactory.RegisterCreator<UnitModuleDescriptor>((e, desc) =>

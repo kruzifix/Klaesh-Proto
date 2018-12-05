@@ -41,7 +41,7 @@ namespace Klaesh.Game
             }
         }
 
-        public override IInputState OnPickGameEntity(IGameEntity entity, RaycastHit hit)
+        public override IInputState OnPickGameEntity(IGameEntity entity)
         {
             var gm = ServiceLocator.Instance.GetService<IGameManager>();
             if (gm.IsPartOfActiveSquad(entity))
@@ -50,11 +50,11 @@ namespace Klaesh.Game
             return null;
         }
 
-        public override IInputState OnPickHexTile(HexTile tile, RaycastHit hit)
+        public override IInputState OnPickHexTile(HexTile tile)
         {
             if (tile.HasEntityOnTop)
             {
-                return OnPickGameEntity(tile.Entity, hit);
+                return OnPickGameEntity(tile.Entity);
             }
 
             ServiceLocator.Instance.GetService<IMessageBus>().Publish(new FocusCameraMessage(this, tile.GetTop()));

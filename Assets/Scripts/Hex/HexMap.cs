@@ -66,7 +66,7 @@ namespace Klaesh.Hex
 
         protected override void OnAwake()
         {
-            _locator.RegisterSingleton<IHexMap, HexMap>(this);
+            _locator.RegisterSingleton<IHexMap>(this);
         }
 
         private void Start()

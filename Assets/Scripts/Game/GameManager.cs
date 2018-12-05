@@ -21,7 +21,7 @@ namespace Klaesh.Game
         bool IsPartOfActiveSquad(IGameEntity entity);
     }
 
-    public class GameManager : ManagerBehaviour, IGameManager, IPickHandler<GameEntity.GameEntity>, IPickHandler<HexTile>
+    public class GameManager : ManagerBehaviour, IGameManager//, IPickHandler<GameEntity.GameEntity>, IPickHandler<HexTile>
     {
         private IGameEntityManager _gem;
         private IHexMap _map;
@@ -36,7 +36,7 @@ namespace Klaesh.Game
 
         protected override void OnAwake()
         {
-            _locator.RegisterSingleton<IGameManager, GameManager>(this);
+            _locator.RegisterSingleton<IGameManager>(this);
         }
 
         private void Start()
@@ -46,9 +46,13 @@ namespace Klaesh.Game
 
             _currentState = new IdleInputState();
 
-            var picker = _locator.GetService<IObjectPicker>();
-            picker.RegisterHandler<GameEntity.GameEntity>(KeyCode.Mouse0, "Entity", this);
-            picker.RegisterHandler<HexTile>(KeyCode.Mouse0, "HexTile", this);
+            //var picker = _locator.GetService<IObjectPicker>();
+            //picker.RegisterHandler<GameEntity.GameEntity>(KeyCode.Mouse0, "Entity", this);
+            //picker.RegisterHandler<HexTile>(KeyCode.Mouse0, "HexTile", this);
+
+            var input = _locator.GetService<IGameInputComponent>();
+            input.RegisterHandler<GameEntity.GameEntity>("Entity", OnPickGameEntity);
+            input.RegisterHandler<HexTile>("HexTile", OnPickHexTile);
 
             // TODO: Deregister Handler!!!
         }
@@ -90,13 +94,16 @@ namespace Klaesh.Game
 
             ActiveSquad.Members.ForEach(ge => ge.GetModule<MovementModule>().Reset());
 
-            SwitchTo(new IdleInputState());
+            _currentState = new IdleInputState();
+            _currentState.OnEnabled();
 
             _bus.Publish(new FocusCameraMessage(this, ActiveSquad.Members[0].Position));
         }
 
         public void EndTurn()
         {
+            _currentState.OnDisabled();
+
             StartNextTurn();
         }
 
@@ -108,14 +115,14 @@ namespace Klaesh.Game
             return ActiveSquad == eSquad;
         }
 
-        public void OnPick(HexTile comp, RaycastHit hit)
+        public void OnPickHexTile(HexTile comp)
         {
-            SwitchTo(_currentState.OnPickHexTile(comp, hit));
+            SwitchTo(_currentState.OnPickHexTile(comp));
         }
 
-        public void OnPick(GameEntity.GameEntity comp, RaycastHit hit)
+        public void OnPickGameEntity(GameEntity.GameEntity comp)
         {
-            SwitchTo(_currentState.OnPickGameEntity(comp, hit));
+            SwitchTo(_currentState.OnPickGameEntity(comp));
         }
 
         private void SwitchTo(IInputState newState)

@@ -114,7 +114,7 @@ namespace Klaesh
 
             _serviceLocator = new ServiceManager();
             ServiceLocator.Instance = _serviceLocator;
-            _serviceLocator.RegisterSingleton<IMessageBus, MessageBus>(new MessageBus());
+            _serviceLocator.RegisterSingleton<IMessageBus>(new MessageBus());
         }
     }
 }
