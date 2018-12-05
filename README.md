@@ -4,6 +4,6 @@
 
 ## Setup:
 - Download & Install UnityHub
-- Install Unity 2018.2.17f1
+- Install Unity 2018.3.0b12
 - Clone repo
-- Start project with Unity version 2018.2.17f1 
+- Start project with Unity version 2018.3.0b12

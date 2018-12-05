@@ -4,7 +4,7 @@ using UnityEngine.EventSystems;
 
 namespace Klaesh.Hex
 {
-    public class HexTile : MonoBehaviour, IPointerEnterHandler
+    public class HexTile : MonoBehaviour//, IPointerEnterHandler
     {
         private const float heightScale = 0.5f;
 
@@ -37,9 +37,9 @@ namespace Klaesh.Hex
             return model.transform.position + new Vector3(0, Height * heightScale, 0);
         }
 
-        public void OnPointerEnter(PointerEventData eventData)
-        {
-            //Debug.Log($"ENTER {name}");
-        }
+        //public void OnPointerEnter(PointerEventData eventData)
+        //{
+        //    Debug.Log($"ENTER {name}");
+        //}
     }
 }
