@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Klaesh.GameEntity.Module;
-using Klaesh.GameEntity.Descriptor;
 using UnityEngine;
 
 namespace Klaesh.GameEntity
@@ -11,11 +10,11 @@ namespace Klaesh.GameEntity
     {
         int Id { get; }
         //GameEntityDescriptor Descriptor { get; }
-        Vector3 Position { get; }
+        //Vector3 Position { get; }
 
         void Initialize(int id/*, GameEntityDescriptor descriptor*/);
 
-        void InitModules();
+        //void InitModules();
 
         void AddModule(object module);
         IEnumerable<T> GetModules<T>();
@@ -30,7 +29,7 @@ namespace Klaesh.GameEntity
 
         public int Id { get; private set; }
         //public GameEntityDescriptor Descriptor { get; private set; }
-        public Vector3 Position => transform.position;
+        //public Vector3 Position => transform.position;
 
         public void Initialize(int id/*, GameEntityDescriptor descriptor*/)
         {
@@ -46,18 +45,18 @@ namespace Klaesh.GameEntity
             //var modules = GetComponents<IGameEntityModule>();
         }
 
-        public void InitModules()
-        {
-            foreach (var mod in _modules.OfType<IEntityModule>())
-                mod.Init();
-        }
+        //public void InitModules()
+        //{
+        //    foreach (var mod in _modules.OfType<IEntityModule>())
+        //        mod.Init();
+        //}
 
         public void AddModule(object module)
         {
             if (_modules.Contains(module))
                 return;
-            if (module is IEntityModule)
-                (module as IEntityModule).Owner = this;
+            //if (module is IEntityModule)
+            //    (module as IEntityModule).Owner = this;
             _modules.Add(module);
         }
 

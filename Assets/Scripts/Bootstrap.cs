@@ -4,10 +4,10 @@ using Klaesh.Core;
 using Klaesh.Core.Message;
 using Klaesh.Game;
 using Klaesh.Game.Config;
+using Klaesh.GameEntity;
 using Klaesh.Hex;
 using Klaesh.Utility;
 using UnityEngine;
-using Klaesh.GameEntity.Descriptor;
 
 namespace Klaesh
 {
@@ -35,7 +35,7 @@ namespace Klaesh
             DontDestroyOnLoad(gameObject);
 
             // setup game board
-            _eventBus.Subscribe<GameEntityDescriptorsLoadedMessage>(msg =>
+            _eventBus.Subscribe<EntityPrefabsLoadedMessage>(msg =>
             {
                 var map = _serviceLocator.GetService<IHexMap>();
 

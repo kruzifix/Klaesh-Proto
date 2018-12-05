@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Klaesh.Core;
-using Klaesh.GameEntity.Descriptor;
+using Klaesh.Core.Message;
 using Klaesh.GameEntity.Module;
 using UnityEngine;
 
@@ -59,7 +59,7 @@ namespace Klaesh.GameEntity
                 .Where(go => go.GetComponent<Entity>() != null)
                 .ToDictionary(go => go.name);
 
-            _bus.Publish(new GameEntityDescriptorsLoadedMessage(this));
+            _bus.Publish(new EntityPrefabsLoadedMessage(this));
         }
 
         private void OnDestroy()
@@ -95,7 +95,7 @@ namespace Klaesh.GameEntity
 
             addModules?.Invoke(entity);
 
-            entity.InitModules();
+            //entity.InitModules();
 
             _entities.Add(entity);
 
@@ -108,6 +108,13 @@ namespace Klaesh.GameEntity
         {
             // TODO: add dict map cache for fast lookup
             return _entities.FirstOrDefault(e => e.Id == id);
+        }
+    }
+
+    public class EntityPrefabsLoadedMessage : MessageBase
+    {
+        public EntityPrefabsLoadedMessage(object sender) : base(sender)
+        {
         }
     }
 }

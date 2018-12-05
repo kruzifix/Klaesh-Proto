@@ -6,6 +6,7 @@ using Klaesh.GameEntity.Module;
 using Klaesh.Game.Config;
 using Klaesh.Hex;
 using UnityEngine;
+using Klaesh.GameEntity.Component;
 
 namespace Klaesh.Game
 {
@@ -18,7 +19,7 @@ namespace Klaesh.Game
         void StartNextTurn();
         void EndTurn();
 
-        bool IsPartOfActiveSquad(IEntity entity);
+        bool IsPartOfActiveSquad(Entity entity);
     }
 
     public class GameManager : ManagerBehaviour, IGameManager//, IPickHandler<GameEntity.GameEntity>, IPickHandler<HexTile>
@@ -92,13 +93,12 @@ namespace Klaesh.Game
         {
             _activeSquadIndex = (_activeSquadIndex + 1) % _squads.Count;
 
-            // TODO
-            //ActiveSquad.Members.ForEach(ge => ge.GetModule<MovementModule>().Reset());
+            ActiveSquad.Members.ForEach(ge => ge.GetComponent<HexMovementComp>().OnNextTurn());
 
             _currentState = new IdleInputState();
             _currentState.OnEnabled();
 
-            _bus.Publish(new FocusCameraMessage(this, ActiveSquad.Members[0].Position));
+            _bus.Publish(new FocusCameraMessage(this, ActiveSquad.Members[0].transform.position));
         }
 
         public void EndTurn()
@@ -108,12 +108,13 @@ namespace Klaesh.Game
             StartNextTurn();
         }
 
-        public bool IsPartOfActiveSquad(IEntity entity)
+        public bool IsPartOfActiveSquad(Entity entity)
         {
-            var eSquad = entity.GetModule<ISquad>();
-            if (eSquad == null)
-                return false;
-            return ActiveSquad == eSquad;
+            return ActiveSquad.Members.Contains(entity);
+            //var eSquad = entity.GetModule<ISquad>();
+            //if (eSquad == null)
+            //    return false;
+            //return ActiveSquad == eSquad;
         }
 
         public void OnPickHexTile(HexTile comp)

@@ -48,13 +48,16 @@ namespace Klaesh.Game
         {
             if (_reachableTiles.Any(tup => tup.Item1 == tile))
             {
-                //if (!Entity.GetModule<MovementModule>().TryMoveTo(tile.Position))
-                //{
-                //    Debug.LogFormat("[EntitySelected Input] unable to move there.");
-                //    if (tile.HasEntityOnTop)
-                //        return OnPickGameEntity(tile.Entity);
-                //    return null;
-                //}
+                if (!Entity.GetComponent<HexMovementComp>().StartMovingTo(tile.Position, () => Debug.Log("arrived!")))
+                {
+                    Debug.LogFormat("[EntitySelected Input] unable to move there.");
+                    if (tile.HasEntityOnTop)
+                        return OnPickGameEntity(tile.Entity);
+                    return null;
+                }
+
+                // TODO: add state that waits for animation!?!
+
                 ServiceLocator.Instance.GetService<IMessageBus>().Publish(new FocusCameraMessage(this, tile.GetTop()));
                 return new IdleInputState();
             }

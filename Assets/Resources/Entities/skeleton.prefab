@@ -54,6 +54,10 @@ PrefabInstance:
       propertyPath: m_TagString
       value: Entity
       objectReference: {fileID: 0}
+    - target: {fileID: 1855012551421857181}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 73c771903952d4640858a577ca13577c, type: 2}
     - target: {fileID: 1855012551431274257}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -103,6 +107,14 @@ PrefabInstance:
       value: skeleton
       objectReference: {fileID: 0}
     - target: {fileID: 1855012551431491849}
+      propertyPath: m_TagString
+      value: Entity
+      objectReference: {fileID: 0}
+    - target: {fileID: 1855012551431491849}
+      propertyPath: m_Name
+      value: skeleton
+      objectReference: {fileID: 0}
+    - target: {fileID: 1855012551431491849}
       propertyPath: m_Name
       value: skeleton
       objectReference: {fileID: 0}
@@ -118,6 +130,10 @@ PrefabInstance:
       propertyPath: m_TagString
       value: Entity
       objectReference: {fileID: 0}
+    - target: {fileID: 9542308, guid: 9f4313a771e05c64d8da7ae6bd19a19f, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 73c771903952d4640858a577ca13577c, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9f4313a771e05c64d8da7ae6bd19a19f, type: 3}
 --- !u!1 &1855012551431491849 stripped
@@ -129,6 +145,12 @@ GameObject:
 --- !u!4 &1855012551431274257 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 403496, guid: 9f4313a771e05c64d8da7ae6bd19a19f,
+    type: 3}
+  m_PrefabInstance: {fileID: 1855012551431395129}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &1855012551421857181 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 9542308, guid: 9f4313a771e05c64d8da7ae6bd19a19f,
     type: 3}
   m_PrefabInstance: {fileID: 1855012551431395129}
   m_PrefabAsset: {fileID: 0}

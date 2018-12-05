@@ -1,4 +1,7 @@
-﻿using Klaesh.Core;
+﻿using System;
+using System.Collections;
+using System.Linq;
+using Klaesh.Core;
 using Klaesh.Game;
 using Klaesh.Hex;
 using UnityEngine;
@@ -9,8 +12,6 @@ namespace Klaesh.GameEntity.Component
     {
         private IHexMap _map;
         private Entity _owner;
-
-        private bool _firstMove = true;
 
         public HexCubeCoord Position { get; private set; }
         public int MovementLeft { get; private set; }
@@ -33,26 +34,78 @@ namespace Klaesh.GameEntity.Component
             transform.position = tile.GetTop();
         }
 
-        //public bool TryMoveTo(IHexCoord position)
-        //{
-        //    var map = ServiceLocator.Instance.GetService<IHexMap>();
-        //    var tile = map.GetTile(position);
+        public void OnNextTurn()
+        {
+            MovementLeft = maxDistance;
+        }
 
-        //    if (tile.HasEntityOnTop)
-        //        return false;
+        public bool StartMovingTo(IHexCoord position, Action arrivalCallback)
+        {
+            if (MovementLeft <= 0)
+                return false;
 
-        //    if (!_firstMove)
-        //    {
-        //        var oldTile = map.GetTile(Position);
-        //        oldTile.Entity = null;
-        //    }
-        //    _firstMove = false;
+            var reachable = _map.GetReachableTiles(Position, MovementLeft, jumpHeight);
 
-        //    Position = position.CubeCoord;
-        //    tile.Entity = Owner;
-        //    (Owner as Entity).transform.position = tile.GetTop();
+            var tile = reachable.Where(t => t.Item1.Position == position.CubeCoord).FirstOrDefault();
+            if (tile == null)
+                return false;
+            int requiredMovement = tile.Item2;
+            if (requiredMovement > MovementLeft)
+                return false;
 
-        //    return true;
-        //}
+            if (!StartMovingToInternal(position, arrivalCallback))
+                return false;
+
+            MovementLeft -= requiredMovement;
+            return true;
+        }
+
+        private bool StartMovingToInternal(IHexCoord position, Action arrivalCallback)
+        {
+            var tile = _map.GetTile(position);
+
+            if (tile.HasEntityOnTop)
+                return false;
+
+            var oldTile = _map.GetTile(Position);
+            oldTile.Entity = null;
+
+            tile.Entity = _owner;
+            Position = position.CubeCoord;
+
+            StartCoroutine(AnimatedMoveTo(tile.GetTop(), arrivalCallback));
+
+            return true;
+        }
+
+        private IEnumerator AnimatedMoveTo(Vector3 target, Action callback)
+        {
+            var anim = GetComponent<Animator>();
+
+            var targetRot = Quaternion.LookRotation(target - transform.position, Vector3.up);
+            var currentRot = transform.rotation;
+            while (currentRot != targetRot)
+            {
+                currentRot = Quaternion.RotateTowards(currentRot, targetRot, 2);
+
+                transform.rotation = currentRot;
+
+                yield return null;
+            }
+
+            anim.SetBool("walking", true);
+
+            while (Vector3.Distance(transform.position, target) > 0.1f)
+            {
+                transform.position = Vector3.MoveTowards(transform.position, target, 0.02f);
+
+                yield return null;
+            }
+
+            transform.position = target;
+            anim.SetBool("walking", false);
+
+            callback();
+        }
     }
 }

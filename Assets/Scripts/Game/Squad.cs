@@ -6,6 +6,7 @@ using Klaesh.GameEntity;
 using Klaesh.Hex;
 using UnityEngine;
 using Klaesh.GameEntity.Component;
+using Klaesh.Core;
 
 namespace Klaesh.Game
 {
@@ -38,10 +39,13 @@ namespace Klaesh.Game
 
             foreach (var unit in Config.Units)
             {
-                var ent = gem.CreateEntity(unit.EntityId, e => e.AddModule(this));
+                var ent = gem.CreateEntity(unit.EntityId/*, e => e.AddModule(this)*/);
 
                 ent.GetComponent<HexMovementComp>().SetPosition(Config.Origin.CubeCoord + unit.Position.CubeCoord);
-                // LOOK AT
+
+                var map = ServiceLocator.Instance.GetService<IHexMap>();
+                var center = map.GetTile(map.Columns / 2, map.Rows / 2);
+                ent.transform.rotation = Quaternion.LookRotation(center.GetTop() - ent.transform.position);
 
                 Members.Add(ent);
             }
