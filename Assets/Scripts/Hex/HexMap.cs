@@ -29,7 +29,7 @@ namespace Klaesh.Hex
         HexTile GetTile(IHexCoord coord);
         List<HexTile> GetNeighbors(IHexCoord origin);
         List<Tuple<HexTile, int>> GetReachableTiles(IHexCoord origin, int maxDistance, int maxHeightDifference);
-        LinkedList<HexTile> GetPathTo(HexTile target, List<Tuple<HexTile, int>> reachableTiles);
+        List<HexTile> GetPathTo(HexTile target, List<Tuple<HexTile, int>> reachableTiles, int maxHeightDifference);
 
         void DeselectAllTiles();
     }
@@ -208,21 +208,27 @@ namespace Klaesh.Hex
             return result;
         }
 
-        public LinkedList<HexTile> GetPathTo(HexTile target, List<Tuple<HexTile, int>> reachableTiles)
+        public List<HexTile> GetPathTo(HexTile target, List<Tuple<HexTile, int>> reachableTiles, int maxHeightDifference)
         {
-            var path = new LinkedList<HexTile>();
+            var path = new List<HexTile>();
 
             var current = reachableTiles.Where(t => t.Item1 == target).First();
-            path.AddFirst(current.Item1);
+            path.Add(current.Item1);
 
             while (current.Item2 > 1)
             {
                 var neighbors = GetNeighbors(current.Item1.Position);
 
                 int targetDist = current.Item2 - 1;
-                current = reachableTiles.Where(t => t.Item2 == targetDist && neighbors.Contains(t.Item1)).First();
-                path.AddFirst(current.Item1);
+                current = reachableTiles.Where(t =>
+                    t.Item2 == targetDist &&
+                    Mathf.Abs(t.Item1.Height - current.Item1.Height) <= maxHeightDifference &&
+                    neighbors.Contains(t.Item1)
+                ).First();
+                path.Add(current.Item1);
             }
+
+            path.Reverse();
 
             return path;
         }

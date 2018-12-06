@@ -54,77 +54,65 @@ namespace Klaesh.GameEntity.Component
             if (requiredMovement > MovementLeft)
                 return false;
 
-            // FALSCJ
-            var path = _map.GetPathTo(tile.Item1, reachable);
+            var path = _map.GetPathTo(tile.Item1, reachable, jumpHeight);
 
-            if (!StartMovingToInternal(path, arrivalCallback))
-                return false;
-
-            MovementLeft -= requiredMovement;
-            return true;
-        }
-
-        private bool StartMovingToInternal(LinkedList<HexTile> path, Action arrivalCallback)
-        {
-            var tile = path.Last.Value;
-
-            if (tile.HasEntityOnTop)
+            var targetTile = path.Last();
+            if (targetTile.HasEntityOnTop)
                 return false;
 
             var oldTile = _map.GetTile(Position);
             oldTile.Entity = null;
 
-            tile.Entity = _owner;
-            Position = tile.Position;
+            targetTile.Entity = _owner;
+            Position = targetTile.Position;
 
+            path.Insert(0, oldTile);
             StartCoroutine(MoveAlongPath(path, arrivalCallback));
 
+            MovementLeft -= requiredMovement;
             return true;
         }
 
-        private IEnumerator MoveAlongPath(LinkedList<HexTile> path, Action callback)
+        private IEnumerator MoveAlongPath(List<HexTile> path, Action callback)
         {
-            while (path.First != null)
+            for (int i = 1; i < path.Count; i++)
             {
-                var tile = path.First.Value;
-                path.RemoveFirst();
+                var lastTile = path[i - 1];
+                var targetTile = path[i];
 
-                var move = AnimatedMoveTo(tile.GetTop());
-
-                yield return StartCoroutine(AnimatedMoveTo(tile.GetTop()));
-                //while (move.MoveNext())
-                //    yield return move.Current;
+                yield return StartCoroutine(AnimatedMoveTo(targetTile.GetTop(), targetTile.Height - lastTile.Height));
             }
 
             callback();
         }
 
-        private IEnumerator AnimatedMoveTo(Vector3 target)
+        private IEnumerator AnimatedMoveTo(Vector3 target, int heightDiff)
         {
             var anim = GetComponent<Animator>();
 
-            var targetRot = Quaternion.LookRotation(target - transform.position, Vector3.up);
+            var dir = target - transform.position;
+            dir.y = 0f;
+
+            var targetRot = Quaternion.LookRotation(dir, Vector3.up);
             var currentRot = transform.rotation;
             while (currentRot != targetRot)
             {
-                currentRot = Quaternion.RotateTowards(currentRot, targetRot, 2);
+                currentRot = Quaternion.RotateTowards(currentRot, targetRot, 4);
 
                 transform.rotation = currentRot;
 
                 yield return null;
             }
 
-            anim.SetBool("walking", true);
+            anim.SetTrigger("move");
+            anim.SetFloat("heightDiff", heightDiff);
+            yield return null;
 
-            while (Vector3.Distance(transform.position, target) > 0.1f)
+            while (anim.GetCurrentAnimatorStateInfo(0).IsName("ForwardMovement"))
             {
-                transform.position = Vector3.MoveTowards(transform.position, target, 0.02f);
-
                 yield return null;
             }
-
             transform.position = target;
-            anim.SetBool("walking", false);
         }
     }
 }
