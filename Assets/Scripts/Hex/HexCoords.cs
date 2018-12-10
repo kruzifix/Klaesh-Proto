@@ -1,4 +1,5 @@
 ﻿using System;
+using Newtonsoft.Json;
 
 namespace Klaesh.Hex
 {
@@ -23,11 +24,13 @@ namespace Klaesh.Hex
     public struct HexOffsetCoord : IHexCoord
     {
         // horizontal (Unity X axis)
-        public int col { get; }
+        public int col { get; set; }
         // vertical (Unity Z axis)
-        public int row { get; }
+        public int row { get; set; }
 
+        [JsonIgnore]
         public HexCubeCoord CubeCoord => ToCube();
+        [JsonIgnore]
         public HexOffsetCoord OffsetCoord => this;
 
         public HexOffsetCoord(int col, int row)
@@ -82,13 +85,15 @@ namespace Klaesh.Hex
     public struct HexCubeCoord : IHexCoord
     {
         // skewed vertical (to the left)
-        public int x { get; }
+        public int x { get; set; }
         // skewed vertical (to the right)
-        public int y { get; }
+        public int y { get; set; }
         // horizontal (Unity X axis)
-        public int z { get; }
+        public int z { get; set; }
 
+        [JsonIgnore]
         public HexCubeCoord CubeCoord => this;
+        [JsonIgnore]
         public HexOffsetCoord OffsetCoord => ToOffset();
 
         public HexCubeCoord(int x, int y, int z)

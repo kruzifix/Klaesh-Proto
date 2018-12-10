@@ -1,4 +1,5 @@
 ﻿using Klaesh.Hex;
+using Newtonsoft.Json;
 
 namespace Klaesh.Game.Config
 {
@@ -10,9 +11,12 @@ namespace Klaesh.Game.Config
 
     public class UnitConfiguration : IUnitConfiguration
     {
+        [JsonProperty("pos")]
         public HexOffsetCoord OffsetPos { get; set; }
+        [JsonProperty("id")]
         public string EntityId { get; set; }
 
+        [JsonIgnore]
         public IHexCoord Position => OffsetPos;
     }
 }

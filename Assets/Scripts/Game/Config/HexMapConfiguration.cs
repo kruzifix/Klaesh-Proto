@@ -1,4 +1,6 @@
-﻿namespace Klaesh.Game.Config
+﻿using Newtonsoft.Json;
+
+namespace Klaesh.Game.Config
 {
     public interface IHexMapConfiguration
     {
@@ -12,11 +14,16 @@
 
     public class HexMapConfiguration : IHexMapConfiguration
     {
+        [JsonProperty("rows")]
         public int Rows { get; set; }
+        [JsonProperty("cols")]
         public int Columns { get; set; }
 
+        [JsonProperty("noffset")]
         public int NoiseOffset { get; set; }
+        [JsonProperty("nscale")]
         public float NoiseScale { get; set; }
+        [JsonProperty("hscale")]
         public float HeightScale { get; set; }
     }
 }

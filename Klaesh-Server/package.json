@@ -1,0 +1,15 @@
+{
+  "name": "klaesh-server",
+  "version": "0.0.1",
+  "description": "test server for klaesh",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "David Cukrowicz",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.4",
+    "ws": "^6.1.2"
+  }
+}

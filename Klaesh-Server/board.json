@@ -1,0 +1,71 @@
+{
+    "map": {
+      "rows": 12,
+      "cols": 7,
+      "noffset": 0,
+      "nscale": 0.5,
+      "hscale": 7.0
+    },
+    "squads": [
+      {
+        "name": "Rowdy3",
+        "origin": {
+          "col": 3,
+          "row": 1
+        },
+        "units": [
+          {
+            "pos": {
+              "col": 0,
+              "row": 0
+            },
+            "id": "knight"
+          },
+          {
+            "pos": {
+              "col": -2,
+              "row": 0
+            },
+            "id": "knight"
+          },
+          {
+            "pos": {
+              "col": 2,
+              "row": 0
+            },
+            "id": "knight"
+          }
+        ]
+      },
+      {
+        "name": "Mighty Drei",
+        "origin": {
+          "col": 3,
+          "row": 10
+        },
+        "units": [
+          {
+            "pos": {
+              "col": 0,
+              "row": 0
+            },
+            "id": "skeleton"
+          },
+          {
+            "pos": {
+              "col": -2,
+              "row": 0
+            },
+            "id": "skeleton"
+          },
+          {
+            "pos": {
+              "col": 2,
+              "row": 0
+            },
+            "id": "skeleton"
+          }
+        ]
+      }
+    ]
+  }
