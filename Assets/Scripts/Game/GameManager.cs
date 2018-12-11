@@ -11,6 +11,8 @@ using Klaesh.Utility;
 using Klaesh.Game.Data;
 using System;
 using Klaesh.Game.UI;
+using System.Linq;
+using Klaesh.Game.Job;
 
 namespace Klaesh.Game
 {
@@ -31,6 +33,8 @@ namespace Klaesh.Game
         void EndTurn();
 
         bool IsPartOfActiveSquad(Entity entity);
+
+        Entity ResolveEntityRef(SquadEntityRefData data);
     }
 
     public class GameManager : ManagerBehaviour, IGameManager//, IPickHandler<GameEntity.GameEntity>, IPickHandler<HexTile>
@@ -39,6 +43,7 @@ namespace Klaesh.Game
         private IHexMap _map;
         private INetworker _networker;
         private IJsonConverter _jconverter;
+        private IJobManager _jobManager;
 
         private IInputState _currentState;
         private IGameConfiguration _currentGameConfig;
@@ -77,6 +82,7 @@ namespace Klaesh.Game
             // TODO: Deregister Handler!!!
 
             _jconverter = _locator.GetService<IJsonConverter>();
+            _jobManager = _locator.GetService<IJobManager>();
             _networker = _locator.GetService<INetworker>();
 
             var networkDataHandler = new Dictionary<EventCode, Action<string>>();
@@ -97,7 +103,7 @@ namespace Klaesh.Game
             //networkDataHandler.Add(EventCode.HeartBeat, MakeHandlerBridge<HeartBeatData>(OnHeartBeat));
             networkDataHandler.Add(EventCode.GameStart, MakeHandlerBridge<GameConfiguration>(StartGame));
             networkDataHandler.Add(EventCode.StartTurn, MakeHandlerBridge<StartTurnData>(StartNextTurn));
-            networkDataHandler.Add(EventCode.MoveUnit, MakeHandlerBridge<MoveUnitData>(OnMoveUnit));
+            networkDataHandler.Add(EventCode.DoJob, MakeHandlerBridge<IJob>(OnDoJob));
         }
 
         private void OnDestroy()
@@ -174,21 +180,10 @@ namespace Klaesh.Game
             _bus.Publish(new RefreshGameUIMessage(this));
         }
 
-        private void OnMoveUnit(MoveUnitData data)
+        private void OnDoJob(IJob job)
         {
-            // check squad id, and if active
-            if (data.SquadId != ActiveSquad.Config.ServerId)
-            {
-                throw new Exception("got move unit message, and sender is not active player!");
-            }
-            // get the entity and move it
-            bool canMove = ActiveSquad.Members[data.MemberId]
-                .GetComponent<HexMovementComp>()
-                .StartMovingTo(data.Target, () => Debug.Log($"unit moved to {data.Target}"));
-            if (!canMove)
-            {
-                throw new Exception($"unit was unable to move to {data.Target}!");
-            }
+            _jobManager.AddJob(job);
+            _jobManager.ExecuteJobs();
         }
 
         public void EndTurn()
@@ -209,6 +204,17 @@ namespace Klaesh.Game
             //if (eSquad == null)
             //    return false;
             //return ActiveSquad == eSquad;
+        }
+
+        public Entity ResolveEntityRef(SquadEntityRefData data)
+        {
+            // this can throw so many exception, but it is intended.
+            // for now....
+            // ...i think
+            return _squads
+                .Where(s => s.Config.ServerId == data.SquadId)
+                .First()
+                .Members[data.MemberId];
         }
 
         public void OnPickHexTile(HexTile comp)

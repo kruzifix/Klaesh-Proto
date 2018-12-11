@@ -96,10 +96,10 @@ function onEndTurn(userId, code, data) {
     console.log(`starting turn ${game.turnNumber}`)
 }
 
-function onMoveUnit(userId, code, data) {
+function onDoJob(userId, code, data) {
     let game = games.filter(g => g.players.some(p => p == userId));
     if (game.length != 1) {
-        console.log(`got moveunit message from player not in a game! games: ${game.length}`)
+        console.log(`got dojob message from player not in a game! games: ${game.length}`)
         return
     }
     game = game[0]
@@ -115,7 +115,7 @@ function handleMsg(userId, code, data) {
 
     const handler = {
         'endturn': onEndTurn,
-        'moveunit': onMoveUnit
+        'dojob': onDoJob
     }
     
     if (code in handler) {

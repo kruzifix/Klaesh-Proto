@@ -1,4 +1,5 @@
 ﻿using Klaesh.Game;
+using Klaesh.Game.Data;
 
 namespace Klaesh.GameEntity.Module
 {
@@ -9,10 +10,14 @@ namespace Klaesh.GameEntity.Module
         public Squad Squad { get; }
         public int Id { get; }
 
+        public SquadEntityRefData RefData { get; }
+
         public SquadMember(Squad squad, int id)
         {
             Squad = squad;
             Id = id;
+
+            RefData = new SquadEntityRefData { SquadId = squad.Config.ServerId, MemberId = id };
         }
 
         public void Init()

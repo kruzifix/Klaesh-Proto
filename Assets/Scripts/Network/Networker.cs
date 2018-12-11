@@ -18,7 +18,7 @@ namespace Klaesh.Network
         StartTurn,
         EndTurn,
 
-        MoveUnit
+        DoJob
 
         // Ack?
     }

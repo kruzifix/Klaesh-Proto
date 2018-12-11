@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace Klaesh
 {
-    public class Bootstrap : MonoBehaviour
+    public class Bootstrap : MonoBehaviour, ICoroutineStarter
     {
         public static Bootstrap Instance { get; private set; }
 
@@ -37,6 +37,7 @@ namespace Klaesh
             var bus = _serviceLocator.GetService<IMessageBus>();
 
             // TODO: get from current webgl context/provider?
+            // or from config file!
             string url = "ws://localhost:3000";
 
             // setup game board
@@ -131,6 +132,7 @@ namespace Klaesh
 
             _serviceLocator = new ServiceManager();
             ServiceLocator.Instance = _serviceLocator;
+            _serviceLocator.RegisterSingleton<ICoroutineStarter>(this);
             _serviceLocator.RegisterSingleton<IMessageBus>(new MessageBus());
             _serviceLocator.RegisterSingleton<IJsonConverter>(new CustomJsonConverter());
         }

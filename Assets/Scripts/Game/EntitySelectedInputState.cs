@@ -4,6 +4,7 @@ using System.Linq;
 using Klaesh.Core;
 using Klaesh.Core.Message;
 using Klaesh.Game.Data;
+using Klaesh.Game.Job;
 using Klaesh.GameEntity;
 using Klaesh.GameEntity.Component;
 using Klaesh.GameEntity.Module;
@@ -50,7 +51,15 @@ namespace Klaesh.Game
         {
             if (_reachableTiles.Any(tup => tup.Item1 == tile))
             {
-                if (!Entity.GetComponent<HexMovementComp>().StartMovingTo(tile.Position, () => Debug.Log("arrived!")))
+                //if (!Entity.GetComponent<HexMovementComp>().StartMovingTo(tile.Position, () => Debug.Log("arrived!")))
+                //{
+                //    Debug.LogFormat("[EntitySelected Input] unable to move there.");
+                //    if (tile.HasEntityOnTop)
+                //        return OnPickGameEntity(tile.Entity);
+                //    return null;
+                //}
+
+                if (!Entity.GetComponent<HexMovementComp>().CanMoveTo(tile.Position, out List<HexTile> path))
                 {
                     Debug.LogFormat("[EntitySelected Input] unable to move there.");
                     if (tile.HasEntityOnTop)
@@ -58,23 +67,28 @@ namespace Klaesh.Game
                     return null;
                 }
 
-                // TODO: add state that waits for animation!?!
+                var coordPath = path.Select(t => t.Position).ToList();
+                var job = new MoveUnitJob(Entity, coordPath);
 
+                var jm = ServiceLocator.Instance.GetService<IJobManager>();
+                jm.AddJob(job);
+                jm.ExecuteJobs();
+                ServiceLocator.Instance.GetService<INetworker>().SendData(EventCode.DoJob, job);
 
                 // TEMPORARY
                 // TEMPORARY
                 // TEMPORARY
-                var sm = Entity.GetModule<SquadMember>();
-                ServiceLocator.Instance.GetService<INetworker>().SendData(EventCode.MoveUnit, new MoveUnitData {
-                    SquadId = sm.Squad.Config.ServerId,
-                    MemberId = sm.Id,
-                    Target = tile.Position
-                });
+                //var sm = Entity.GetModule<SquadMember>();
+                //ServiceLocator.Instance.GetService<INetworker>().SendData(EventCode.MoveUnit, new MoveUnitData {
+                //    SquadId = sm.Squad.Config.ServerId,
+                //    MemberId = sm.Id,
+                //    Target = tile.Position
+                //});
                 // TEMPORARY
                 // TEMPORARY
                 // TEMPORARY
 
-                ServiceLocator.Instance.GetService<IMessageBus>().Publish(new FocusCameraMessage(this, tile.GetTop()));
+                //ServiceLocator.Instance.GetService<IMessageBus>().Publish(new FocusCameraMessage(this, tile.GetTop()));
                 return new IdleInputState();
             }
             Debug.LogFormat("[EntitySelected Input] can't move there. out of range");
