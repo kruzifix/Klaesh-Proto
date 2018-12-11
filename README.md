@@ -17,6 +17,7 @@ To run the server locally:
 
 If server is used to host build:
 - adjust dir variable in index.js to point to build directory
+
 when running project in unity editor this is not necessary!
 
 ## TODO

@@ -34,14 +34,12 @@ function startGame(game) {
     console.log('starting game')
     console.log(game)
 
-    const config = game.gameConfig
-
     // send game start to players
     for (let i = 0; i < game.players.length; i++) {
-        config.home_squad = i
-        config.random_seed = game.randomSeed
-        clients[game.players[i]].socket.send(makeMsg('gamestart', config))
+        game.config.home_squad = i
+        clients[game.players[i]].socket.send(makeMsg('gamestart', game.config))
     }
+    delete game.config.home_squad
 
     // start first turn
     game.turnNumber = 1
@@ -110,16 +108,20 @@ wss.on('connection', socket => {
     clientsSearchingForGame.push(id)
 
     if (clientsSearchingForGame.length >= 2) {
-        const player1 = clientsSearchingForGame.pop()
         const player2 = clientsSearchingForGame.pop()
+        const player1 = clientsSearchingForGame.pop()
 
         const gid = getId('game')
         const game = {
             id: gid,
-            gameConfig: board,
+            config: board,
             players: [player1, player2],
             randomSeed: Math.floor(Math.random() * 10000)
         }
+        game.config.id = gid
+        game.config.squads[0].id = player1
+        game.config.squads[1].id = player2
+        game.config.random_seed = game.randomSeed
         startGame(game)
     }
 

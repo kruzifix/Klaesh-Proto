@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Klaesh.Core;
 using Klaesh.GameEntity;
-using Klaesh.GameEntity.Module;
 using Klaesh.Game.Config;
 using Klaesh.Hex;
 using UnityEngine;
@@ -18,8 +17,11 @@ namespace Klaesh.Game
     public interface IGameManager
     {
         int TurnNumber { get; }
+        int ActiveSquadIndex { get; }
         ISquad ActiveSquad { get; }
         bool HomeSquadActive { get; }
+
+        IGameConfiguration CurrentConfig { get; }
 
         bool TurnEnded { get; }
 
@@ -47,6 +49,8 @@ namespace Klaesh.Game
         public int ActiveSquadIndex { get; private set; }
         public ISquad ActiveSquad => _squads?[ActiveSquadIndex] ?? null;
         public bool HomeSquadActive => ActiveSquadIndex == _currentGameConfig.HomeSquadId;
+
+        public IGameConfiguration CurrentConfig => _currentGameConfig;
 
         public bool TurnEnded { get; private set; }
 
