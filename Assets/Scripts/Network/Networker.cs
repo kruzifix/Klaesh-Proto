@@ -48,7 +48,9 @@ namespace Klaesh.Network
                 var received = _socket.RecvString();
                 if (received != null)
                 {
+                    Debug.Log($"[Networker] received data: {received}");
                     var msgData = JsonConvert.DeserializeObject<MsgData>(received);
+                    Debug.Log($"[Networker] parsed to: {msgData.code} {msgData.data}");
                     DataReceived?.Invoke(msgData.code, msgData.data);
                 }
 

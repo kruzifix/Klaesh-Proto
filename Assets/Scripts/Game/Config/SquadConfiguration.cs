@@ -20,7 +20,7 @@ namespace Klaesh.Game.Config
         [JsonProperty("name")]
         public string Name { get; set; }
         // TODO: fix this!
-        [JsonIgnore]
+        [JsonProperty("color")]
         public Color Color { get; set; }
 
         [JsonProperty("origin")]

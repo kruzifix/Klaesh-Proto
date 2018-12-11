@@ -118,6 +118,11 @@ namespace Klaesh
                             }
                         }
                     };
+
+                    var data = _serviceLocator.GetService<IJsonConverter>().SerializeObject(config, Formatting.Indented);
+                    Debug.Log(data);
+                    config = _serviceLocator.GetService<IJsonConverter>().DeserializeObject<GameConfiguration>(data);
+
                     _serviceLocator.GetService<IGameManager>().StartGame(config);
                 }
             });
@@ -125,11 +130,13 @@ namespace Klaesh
 
         private void OnDataReceived(EventCode eventCode, string data)
         {
+            var jcon = _serviceLocator.GetService<IJsonConverter>();
+
             if (eventCode == EventCode.GameStart)
             {
                 Debug.Log("Start Game!");
 
-                var config = JsonConvert.DeserializeObject<GameConfiguration>(data);
+                var config = jcon.DeserializeObject<GameConfiguration>(data);
 
                 _serviceLocator.GetService<IGameManager>().StartGame(config);
             }
@@ -142,6 +149,7 @@ namespace Klaesh
             _serviceLocator = new ServiceManager();
             ServiceLocator.Instance = _serviceLocator;
             _serviceLocator.RegisterSingleton<IMessageBus>(new MessageBus());
+            _serviceLocator.RegisterSingleton<IJsonConverter>(new CustomJsonConverter());
         }
     }
 }

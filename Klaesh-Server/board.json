@@ -1,71 +1,83 @@
 {
-    "map": {
-      "rows": 12,
-      "cols": 7,
-      "noffset": 0,
-      "nscale": 0.5,
-      "hscale": 7.0
-    },
-    "squads": [
-      {
-        "name": "Rowdy3",
-        "origin": {
-          "col": 3,
-          "row": 1
-        },
-        "units": [
-          {
-            "pos": {
-              "col": 0,
-              "row": 0
-            },
-            "id": "knight"
-          },
-          {
-            "pos": {
-              "col": -2,
-              "row": 0
-            },
-            "id": "knight"
-          },
-          {
-            "pos": {
-              "col": 2,
-              "row": 0
-            },
-            "id": "knight"
-          }
-        ]
+  "map": {
+    "rows": 12,
+    "cols": 7,
+    "noffset": 0,
+    "nscale": 0.5,
+    "hscale": 7.0
+  },
+  "squads": [
+    {
+      "name": "Rowdy3",
+      "color": {
+        "r": 0.259,
+        "g": 0.525,
+        "b": 0.957,
+        "a": 1.0
       },
-      {
-        "name": "Mighty Drei",
-        "origin": {
-          "col": 3,
-          "row": 10
+      "origin": {
+        "col": 3,
+        "row": 1
+      },
+      "units": [
+        {
+          "pos": {
+            "col": 0,
+            "row": 0
+          },
+          "id": "knight"
         },
-        "units": [
-          {
-            "pos": {
-              "col": 0,
-              "row": 0
-            },
-            "id": "skeleton"
+        {
+          "pos": {
+            "col": -2,
+            "row": 0
           },
-          {
-            "pos": {
-              "col": -2,
-              "row": 0
-            },
-            "id": "skeleton"
+          "id": "knight"
+        },
+        {
+          "pos": {
+            "col": 2,
+            "row": 0
           },
-          {
-            "pos": {
-              "col": 2,
-              "row": 0
-            },
-            "id": "skeleton"
-          }
-        ]
-      }
-    ]
-  }
+          "id": "knight"
+        }
+      ]
+    },
+    {
+      "name": "Mighty Drei",
+      "color": {
+        "r": 0.957,
+        "g": 0.675,
+        "b": 0.255,
+        "a": 1.0
+      },
+      "origin": {
+        "col": 3,
+        "row": 10
+      },
+      "units": [
+        {
+          "pos": {
+            "col": 0,
+            "row": 0
+          },
+          "id": "skeleton"
+        },
+        {
+          "pos": {
+            "col": -2,
+            "row": 0
+          },
+          "id": "skeleton"
+        },
+        {
+          "pos": {
+            "col": 2,
+            "row": 0
+          },
+          "id": "skeleton"
+        }
+      ]
+    }
+  ]
+}
