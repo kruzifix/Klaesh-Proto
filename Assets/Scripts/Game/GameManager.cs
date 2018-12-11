@@ -97,6 +97,7 @@ namespace Klaesh.Game
             //networkDataHandler.Add(EventCode.HeartBeat, MakeHandlerBridge<HeartBeatData>(OnHeartBeat));
             networkDataHandler.Add(EventCode.GameStart, MakeHandlerBridge<GameConfiguration>(StartGame));
             networkDataHandler.Add(EventCode.StartTurn, MakeHandlerBridge<StartTurnData>(StartNextTurn));
+            networkDataHandler.Add(EventCode.MoveUnit, MakeHandlerBridge<MoveUnitData>(OnMoveUnit));
         }
 
         private void OnDestroy()
@@ -117,30 +118,6 @@ namespace Klaesh.Game
         //{
         //    Debug.Log($"[HeartBeat] {data.Time}");
         //    _networker.SendData(EventCode.HeartBeat, new HeartBeatData { Time = DateTime.Now });
-        //}
-
-        //private void OnDataReceived(EventCode eventCode, string data)
-        //{
-        //    switch (eventCode)
-        //    {
-        //        case EventCode.HeartBeat:
-        //            var hbData = _jconverter.DeserializeObject<HeartBeatData>(data);
-        //            break;
-        //        case EventCode.GameStart:
-        //            var config = _jconverter.DeserializeObject<GameConfiguration>(data);
-        //            StartGame(config);
-        //            break;
-        //        case EventCode.StartTurn:
-        //            var stData = _jconverter.DeserializeObject<StartTurnData>(data);
-        //            StartNextTurn(stData);
-        //            break;
-        //        case EventCode.MoveUnit:
-        //            Debug.Log($"[GameManager] move unit! {data}");
-        //            break;
-        //        default:
-        //            Debug.Log($"[GameManager] unhandeled event code received: {eventCode}\n{data}");
-        //            break;
-        //    }
         //}
 
         public void StartGame(IGameConfiguration game)
@@ -187,13 +164,31 @@ namespace Klaesh.Game
 
             if (HomeSquadActive)
             {
-                ActiveSquad.Members.ForEach(ge => ge.GetComponent<HexMovementComp>().OnNextTurn());
                 SwitchTo(new IdleInputState());
                 TurnEnded = false;
             }
 
+            _squads.ForEach(s => s.Members.ForEach(ge => ge.GetComponent<HexMovementComp>().OnNextTurn()));
+
             _bus.Publish(new FocusCameraMessage(this, ActiveSquad.Members[0].transform.position));
             _bus.Publish(new RefreshGameUIMessage(this));
+        }
+
+        private void OnMoveUnit(MoveUnitData data)
+        {
+            // check squad id, and if active
+            if (data.SquadId != ActiveSquad.Config.ServerId)
+            {
+                throw new Exception("got move unit message, and sender is not active player!");
+            }
+            // get the entity and move it
+            bool canMove = ActiveSquad.Members[data.MemberId]
+                .GetComponent<HexMovementComp>()
+                .StartMovingTo(data.Target, () => Debug.Log($"unit moved to {data.Target}"));
+            if (!canMove)
+            {
+                throw new Exception($"unit was unable to move to {data.Target}!");
+            }
         }
 
         public void EndTurn()

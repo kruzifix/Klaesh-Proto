@@ -37,9 +37,12 @@ namespace Klaesh.Game
 
             Members = new List<Entity>();
 
+            int number = 0;
             foreach (var unit in Config.Units)
             {
-                var ent = gem.CreateEntity(unit.EntityId/*, e => e.AddModule(this)*/);
+                var ent = gem.CreateEntity(unit.EntityId, e => {
+                    e.AddModule(new SquadMember(this, number));
+                });
 
                 ent.GetComponent<HexMovementComp>().SetPosition(Config.Origin.CubeCoord + unit.Position.CubeCoord);
 
@@ -48,6 +51,7 @@ namespace Klaesh.Game
                 ent.transform.rotation = Quaternion.LookRotation(center.GetTop() - ent.transform.position);
 
                 Members.Add(ent);
+                number++;
             }
         }
     }

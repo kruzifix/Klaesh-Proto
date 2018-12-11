@@ -75,6 +75,7 @@ namespace Klaesh.Network
             }
 
             _socket.Close();
+            _socket = null;
             _connectionRoutine = null;
         }
 
@@ -113,6 +114,12 @@ namespace Klaesh.Network
             {
                 StopCoroutine(_connectionRoutine);
                 _connectionRoutine = null;
+
+                if (_socket != null)
+                {
+                    _socket.Close();
+                    _socket = null;
+                }
             }
         }
 

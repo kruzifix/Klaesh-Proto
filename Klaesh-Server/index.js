@@ -58,40 +58,70 @@ function gameBroadcast(game, msg) {
     }
 }
 
+function gameBroadcastToOthers(game, sourcePlayer, msg) {
+    for (let id of game.players) {
+        if (id != sourcePlayer) {
+            clients[id].socket.send(msg)
+        }
+    }
+}
+
+function onEndTurn(userId, code, data) {
+    // find game user is in; if any
+    let game = games.filter(g => g.players.some(p => p == userId));
+    if (game.length != 1) {
+        console.log(`got endtturn message from player not in a game! games: ${game.length}`)
+        return
+    }
+    game = game[0]
+    // check if player is active player
+    if (userId != game.players[game.activeSquad]) {
+        console.log('got endtturn message from the wrong player!')
+        return
+    }
+    // check turn number
+    if (game.turnNumber != data.turn_num) {
+        console.log('wrong turnnumber!')
+        return
+    }
+
+    // everything checks out!
+    // end current turn and start next
+    game.turnNumber += 1
+    game.activeSquad = (game.activeSquad + 1) % game.players.length
+    gameBroadcast(game, makeMsg('startturn', {
+        turn_num: game.turnNumber,
+        active_squad: game.activeSquad
+    }))
+    console.log(`starting turn ${game.turnNumber}`)
+}
+
+function onMoveUnit(userId, code, data) {
+    let game = games.filter(g => g.players.some(p => p == userId));
+    if (game.length != 1) {
+        console.log(`got moveunit message from player not in a game! games: ${game.length}`)
+        return
+    }
+    game = game[0]
+
+    // check validitiy of msg?
+
+    gameBroadcastToOthers(game, userId, makeMsg(code, data))
+}
+
 function handleMsg(userId, code, data) {
     console.log(`${userId} -- ${code}:`)
     console.log(data)
 
-    switch(code) {
-        case "endturn":
-            // find game user is in; if any
-            let game = games.filter(g => g.players.some(p => p == userId));
-            if (game.length != 1) {
-                console.log(`got endtturn message from player not in a game! games: ${game.length}`)
-                return
-            }
-            game = game[0]
-            // check if player is active player
-            if (userId != game.players[game.activeSquad]) {
-                console.log('got endtturn message from the wrong player!')
-                return
-            }
-            // check turn number
-            if (game.turnNumber != data.turn_num) {
-                console.log('wrong turnnumber!')
-                return
-            }
-
-            // everything checks out!
-            // end current turn and start next
-            game.turnNumber += 1
-            game.activeSquad = (game.activeSquad + 1) % game.players.length
-            gameBroadcast(game, makeMsg('startturn', {
-                turn_num: game.turnNumber,
-                active_squad: game.activeSquad
-            }))
-            console.log(`starting turn ${game.turnNumber}`)
-        break;
+    const handler = {
+        'endturn': onEndTurn,
+        'moveunit': onMoveUnit
+    }
+    
+    if (code in handler) {
+        handler[code](userId, code, data)
+    } else {
+        console.log(`no handler for code ${code}`)
     }
 }
 
@@ -142,6 +172,11 @@ wss.on('connection', socket => {
         if (clients[id]) {
             console.log('closing connection to ' + id)
             delete clients[id]
+            
+            const idx = clientsSearchingForGame.indexOf(id);
+            if (idx >= 0) {
+                clientsSearchingForGame.splice(idx, 1);
+            }
         }
     })
 })

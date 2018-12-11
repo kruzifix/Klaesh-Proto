@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using Klaesh.Core;
 using Klaesh.Core.Message;
+using Klaesh.Game.Data;
 using Klaesh.GameEntity;
 using Klaesh.GameEntity.Component;
 using Klaesh.GameEntity.Module;
 using Klaesh.Hex;
+using Klaesh.Network;
 using Klaesh.Utility;
 using UnityEngine;
 
@@ -57,6 +59,20 @@ namespace Klaesh.Game
                 }
 
                 // TODO: add state that waits for animation!?!
+
+
+                // TEMPORARY
+                // TEMPORARY
+                // TEMPORARY
+                var sm = Entity.GetModule<SquadMember>();
+                ServiceLocator.Instance.GetService<INetworker>().SendData(EventCode.MoveUnit, new MoveUnitData {
+                    SquadId = sm.Squad.Config.ServerId,
+                    MemberId = sm.Id,
+                    Target = tile.Position
+                });
+                // TEMPORARY
+                // TEMPORARY
+                // TEMPORARY
 
                 ServiceLocator.Instance.GetService<IMessageBus>().Publish(new FocusCameraMessage(this, tile.GetTop()));
                 return new IdleInputState();

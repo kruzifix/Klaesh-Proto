@@ -23,6 +23,8 @@ when running project in unity editor this is not necessary!
 ## TODO
 - You can reduce your startup time if you configure your web server to host .unityweb files using gzip compression.
 
+- configure to never strip JSON.net code!!!
+
 - use Jobs and a JobManager to handle movement and combat
 - MoveToJob, AttackJob, ...
 
