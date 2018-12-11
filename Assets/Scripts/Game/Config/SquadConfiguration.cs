@@ -8,6 +8,7 @@ namespace Klaesh.Game.Config
 {
     public interface ISquadConfiguration
     {
+        int ServerId { get; }
         string Name { get; }
         Color Color { get; }
 
@@ -17,6 +18,8 @@ namespace Klaesh.Game.Config
 
     public class SquadConfiguration : ISquadConfiguration
     {
+        [JsonProperty("id")]
+        public int ServerId { get; set; }
         [JsonProperty("name")]
         public string Name { get; set; }
         // TODO: fix this!

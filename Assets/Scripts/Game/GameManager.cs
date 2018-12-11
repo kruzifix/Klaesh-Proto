@@ -7,16 +7,25 @@ using Klaesh.Game.Config;
 using Klaesh.Hex;
 using UnityEngine;
 using Klaesh.GameEntity.Component;
+using Klaesh.Network;
+using Klaesh.Utility;
+using Klaesh.Game.Data;
+using System;
+using Klaesh.Game.UI;
 
 namespace Klaesh.Game
 {
     public interface IGameManager
     {
+        int TurnNumber { get; }
         ISquad ActiveSquad { get; }
+        bool HomeSquadActive { get; }
+
+        bool TurnEnded { get; }
 
         void StartGame(IGameConfiguration game);
 
-        void StartNextTurn();
+        void StartNextTurn(StartTurnData data);
         void EndTurn();
 
         bool IsPartOfActiveSquad(Entity entity);
@@ -26,14 +35,20 @@ namespace Klaesh.Game
     {
         private IEntityManager _gem;
         private IHexMap _map;
+        private INetworker _networker;
+        private IJsonConverter _jconverter;
 
         private IInputState _currentState;
         private IGameConfiguration _currentGameConfig;
 
         private List<Squad> _squads;
-        private int _activeSquadIndex;
 
-        public ISquad ActiveSquad => _squads?[_activeSquadIndex] ?? null;
+        public int TurnNumber { get; private set; }
+        public int ActiveSquadIndex { get; private set; }
+        public ISquad ActiveSquad => _squads?[ActiveSquadIndex] ?? null;
+        public bool HomeSquadActive => ActiveSquadIndex == _currentGameConfig.HomeSquadId;
+
+        public bool TurnEnded { get; private set; }
 
         protected override void OnAwake()
         {
@@ -45,7 +60,7 @@ namespace Klaesh.Game
             _gem = _locator.GetService<IEntityManager>();
             _map = _locator.GetService<IHexMap>();
 
-            _currentState = new IdleInputState();
+            _currentState = NullInputState.Instance;
 
             //var picker = _locator.GetService<IObjectPicker>();
             //picker.RegisterHandler<GameEntity.GameEntity>(KeyCode.Mouse0, "Entity", this);
@@ -56,12 +71,73 @@ namespace Klaesh.Game
             input.RegisterHandler<HexTile>("HexTile", OnPickHexTile);
 
             // TODO: Deregister Handler!!!
+
+            _jconverter = _locator.GetService<IJsonConverter>();
+            _networker = _locator.GetService<INetworker>();
+
+            var networkDataHandler = new Dictionary<EventCode, Action<string>>();
+
+            //_networker.DataReceived += OnDataReceived;
+            _networker.DataReceived += (code, data) =>
+            {
+                if (networkDataHandler.ContainsKey(code))
+                {
+                    networkDataHandler[code].Invoke(data);
+                }
+                else
+                {
+                    Debug.Log($"[GameManager] unhandeled event code received: {code}\n{data}");
+                }
+            };
+
+            //networkDataHandler.Add(EventCode.HeartBeat, MakeHandlerBridge<HeartBeatData>(OnHeartBeat));
+            networkDataHandler.Add(EventCode.GameStart, MakeHandlerBridge<GameConfiguration>(StartGame));
+            networkDataHandler.Add(EventCode.StartTurn, MakeHandlerBridge<StartTurnData>(StartNextTurn));
         }
 
         private void OnDestroy()
         {
             _locator.DeregisterSingleton<IGameManager>();
         }
+
+        private Action<string> MakeHandlerBridge<T>(Action<T> action)
+        {
+            return data =>
+            {
+                var jdata = _jconverter.DeserializeObject<T>(data);
+                action(jdata);
+            };
+        }
+
+        //private void OnHeartBeat(HeartBeatData data)
+        //{
+        //    Debug.Log($"[HeartBeat] {data.Time}");
+        //    _networker.SendData(EventCode.HeartBeat, new HeartBeatData { Time = DateTime.Now });
+        //}
+
+        //private void OnDataReceived(EventCode eventCode, string data)
+        //{
+        //    switch (eventCode)
+        //    {
+        //        case EventCode.HeartBeat:
+        //            var hbData = _jconverter.DeserializeObject<HeartBeatData>(data);
+        //            break;
+        //        case EventCode.GameStart:
+        //            var config = _jconverter.DeserializeObject<GameConfiguration>(data);
+        //            StartGame(config);
+        //            break;
+        //        case EventCode.StartTurn:
+        //            var stData = _jconverter.DeserializeObject<StartTurnData>(data);
+        //            StartNextTurn(stData);
+        //            break;
+        //        case EventCode.MoveUnit:
+        //            Debug.Log($"[GameManager] move unit! {data}");
+        //            break;
+        //        default:
+        //            Debug.Log($"[GameManager] unhandeled event code received: {eventCode}\n{data}");
+        //            break;
+        //    }
+        //}
 
         public void StartGame(IGameConfiguration game)
         {
@@ -85,27 +161,46 @@ namespace Klaesh.Game
                 _squads.Add(squad);
             }
 
-            _activeSquadIndex = -1;
-            StartNextTurn();
+            TurnNumber = 0;
+            TurnEnded = true;
+
+            // Initialize Random with seed!
+
+
+            Debug.Log($"[GameManager] Starting game! id: {_currentGameConfig.ServerId}; random seed: {_currentGameConfig.RandomSeed}");
         }
 
-        public void StartNextTurn()
+        public void StartNextTurn(StartTurnData data)
         {
-            _activeSquadIndex = (_activeSquadIndex + 1) % _squads.Count;
+            // check turn number
+            if (data.TurnNumber != TurnNumber + 1)
+            {
+                throw new Exception($"got wrong turn number. expected {TurnNumber + 1}, got {data.TurnNumber}");
+            }
 
-            ActiveSquad.Members.ForEach(ge => ge.GetComponent<HexMovementComp>().OnNextTurn());
+            TurnNumber = data.TurnNumber;
+            ActiveSquadIndex = data.ActiveSquadIndex;
 
-            _currentState = new IdleInputState();
-            _currentState.OnEnabled();
+            if (HomeSquadActive)
+            {
+                ActiveSquad.Members.ForEach(ge => ge.GetComponent<HexMovementComp>().OnNextTurn());
+                SwitchTo(new IdleInputState());
+                TurnEnded = false;
+            }
 
             _bus.Publish(new FocusCameraMessage(this, ActiveSquad.Members[0].transform.position));
+            _bus.Publish(new RefreshGameUIMessage(this));
         }
 
         public void EndTurn()
         {
-            _currentState.OnDisabled();
+            if (TurnEnded)
+                return;
+            TurnEnded = true;
 
-            StartNextTurn();
+            SwitchTo(NullInputState.Instance);
+
+            _networker.SendData(EventCode.EndTurn, new EndTurnData { TurnNumber = TurnNumber });
         }
 
         public bool IsPartOfActiveSquad(Entity entity)

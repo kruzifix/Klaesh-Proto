@@ -29,4 +29,14 @@ namespace Klaesh.Game
             return null;
         }
     }
+
+    public class NullInputState : BaseInputState
+    {
+        private static NullInputState _instance;
+        public static NullInputState Instance { get { return _instance ?? (_instance = new NullInputState()); } }
+
+        private NullInputState()
+        {
+        }
+    }
 }

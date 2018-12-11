@@ -2,14 +2,23 @@
 using System.Collections;
 using System.Collections.Generic;
 using Klaesh.Core;
+using Klaesh.Utility;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using UnityEngine;
 
 namespace Klaesh.Network
 {
+    //[JsonConverter(typeof(StringEnumConverter))]
     public enum EventCode
     {
+        HeartBeat,
         GameStart,
+
+        StartTurn,
+        EndTurn,
+
+        MoveUnit
 
         // Ack?
     }
@@ -23,11 +32,13 @@ namespace Klaesh.Network
 
         void ConnectTo(string url);
 
-        void SendData(EventCode eventCode, string data);
+        void SendData(EventCode eventCode, object data);
     }
 
     public class Networker : ManagerBehaviour, INetworker
     {
+        private IJsonConverter _converter;
+
         private WebSocket _socket;
         private Coroutine _connectionRoutine;
 
@@ -75,18 +86,34 @@ namespace Klaesh.Network
             _connectionRoutine = StartCoroutine(DoConnection(url));
         }
 
-        public void SendData(EventCode eventCode, string data)
+        public void SendData(EventCode eventCode, object data)
         {
             var msgData = new MsgData();
             msgData.code = eventCode;
-            msgData.data = data;
+            msgData.data = _converter.SerializeObject(data);
 
-            _socket.SendString(JsonConvert.SerializeObject(msgData));
+            var str = _converter.SerializeObject(msgData);
+            Debug.Log($"[Networker] sending data {str}");
+            _socket.SendString(str);
         }
 
         protected override void OnAwake()
         {
             _locator.RegisterSingleton<INetworker>(this);
+        }
+
+        private void Start()
+        {
+            _converter = _locator.GetService<IJsonConverter>();
+        }
+
+        private void OnDestroy()
+        {
+            if (_connectionRoutine != null)
+            {
+                StopCoroutine(_connectionRoutine);
+                _connectionRoutine = null;
+            }
         }
 
         private class MsgData

@@ -31,23 +31,20 @@ namespace Klaesh
 
         private void Start()
         {
+            DontDestroyOnLoad(gameObject);
             Application.targetFrameRate = 60;
 
             var bus = _serviceLocator.GetService<IMessageBus>();
 
-            DontDestroyOnLoad(gameObject);
-
             // TODO: get from current webgl context/provider?
             string url = "ws://localhost:3000";
-
-            var networker = _serviceLocator.GetService<INetworker>();
-            networker.DataReceived += OnDataReceived;
 
             // setup game board
             bus.Subscribe<EntityPrefabsLoadedMessage>(msg =>
             {
                 if (useServer)
                 {
+                    var networker = _serviceLocator.GetService<INetworker>();
                     networker.ConnectTo(url);
                 }
                 else
@@ -126,20 +123,6 @@ namespace Klaesh
                     _serviceLocator.GetService<IGameManager>().StartGame(config);
                 }
             });
-        }
-
-        private void OnDataReceived(EventCode eventCode, string data)
-        {
-            var jcon = _serviceLocator.GetService<IJsonConverter>();
-
-            if (eventCode == EventCode.GameStart)
-            {
-                Debug.Log("Start Game!");
-
-                var config = jcon.DeserializeObject<GameConfiguration>(data);
-
-                _serviceLocator.GetService<IGameManager>().StartGame(config);
-            }
         }
 
         private void Create()

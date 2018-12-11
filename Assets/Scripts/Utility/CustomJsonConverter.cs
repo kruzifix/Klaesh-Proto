@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using Assets.Scripts.Utility;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Klaesh.Utility
 {
@@ -17,7 +19,8 @@ namespace Klaesh.Utility
         {
             _converter = new JsonConverter[]
             {
-                new ColorConverter()
+                new ColorConverter(),
+                new AnnoyingStringEnumConverter { AllowIntegerValues = false, CamelCaseText = false }
             };
         }
 
