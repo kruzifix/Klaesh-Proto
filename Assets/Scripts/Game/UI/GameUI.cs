@@ -11,6 +11,9 @@ namespace Klaesh.Game.UI
         public Text TurnNumberLabel;
         public Text DebugInfoText;
 
+        public Button RecruitButton;
+        public Button AbortButton;
+
         private void Start()
         {
             _gameManager = _locator.GetService<IGameManager>();
@@ -20,7 +23,11 @@ namespace Klaesh.Game.UI
 
         private void OnRefresh(RefreshGameUIMessage msg)
         {
-            EndTurnButton.gameObject.SetActive(!_gameManager.TurnEnded && _gameManager.HomeSquadActive);
+            bool active = !_gameManager.TurnEnded && _gameManager.HomeSquadActive;
+            EndTurnButton.gameObject.SetActive(active);
+            RecruitButton.gameObject.SetActive(active);
+            AbortButton.gameObject.SetActive(active);
+
             TurnNumberLabel.text = $"Turn: {_gameManager.TurnNumber}";
 
             var config = _gameManager.CurrentConfig;
@@ -41,6 +48,17 @@ HomeSquadActive: {_gameManager.HomeSquadActive}
         {
             _gameManager.EndTurn();
             OnRefresh(null);
+        }
+
+        public void OnAbortInput()
+        {
+            _gameManager.ActivateInput("abort");
+        }
+
+        public void OnRecruitUnit()
+        {
+            // TODO: pass unit type here!
+            _gameManager.ActivateInput("recruitUnit");
         }
     }
 }

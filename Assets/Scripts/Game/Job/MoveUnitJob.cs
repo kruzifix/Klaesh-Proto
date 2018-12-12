@@ -53,12 +53,13 @@ namespace Klaesh.Game.Job
             // later tiles can have more movement requirement!!!
             movement.MovementLeft -= Path.Count;
 
+            bus.Publish(new FocusCameraMessage(this, endTile.GetTop()));
+
             for (int i = 1; i < Path.Count; i++)
             {
                 var lastTile = map.GetTile(Path[i - 1]);
                 var targetTile = map.GetTile(Path[i]);
 
-                bus.Publish(new FocusCameraMessage(this, targetTile.GetTop()));
                 yield return _starter.StartCoroutine(AnimatedMoveTo(targetTile.GetTop(), targetTile.Height - lastTile.Height));
             }
 

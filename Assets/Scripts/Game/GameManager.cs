@@ -13,6 +13,7 @@ using System;
 using Klaesh.Game.UI;
 using System.Linq;
 using Klaesh.Game.Job;
+using Klaesh.Game.Input;
 
 namespace Klaesh.Game
 {
@@ -32,6 +33,9 @@ namespace Klaesh.Game
         void StartNextTurn(StartTurnData data);
         void EndTurn();
 
+        void ActivateInput(string id);
+        void ActivateInput(string id, object data);
+
         bool IsPartOfActiveSquad(Entity entity);
 
         Entity ResolveEntityRef(SquadEntityRefData data);
@@ -45,7 +49,9 @@ namespace Klaesh.Game
         private IJsonConverter _jconverter;
         private IJobManager _jobManager;
 
+        private IInputState _baseState;
         private IInputState _currentState;
+
         private IGameConfiguration _currentGameConfig;
 
         private List<Squad> _squads;
@@ -69,6 +75,7 @@ namespace Klaesh.Game
             _gem = _locator.GetService<IEntityManager>();
             _map = _locator.GetService<IHexMap>();
 
+            _baseState = NullInputState.Instance;
             _currentState = NullInputState.Instance;
 
             //var picker = _locator.GetService<IObjectPicker>();
@@ -168,9 +175,12 @@ namespace Klaesh.Game
             TurnNumber = data.TurnNumber;
             ActiveSquadIndex = data.ActiveSquadIndex;
 
+            _baseState = NullInputState.Instance;
+
             if (HomeSquadActive)
             {
-                SwitchTo(new IdleInputState());
+                _baseState = new IdleInputState();
+                SwitchTo(_baseState);
                 TurnEnded = false;
             }
 
@@ -195,6 +205,22 @@ namespace Klaesh.Game
             SwitchTo(NullInputState.Instance);
 
             _networker.SendData(EventCode.EndTurn, new EndTurnData { TurnNumber = TurnNumber });
+        }
+
+        public void ActivateInput(string id)
+        {
+            ActivateInput(id, null);
+        }
+
+        public void ActivateInput(string id, object data)
+        {
+            if (id.Equals("abort") && _currentState != _baseState)
+            {
+                SwitchTo(_baseState);
+                return;
+            }
+
+            SwitchTo(_currentState.OnInputActivated(id, data));
         }
 
         public bool IsPartOfActiveSquad(Entity entity)
@@ -231,6 +257,8 @@ namespace Klaesh.Game
         {
             if (newState != null)
             {
+                Debug.Log($"[GameManager] switching input state! {_currentState.GetType().Name} -> {newState.GetType().Name}");
+
                 _currentState.OnDisabled();
                 _currentState = newState;
                 _currentState.OnEnabled();

@@ -15,6 +15,8 @@ namespace Klaesh.Utility
 
         public static Color[] SquadColors = new Color[] { new Color32(66, 134, 244, 255), new Color32(244, 172, 65, 255) };
 
+        public static Color HighlightOrange = new Color32(255, 185, 94, 255);
+
         static Colors()
         {
             ColorUtility.TryParseHtmlString("#6D80EC", out TileOrigin);

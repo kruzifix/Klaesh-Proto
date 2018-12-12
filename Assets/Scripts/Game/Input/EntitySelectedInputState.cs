@@ -13,7 +13,7 @@ using Klaesh.Network;
 using Klaesh.Utility;
 using UnityEngine;
 
-namespace Klaesh.Game
+namespace Klaesh.Game.Input
 {
     public class EntitySelectedInputState : BaseInputState
     {

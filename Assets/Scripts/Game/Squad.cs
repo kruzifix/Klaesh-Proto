@@ -17,10 +17,13 @@ namespace Klaesh.Game
         List<Entity> Members { get; }
 
         void CreateMembers(IEntityManager man);
+        void AddMember(IEntityManager gem, IHexCoord position, string entityId);
     }
 
     public class Squad : ISquad
     {
+        private int _number;
+
         public ISquadConfiguration Config { get; private set; }
 
         public List<Entity> Members { get; private set; }
@@ -36,23 +39,28 @@ namespace Klaesh.Game
                 return;
 
             Members = new List<Entity>();
+            _number = 0;
 
-            int number = 0;
             foreach (var unit in Config.Units)
             {
-                var ent = gem.CreateEntity(unit.EntityId, e => {
-                    e.AddModule(new SquadMember(this, number));
-                });
-
-                ent.GetComponent<HexMovementComp>().SetPosition(Config.Origin.CubeCoord + unit.Position.CubeCoord);
-
-                var map = ServiceLocator.Instance.GetService<IHexMap>();
-                var center = map.GetTile(map.Columns / 2, map.Rows / 2);
-                ent.transform.rotation = Quaternion.LookRotation(center.GetTop() - ent.transform.position);
-
-                Members.Add(ent);
-                number++;
+                AddMember(gem, Config.Origin.CubeCoord + unit.Position.CubeCoord, unit.EntityId);
             }
+        }
+
+        public void AddMember(IEntityManager gem, IHexCoord position, string entityId)
+        {
+            var ent = gem.CreateEntity(entityId, e => {
+                e.AddModule(new SquadMember(this, _number));
+            });
+
+            ent.GetComponent<HexMovementComp>().SetPosition(position);
+
+            var map = ServiceLocator.Instance.GetService<IHexMap>();
+            var center = map.GetTile(map.Columns / 2, map.Rows / 2);
+            ent.transform.rotation = Quaternion.LookRotation(center.GetTop() - ent.transform.position);
+
+            Members.Add(ent);
+            _number++;
         }
     }
 }
