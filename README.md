@@ -15,21 +15,25 @@ To run the server locally:
 - install packages with `npm i`
 - run server with `npm start`
 
-If server is used to host build:
-- adjust dir variable in index.js to point to build directory
+If server is used to host WEBGL build:
+- adjust dir variable in index.js to point to WEBGL build directory
 
-when running project in unity editor this is not necessary!
+### For Testing:
+the editor can connect to the local server!
+
+But you need a second client to test!
+For this: build the project as Windows Standalone (this is faster than a webgl build) and just start it!
+It should connect to the local server and you can test your stuff! awesome!
+
 
 ## TODO
 - You can reduce your startup time if you configure your web server to host .unityweb files using gzip compression.
 
 - configure to never strip JSON.net code!!!
 
-- use Jobs and a JobManager to handle movement and combat
-- MoveToJob, AttackJob, ...
-
 - Navigator that builds 'Nav-Mesh/Map' from properties of Hextiles
 - has methods like Flood(origin)
+- should then consider tile properties (bigger weight for forest, etc)
 - and then Backtrack(target) -> returns path
 
 - Fog of War!
