@@ -13,6 +13,7 @@ using System;
 using System.Linq;
 using Klaesh.Game.Job;
 using Klaesh.Game.Input;
+using Klaesh.Game.Message;
 
 namespace Klaesh.Game
 {
@@ -108,6 +109,7 @@ namespace Klaesh.Game
 
             //networkDataHandler.Add(EventCode.HeartBeat, MakeHandlerBridge<HeartBeatData>(OnHeartBeat));
             networkDataHandler.Add(EventCode.GameStart, MakeHandlerBridge<GameConfiguration>(StartGame));
+            networkDataHandler.Add(EventCode.GameAbort, MakeHandlerBridge<GameAbortData>(GameAborted));
             networkDataHandler.Add(EventCode.StartTurn, MakeHandlerBridge<StartTurnData>(StartNextTurn));
             networkDataHandler.Add(EventCode.DoJob, MakeHandlerBridge<IJob>(OnDoJob));
         }
@@ -205,6 +207,25 @@ namespace Klaesh.Game
 
             _networker.SendData(EventCode.EndTurn, new EndTurnData { TurnNumber = TurnNumber });
             _bus.Publish(new TurnBoundaryMessage(this, false));
+        }
+
+        private void GameAborted(GameAbortData data)
+        {
+            Debug.Log($"[GameManager] game aborted. reason: {data.Reason}");
+
+            _networker.Disconnect();
+
+            _baseState = NullInputState.Instance;
+            _currentState = NullInputState.Instance;
+
+            // cleanup!
+            // kill all entities
+            _gem.KillAll();
+
+            // clear map
+            _map.ClearMap();
+
+            _bus.Publish(new GameAbortedMessage(this, data.Reason));
         }
 
         public void ActivateInput(string id)

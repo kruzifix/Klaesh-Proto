@@ -1,4 +1,5 @@
 ﻿using Klaesh.Game;
+using Klaesh.Game.Message;
 using Klaesh.Network;
 using UnityEngine;
 using UnityEngine.UI;

@@ -24,6 +24,7 @@ namespace Klaesh.Hex
         HexMapGenParams GenParams { get; }
 
         void BuildMap();
+        void ClearMap();
 
         HexTile GetTile(int col, int row);
         HexTile GetTile(IHexCoord coord);
@@ -122,7 +123,8 @@ namespace Klaesh.Hex
         {
             _tiles = null;
             var children = new List<GameObject>();
-            foreach (Transform t in transform) children.Add(t.gameObject);
+            foreach (Transform t in transform)
+                children.Add(t.gameObject);
             children.ForEach(c => DestroyImmediate(c));
         }
 

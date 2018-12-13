@@ -21,6 +21,8 @@ namespace Klaesh.UI
 
         protected override void OnAwake()
         {
+            _locator.RegisterSingleton<INavigator>(this);
+
             _history = new Stack<Navigate>();
 
             _bus.Subscribe<Navigate>(HandleNavigate);

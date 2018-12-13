@@ -19,6 +19,8 @@ namespace Klaesh.GameEntity
         /// <returns></returns>
         Entity CreateEntity(string type, Action<Entity> addModules = null);
         Entity GetEntity(int id);
+
+        void KillAll();
     }
 
     public class EntityManager : ManagerBehaviour, IEntityManager
@@ -108,6 +110,15 @@ namespace Klaesh.GameEntity
         {
             // TODO: add dict map cache for fast lookup
             return _entities.FirstOrDefault(e => e.Id == id);
+        }
+
+        public void KillAll()
+        {
+            _entities.Clear();
+            var children = new List<GameObject>();
+            foreach (Transform t in transform)
+                children.Add(t.gameObject);
+            children.ForEach(c => DestroyImmediate(c));
         }
     }
 

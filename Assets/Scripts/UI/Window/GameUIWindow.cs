@@ -1,4 +1,5 @@
 ﻿using Klaesh.Game;
+using Klaesh.Game.Message;
 using UnityEngine.UI;
 
 namespace Klaesh.UI.Window
@@ -20,7 +21,13 @@ namespace Klaesh.UI.Window
 
             Refresh(false);
 
+            AddSubscription(_bus.Subscribe<GameAbortedMessage>(OnGameAborted));
             AddSubscription(_bus.Subscribe<TurnBoundaryMessage>(OnTurnBoundary));
+        }
+
+        private void OnGameAborted(GameAbortedMessage msg)
+        {
+            Close();
         }
 
         private void OnTurnBoundary(TurnBoundaryMessage msg)
@@ -37,8 +44,9 @@ namespace Klaesh.UI.Window
 
             TurnNumberLabel.text = $"Turn: {_gameManager.TurnNumber}";
 
-            DebugInfoText.gameObject.SetActive(active);
-            if (active)
+            bool showDebug = _gameManager.CurrentConfig != null;
+            DebugInfoText.gameObject.SetActive(showDebug);
+            if (showDebug)
             {
                 var config = _gameManager.CurrentConfig;
 

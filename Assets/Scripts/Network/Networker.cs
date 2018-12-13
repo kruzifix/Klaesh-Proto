@@ -12,8 +12,9 @@ namespace Klaesh.Network
     //[JsonConverter(typeof(StringEnumConverter))]
     public enum EventCode
     {
-        HeartBeat,
+        //HeartBeat,
         GameStart,
+        GameAbort,
 
         StartTurn,
         EndTurn,
@@ -33,6 +34,7 @@ namespace Klaesh.Network
         event ConnectCallback Connected;
 
         void ConnectTo(string url);
+        void Disconnect();
 
         void SendData(EventCode eventCode, object data);
     }
@@ -41,6 +43,7 @@ namespace Klaesh.Network
     {
         private IJsonConverter _converter;
 
+        private bool _keepAlive;
         private WebSocket _socket;
         private Coroutine _connectionRoutine;
 
@@ -69,7 +72,8 @@ namespace Klaesh.Network
 
             Connected?.Invoke();
 
-            while (true)
+            _keepAlive = true;
+            while (_keepAlive)
             {
                 var received = _socket.RecvString();
                 if (received != null)
@@ -100,6 +104,14 @@ namespace Klaesh.Network
                 throw new Exception("a connection is already running!");
 
             _connectionRoutine = StartCoroutine(DoConnection(url));
+        }
+
+        public void Disconnect()
+        {
+            if (_connectionRoutine != null)
+            {
+                _keepAlive = false;
+            }
         }
 
         public void SendData(EventCode eventCode, object data)

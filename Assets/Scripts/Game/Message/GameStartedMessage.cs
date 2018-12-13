@@ -1,6 +1,6 @@
 ﻿using Klaesh.Core.Message;
 
-namespace Klaesh.Game
+namespace Klaesh.Game.Message
 {
     public class GameStartedMessage : MessageBase
     {

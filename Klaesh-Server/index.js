@@ -37,6 +37,7 @@ function startGame(game) {
     // send game start to players
     for (let i = 0; i < game.players.length; i++) {
         game.config.home_squad = i
+        // todo: handle disconnect here!
         clients[game.players[i]].socket.send(makeMsg('gamestart', game.config))
     }
     delete game.config.home_squad
@@ -52,28 +53,54 @@ function startGame(game) {
     games.push(game)
 }
 
+function abortGame(game, reason) {
+    console.log(`aborting game with id ${game.id}\nreason: ${reason}`)
+
+    // send game abort message to all clients still connected
+    gameBroadcast(game, makeMsg('gameabort', { reason: reason }))
+
+    const idx = games.indexOf(game)
+    if (idx >= 0) {
+        games.splice(idx, 1)
+    }
+}
+
+function getGameFromUser(userId) {
+    let res = games.filter(g => g.players.some(p => p == userId))
+    if (res.length > 1) {
+        throw new Error('PLAYER IS IN TWO GAMES. WTF??!?')
+    } else if (res.length == 0) {
+        // player not in game
+        return null
+    }
+    return res[0]
+}
+
 function gameBroadcast(game, msg) {
     for (let id of game.players) {
-        clients[id].socket.send(msg)
+        if (clients[id]) {
+            clients[id].socket.send(msg)
+        }
     }
 }
 
 function gameBroadcastToOthers(game, sourcePlayer, msg) {
     for (let id of game.players) {
         if (id != sourcePlayer) {
-            clients[id].socket.send(msg)
+            if (clients[id]) {
+                clients[id].socket.send(msg)
+            }
         }
     }
 }
 
 function onEndTurn(userId, code, data) {
     // find game user is in; if any
-    let game = games.filter(g => g.players.some(p => p == userId));
-    if (game.length != 1) {
+    let game = getGameFromUser(userId)
+    if (!game) {
         console.log(`got endtturn message from player not in a game! games: ${game.length}`)
         return
     }
-    game = game[0]
     // check if player is active player
     if (userId != game.players[game.activeSquad]) {
         console.log('got endtturn message from the wrong player!')
@@ -97,13 +124,11 @@ function onEndTurn(userId, code, data) {
 }
 
 function onDoJob(userId, code, data) {
-    let game = games.filter(g => g.players.some(p => p == userId));
-    if (game.length != 1) {
+    let game = getGameFromUser(userId)
+    if (!game) {
         console.log(`got dojob message from player not in a game! games: ${game.length}`)
         return
     }
-    game = game[0]
-
     // check validitiy of msg?
 
     gameBroadcastToOthers(game, userId, makeMsg(code, data))
@@ -176,6 +201,12 @@ wss.on('connection', socket => {
             const idx = clientsSearchingForGame.indexOf(id);
             if (idx >= 0) {
                 clientsSearchingForGame.splice(idx, 1);
+            }
+
+            // if client is in game, abort it!
+            const game = getGameFromUser(id);
+            if (game) {
+                abortGame(game, `user with id ${id} disconnected`)
             }
         }
     })
