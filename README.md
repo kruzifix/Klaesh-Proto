@@ -31,6 +31,10 @@ It should connect to the local server and you can test your stuff! awesome!
 
 - configure to never strip JSON.net code!!!
 
+- on hover entity/tile (in inputstate)
+- action point system?
+- floating/scrolling text in screen and worldspace (i.e. above unit)
+
 - Navigator that builds 'Nav-Mesh/Map' from properties of Hextiles
 - has methods like Flood(origin)
 - should then consider tile properties (bigger weight for forest, etc)
