@@ -1,48 +1,33 @@
 ﻿using Klaesh.GameEntity;
 using Klaesh.Hex;
-using UnityEngine;
 
 namespace Klaesh.Game.Input
 {
-    public interface IInputState
+    public interface IInputState : IInputProcessor
     {
-        void OnEnabled();
-        void OnDisabled();
+        InputStateMachine Context { get; }
 
-        IInputState OnInputActivated(string id, object data);
-        IInputState OnPickHexTile(HexTile tile);
-        IInputState OnPickGameEntity(Entity entity);
+        void Enter();
+        void Exit();
+
+        void ProcessHexTile(HexTile tile);
+        void ProcessEntity(Entity entity);
     }
 
-    public abstract class BaseInputState : IInputState
+    public abstract class AbstractInputState : IInputState
     {
-        public virtual void OnDisabled() { }
+        public InputStateMachine Context { get; }
 
-        public virtual void OnEnabled() { }
-
-        public virtual IInputState OnInputActivated(string id, object data)
+        public AbstractInputState(InputStateMachine context)
         {
-            return null;
+            Context = context;
         }
 
-        public virtual IInputState OnPickHexTile(HexTile tile)
-        {
-            return null;
-        }
+        public virtual void Enter() { }
+        public virtual void Exit() { }
 
-        public virtual IInputState OnPickGameEntity(Entity entity)
-        {
-            return null;
-        }
-    }
-
-    public class NullInputState : BaseInputState
-    {
-        private static NullInputState _instance;
-        public static NullInputState Instance { get { return _instance ?? (_instance = new NullInputState()); } }
-
-        private NullInputState()
-        {
-        }
+        public virtual void ProcessInput(InputCode code, object data) { }
+        public virtual void ProcessHexTile(HexTile tile) { }
+        public virtual void ProcessEntity(Entity entity) { }
     }
 }

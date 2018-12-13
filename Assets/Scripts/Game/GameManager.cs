@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Klaesh.Core;
 using Klaesh.GameEntity;
 using Klaesh.Game.Config;
@@ -17,14 +16,14 @@ using Klaesh.Game.Message;
 
 namespace Klaesh.Game
 {
-    public interface IGameManager
+    public interface IGameManager : IInputProcessor
     {
         int TurnNumber { get; }
         int ActiveSquadIndex { get; }
         ISquad ActiveSquad { get; }
         bool HomeSquadActive { get; }
 
-        IGameConfiguration CurrentConfig { get; }
+        IGameConfiguration GameConfig { get; }
 
         bool TurnEnded { get; }
 
@@ -32,9 +31,6 @@ namespace Klaesh.Game
 
         void StartNextTurn(StartTurnData data);
         void EndTurn();
-
-        void ActivateInput(string id);
-        void ActivateInput(string id, object data);
 
         bool IsPartOfActiveSquad(Entity entity);
 
@@ -49,19 +45,15 @@ namespace Klaesh.Game
         private IJsonConverter _jconverter;
         private IJobManager _jobManager;
 
-        private IInputState _baseState;
-        private IInputState _currentState;
-
-        private IGameConfiguration _currentGameConfig;
-
+        private InputStateMachine _inputMachine;
         private List<Squad> _squads;
 
         public int TurnNumber { get; private set; }
         public int ActiveSquadIndex { get; private set; }
         public ISquad ActiveSquad => _squads?[ActiveSquadIndex] ?? null;
-        public bool HomeSquadActive => ActiveSquadIndex == _currentGameConfig.HomeSquadId;
+        public bool HomeSquadActive => ActiveSquadIndex == GameConfig.HomeSquadId;
 
-        public IGameConfiguration CurrentConfig => _currentGameConfig;
+        public IGameConfiguration GameConfig { get; private set; }
 
         public bool TurnEnded { get; private set; }
 
@@ -75,18 +67,12 @@ namespace Klaesh.Game
             _gem = _locator.GetService<IEntityManager>();
             _map = _locator.GetService<IHexMap>();
 
-            _baseState = NullInputState.Instance;
-            _currentState = NullInputState.Instance;
-
-            //var picker = _locator.GetService<IObjectPicker>();
-            //picker.RegisterHandler<GameEntity.GameEntity>(KeyCode.Mouse0, "Entity", this);
-            //picker.RegisterHandler<HexTile>(KeyCode.Mouse0, "HexTile", this);
+            _inputMachine = new InputStateMachine();
+            _inputMachine.SetState(null);
 
             var input = _locator.GetService<IGameInputComponent>();
-            input.RegisterHandler<Entity>("Entity", OnPickGameEntity);
-            input.RegisterHandler<HexTile>("HexTile", OnPickHexTile);
-
-            // TODO: Deregister Handler!!!
+            input.RegisterHandler<Entity>("Entity", OnProcessEntity);
+            input.RegisterHandler<HexTile>("HexTile", OnProcessHexTile);
 
             _jconverter = _locator.GetService<IJsonConverter>();
             _jobManager = _locator.GetService<IJobManager>();
@@ -94,7 +80,6 @@ namespace Klaesh.Game
 
             var networkDataHandler = new Dictionary<EventCode, Action<string>>();
 
-            //_networker.DataReceived += OnDataReceived;
             _networker.DataReceived += (code, data) =>
             {
                 if (networkDataHandler.ContainsKey(code))
@@ -107,7 +92,6 @@ namespace Klaesh.Game
                 }
             };
 
-            //networkDataHandler.Add(EventCode.HeartBeat, MakeHandlerBridge<HeartBeatData>(OnHeartBeat));
             networkDataHandler.Add(EventCode.GameStart, MakeHandlerBridge<GameConfiguration>(StartGame));
             networkDataHandler.Add(EventCode.GameAbort, MakeHandlerBridge<GameAbortData>(GameAborted));
             networkDataHandler.Add(EventCode.StartTurn, MakeHandlerBridge<StartTurnData>(StartNextTurn));
@@ -128,15 +112,9 @@ namespace Klaesh.Game
             };
         }
 
-        //private void OnHeartBeat(HeartBeatData data)
-        //{
-        //    Debug.Log($"[HeartBeat] {data.Time}");
-        //    _networker.SendData(EventCode.HeartBeat, new HeartBeatData { Time = DateTime.Now });
-        //}
-
         public void StartGame(IGameConfiguration game)
         {
-            _currentGameConfig = game;
+            GameConfig = game;
 
             _map.Columns = game.Map.Columns;
             _map.Rows = game.Map.Rows;
@@ -161,7 +139,7 @@ namespace Klaesh.Game
 
             // Initialize Random with seed!
 
-            Debug.Log($"[GameManager] Starting game! id: {_currentGameConfig.ServerId}; random seed: {_currentGameConfig.RandomSeed}");
+            Debug.Log($"[GameManager] Starting game! id: {GameConfig.ServerId}");
             _bus.Publish(new GameStartedMessage(this));
         }
 
@@ -176,12 +154,11 @@ namespace Klaesh.Game
             TurnNumber = data.TurnNumber;
             ActiveSquadIndex = data.ActiveSquadIndex;
 
-            _baseState = NullInputState.Instance;
+            _inputMachine.SetState(null);
 
             if (HomeSquadActive)
             {
-                _baseState = new IdleInputState();
-                SwitchTo(_baseState);
+                _inputMachine.SetState(new IdleInputState(_inputMachine));
                 TurnEnded = false;
             }
 
@@ -203,7 +180,7 @@ namespace Klaesh.Game
                 return;
             TurnEnded = true;
 
-            SwitchTo(NullInputState.Instance);
+            _inputMachine.SetState(null);
 
             _networker.SendData(EventCode.EndTurn, new EndTurnData { TurnNumber = TurnNumber });
             _bus.Publish(new TurnBoundaryMessage(this, false));
@@ -215,10 +192,10 @@ namespace Klaesh.Game
 
             _networker.Disconnect();
 
-            _baseState = NullInputState.Instance;
-            _currentState = NullInputState.Instance;
+            _inputMachine.SetState(null);
 
             // cleanup!
+            GameConfig = null;
             // kill all entities
             _gem.KillAll();
 
@@ -228,29 +205,9 @@ namespace Klaesh.Game
             _bus.Publish(new GameAbortedMessage(this, data.Reason));
         }
 
-        public void ActivateInput(string id)
-        {
-            ActivateInput(id, null);
-        }
-
-        public void ActivateInput(string id, object data)
-        {
-            if (id.Equals("abort") && _currentState != _baseState)
-            {
-                SwitchTo(_baseState);
-                return;
-            }
-
-            SwitchTo(_currentState.OnInputActivated(id, data));
-        }
-
         public bool IsPartOfActiveSquad(Entity entity)
         {
             return ActiveSquad.Members.Contains(entity);
-            //var eSquad = entity.GetModule<ISquad>();
-            //if (eSquad == null)
-            //    return false;
-            //return ActiveSquad == eSquad;
         }
 
         public Entity ResolveEntityRef(SquadEntityRefData data)
@@ -264,26 +221,19 @@ namespace Klaesh.Game
                 .Members[data.MemberId];
         }
 
-        public void OnPickHexTile(HexTile comp)
+        public void ProcessInput(InputCode code, object data)
         {
-            SwitchTo(_currentState.OnPickHexTile(comp));
+            _inputMachine.ProcessInput(code, data);
         }
 
-        public void OnPickGameEntity(Entity comp)
+        public void OnProcessHexTile(HexTile comp)
         {
-            SwitchTo(_currentState.OnPickGameEntity(comp));
+            _inputMachine.ProcessHexTile(comp);
         }
 
-        private void SwitchTo(IInputState newState)
+        public void OnProcessEntity(Entity comp)
         {
-            if (newState != null)
-            {
-                Debug.Log($"[GameManager] switching input state! {_currentState.GetType().Name} -> {newState.GetType().Name}");
-
-                _currentState.OnDisabled();
-                _currentState = newState;
-                _currentState.OnEnabled();
-            }
+            _inputMachine.ProcessEntity(comp);
         }
     }
 }

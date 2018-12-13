@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Klaesh.Core;
 using Klaesh.Core.Message;
-using Klaesh.Game.Data;
 using Klaesh.Game.Job;
 using Klaesh.GameEntity;
 using Klaesh.GameEntity.Component;
-using Klaesh.GameEntity.Module;
 using Klaesh.Hex;
 using Klaesh.Network;
 using Klaesh.Utility;
@@ -15,22 +13,26 @@ using UnityEngine;
 
 namespace Klaesh.Game.Input
 {
-    public class EntitySelectedInputState : BaseInputState
+    public class EntitySelectedInputState : AbstractInputState
     {
+        private IGameManager _gm;
         private IHexMap _map;
+
         private List<Tuple<HexTile, int>> _reachableTiles;
 
         public Entity Entity { get; private set; }
 
-        public EntitySelectedInputState(Entity entity)
+        public EntitySelectedInputState(InputStateMachine context, Entity entity)
+            : base(context)
         {
             Entity = entity;
+
+            _gm = ServiceLocator.Instance.GetService<IGameManager>();
+            _map = ServiceLocator.Instance.GetService<IHexMap>();
         }
 
-        public override void OnEnabled()
+        public override void Enter()
         {
-            _map = ServiceLocator.Instance.GetService<IHexMap>();
-
             var moveComp = Entity.GetComponent<HexMovementComp>();
 
             _map.DeselectAllTiles();
@@ -47,24 +49,16 @@ namespace Klaesh.Game.Input
             ServiceLocator.Instance.GetService<IMessageBus>().Publish(new FocusCameraMessage(this, tile.GetTop()));
         }
 
-        public override IInputState OnPickHexTile(HexTile tile)
+        public override void ProcessHexTile(HexTile tile)
         {
             if (_reachableTiles.Any(tup => tup.Item1 == tile))
             {
-                //if (!Entity.GetComponent<HexMovementComp>().StartMovingTo(tile.Position, () => Debug.Log("arrived!")))
-                //{
-                //    Debug.LogFormat("[EntitySelected Input] unable to move there.");
-                //    if (tile.HasEntityOnTop)
-                //        return OnPickGameEntity(tile.Entity);
-                //    return null;
-                //}
-
                 if (!Entity.GetComponent<HexMovementComp>().CanMoveTo(tile.Position, out List<HexTile> path))
                 {
                     Debug.LogFormat("[EntitySelected Input] unable to move there.");
                     if (tile.HasEntityOnTop)
-                        return OnPickGameEntity(tile.Entity);
-                    return null;
+                        ProcessEntity(tile.Entity);
+                    return;
                 }
 
                 var coordPath = path.Select(t => t.Position).ToList();
@@ -75,39 +69,23 @@ namespace Klaesh.Game.Input
                 jm.ExecuteJobs();
                 ServiceLocator.Instance.GetService<INetworker>().SendData(EventCode.DoJob, job);
 
-                // TEMPORARY
-                // TEMPORARY
-                // TEMPORARY
-                //var sm = Entity.GetModule<SquadMember>();
-                //ServiceLocator.Instance.GetService<INetworker>().SendData(EventCode.MoveUnit, new MoveUnitData {
-                //    SquadId = sm.Squad.Config.ServerId,
-                //    MemberId = sm.Id,
-                //    Target = tile.Position
-                //});
-                // TEMPORARY
-                // TEMPORARY
-                // TEMPORARY
-
-                //ServiceLocator.Instance.GetService<IMessageBus>().Publish(new FocusCameraMessage(this, tile.GetTop()));
-                return new IdleInputState();
+                Context.SetState(new IdleInputState(Context));
             }
             Debug.LogFormat("[EntitySelected Input] can't move there. out of range");
 
-            //ServiceLocator.Instance.GetService<IMessageBus>().Publish(new FocusCameraMessage(this, tile.GetTop()));
-            return new IdleInputState();
+            Context.SetState(new IdleInputState(Context));
         }
 
-        public override IInputState OnPickGameEntity(Entity entity)
+        public override void ProcessEntity(Entity entity)
         {
-            var gm = ServiceLocator.Instance.GetService<IGameManager>();
-            if (gm.IsPartOfActiveSquad(entity))
+            if (_gm.IsPartOfActiveSquad(entity))
             {
+                Exit();
                 Entity = entity;
-                return this;
+                Enter();
             }
 
             // ATTAC other unit!
-            return null;
         }
     }
 }

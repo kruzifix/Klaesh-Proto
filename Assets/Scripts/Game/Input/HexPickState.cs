@@ -7,20 +7,23 @@ using UnityEngine;
 
 namespace Klaesh.Game.Input
 {
-    public class HexPickState : BaseInputState
+    public class HexPickState : AbstractInputState
     {
         private HashSet<HexTile> _pickableTiles;
-        private Func<HexTile, IInputState> _pickCallback;
+        private Action<HexTile> _pickCallback;
+        private Action _otherCallback;
 
         public Color HighlightColor { get; set; } = Colors.HighlightOrange;
 
-        public HexPickState(IEnumerable<HexTile> pickableTiles, Func<HexTile, IInputState> pickCallback)
+        public HexPickState(InputStateMachine context, IEnumerable<HexTile> pickableTiles, Action<HexTile> pickCallback = null, Action otherCallback = null)
+            : base(context)
         {
             _pickableTiles = new HashSet<HexTile>(pickableTiles);
             _pickCallback = pickCallback;
+            _otherCallback = otherCallback;
         }
 
-        public override void OnEnabled()
+        public override void Enter()
         {
             foreach (var tile in _pickableTiles)
             {
@@ -28,20 +31,22 @@ namespace Klaesh.Game.Input
             }
         }
 
-        public override void OnDisabled()
+        public override void Exit()
         {
             var map = ServiceLocator.Instance.GetService<IHexMap>();
             map.DeselectAllTiles();
         }
 
-        public override IInputState OnPickHexTile(HexTile tile)
+        public override void ProcessHexTile(HexTile tile)
         {
             if (_pickableTiles.Contains(tile))
             {
-                return _pickCallback(tile);
+                _pickCallback?.Invoke(tile);
             }
-
-            return null;
+            else
+            {
+                _otherCallback?.Invoke();
+            }
         }
     }
 }

@@ -1,66 +1,49 @@
-﻿using System.Linq;
-using Klaesh.Core;
+﻿using Klaesh.Core;
 using Klaesh.Core.Message;
 using Klaesh.Game.Job;
 using Klaesh.GameEntity;
 using Klaesh.GameEntity.Component;
-using Klaesh.GameEntity.Module;
 using Klaesh.Hex;
 using Klaesh.Network;
-using UnityEngine;
 
 namespace Klaesh.Game.Input
 {
-    public class IdleInputState : BaseInputState
+    public class IdleInputState : AbstractInputState
     {
-        public override void OnEnabled()
+        private IGameManager _gm;
+        private IHexMap _map;
+
+        public IdleInputState(InputStateMachine context)
+            : base(context)
+        {
+            _gm = ServiceLocator.Instance.GetService<IGameManager>();
+            _map = ServiceLocator.Instance.GetService<IHexMap>();
+        }
+
+        public override void Enter()
         {
             // highlight active squad units
-            var map = ServiceLocator.Instance.GetService<IHexMap>();
+            _map.DeselectAllTiles();
 
-            map.DeselectAllTiles();
-
-            var gm = ServiceLocator.Instance.GetService<IGameManager>();
-            foreach (var unit in gm.ActiveSquad.Members)
+            foreach (var unit in _gm.ActiveSquad.Members)
             {
-                map.GetTile(unit.GetComponent<HexMovementComp>().Position).SetColor(gm.ActiveSquad.Config.Color);
-
-                //foreach (var mod in unit.GetModules<MeshModule>().Where(m => m.Name == "WobblyCircle"))
-                //{
-                //    mod.Enabled = true;
-                //}
+                _map.GetTile(unit.GetComponent<HexMovementComp>().Position).SetColor(_gm.ActiveSquad.Config.Color);
             }
         }
 
-        public override void OnDisabled()
+        public override void ProcessInput(InputCode code, object data)
         {
-            //var gm = ServiceLocator.Instance.GetService<IGameManager>();
-            //foreach (var unit in gm.ActiveSquad.Members)
-            //{
-            //    foreach (var mod in unit.GetModules<MeshModule>().Where(m => m.Name == "WobblyCircle"))
-            //    {
-            //        mod.Enabled = false;
-            //    }
-            //}
-        }
-
-        public override IInputState OnInputActivated(string id, object data)
-        {
-            switch (id)
+            if (code == InputCode.RecruitUnit)
             {
-                case "recruitUnit":
-                    var map = ServiceLocator.Instance.GetService<IHexMap>();
-                    var gm = ServiceLocator.Instance.GetService<IGameManager>();
+                var originCoord = _gm.ActiveSquad.Config.Origin;
+                var originTile = _map.GetTile(originCoord);
+                var pickableTiles = _map.GetNeighbors(originCoord);
+                pickableTiles.Add(originTile);
 
-                    //var pickableTiles = map.GetReachableTiles(new HexOffsetCoord(3, 2), 1, 5)
-                    //    .Select(t => t.Item1);
-                    var pickableTiles = map.GetNeighbors(gm.ActiveSquad.Config.Origin);
-                    pickableTiles.Add(map.GetTile(gm.ActiveSquad.Config.Origin));
-
-                    return new HexPickState(pickableTiles, (tile) =>
+                var state = new HexPickState(Context, pickableTiles, (tile) =>
                     {
                         if (tile.HasEntityOnTop)
-                            return null;
+                            return;
                         // spawn unit at that tile
                         var job = new SpawnUnitJob
                         {
@@ -74,33 +57,32 @@ namespace Klaesh.Game.Input
                         ServiceLocator.Instance.GetService<INetworker>().SendData(EventCode.DoJob, job);
 
                         // callback
-                        return new IdleInputState();
+                        Context.SetState(this);
+                    }, () =>
+                    {
+                        Context.SetState(this);
                     });
-
-                    //break;
-                default:
-                    return null;
+                Context.SetState(state);
+                ServiceLocator.Instance.GetService<IMessageBus>().Publish(new FocusCameraMessage(this, originTile.GetTop()));
             }
         }
 
-        public override IInputState OnPickGameEntity(Entity entity)
+        public override void ProcessEntity(Entity entity)
         {
-            var gm = ServiceLocator.Instance.GetService<IGameManager>();
-            if (gm.IsPartOfActiveSquad(entity))
-                return new EntitySelectedInputState(entity);
-
-            return null;
+            if (_gm.IsPartOfActiveSquad(entity))
+            {
+                Context.SetState(new EntitySelectedInputState(Context, entity));
+            }
         }
 
-        public override IInputState OnPickHexTile(HexTile tile)
+        public override void ProcessHexTile(HexTile tile)
         {
             if (tile.HasEntityOnTop)
             {
-                return OnPickGameEntity(tile.Entity);
+                ProcessEntity(tile.Entity);
+                return;
             }
-
             ServiceLocator.Instance.GetService<IMessageBus>().Publish(new FocusCameraMessage(this, tile.GetTop()));
-            return null;
         }
     }
 }

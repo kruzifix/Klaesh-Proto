@@ -26,20 +26,6 @@
             "row": 0
           },
           "id": "knight"
-        },
-        {
-          "pos": {
-            "col": -2,
-            "row": 0
-          },
-          "id": "knight"
-        },
-        {
-          "pos": {
-            "col": 2,
-            "row": 0
-          },
-          "id": "knight"
         }
       ]
     },
@@ -61,21 +47,7 @@
             "col": 0,
             "row": 0
           },
-          "id": "skeleton"
-        },
-        {
-          "pos": {
-            "col": -2,
-            "row": 0
-          },
-          "id": "skeleton"
-        },
-        {
-          "pos": {
-            "col": 2,
-            "row": 0
-          },
-          "id": "skeleton"
+          "id": "knight"
         }
       ]
     }

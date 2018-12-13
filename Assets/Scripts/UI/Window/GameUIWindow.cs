@@ -1,4 +1,5 @@
 ﻿using Klaesh.Game;
+using Klaesh.Game.Input;
 using Klaesh.Game.Message;
 using UnityEngine.UI;
 
@@ -13,7 +14,6 @@ namespace Klaesh.UI.Window
         public Text DebugInfoText;
 
         public Button RecruitButton;
-        public Button AbortButton;
 
         protected override void Init()
         {
@@ -40,15 +40,14 @@ namespace Klaesh.UI.Window
         {
             EndTurnButton.gameObject.SetActive(active);
             RecruitButton.gameObject.SetActive(active);
-            AbortButton.gameObject.SetActive(active);
 
             TurnNumberLabel.text = $"Turn: {_gameManager.TurnNumber}";
 
-            bool showDebug = _gameManager.CurrentConfig != null;
+            bool showDebug = _gameManager.GameConfig != null;
             DebugInfoText.gameObject.SetActive(showDebug);
             if (showDebug)
             {
-                var config = _gameManager.CurrentConfig;
+                var config = _gameManager.GameConfig;
 
                 DebugInfoText.text = $@"GameId: {config.ServerId}
 HomeSquadId: {config.HomeSquadId}
@@ -68,15 +67,10 @@ HomeSquadActive: {_gameManager.HomeSquadActive}
             _gameManager.EndTurn();
         }
 
-        public void OnAbortInput()
-        {
-            _gameManager.ActivateInput("abort");
-        }
-
         public void OnRecruitUnit()
         {
             // TODO: pass unit type here!
-            _gameManager.ActivateInput("recruitUnit");
+            _gameManager.ProcessInput(InputCode.RecruitUnit, null);
         }
     }
 }
