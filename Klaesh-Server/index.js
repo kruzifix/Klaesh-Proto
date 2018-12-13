@@ -30,6 +30,23 @@ const clients = {}
 const clientsSearchingForGame = []
 const games = []
 
+function createGame(player1, player2) {
+    const gid = getId('game')
+    const game = {
+        id: gid,
+        config: board,
+        players: [player1, player2],
+        randomSeed: Math.floor(Math.random() * 10000)
+    }
+    game.config.id = gid
+    game.config.squads[0].id = player1
+    game.config.squads[1].id = player2
+    game.config.random_seed = game.randomSeed
+    game.config.map.noffset = game.randomSeed
+
+    return game
+}
+
 function startGame(game) {
     console.log('starting game')
     console.log(game)
@@ -166,17 +183,7 @@ wss.on('connection', socket => {
         const player2 = clientsSearchingForGame.pop()
         const player1 = clientsSearchingForGame.pop()
 
-        const gid = getId('game')
-        const game = {
-            id: gid,
-            config: board,
-            players: [player1, player2],
-            randomSeed: Math.floor(Math.random() * 10000)
-        }
-        game.config.id = gid
-        game.config.squads[0].id = player1
-        game.config.squads[1].id = player2
-        game.config.random_seed = game.randomSeed
+        const game = createGame(player1, player2)
         startGame(game)
     }
 
