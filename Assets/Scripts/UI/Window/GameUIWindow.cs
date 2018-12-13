@@ -1,9 +1,9 @@
-﻿using Klaesh.Core;
+﻿using Klaesh.Game;
 using UnityEngine.UI;
 
-namespace Klaesh.Game.UI
+namespace Klaesh.UI.Window
 {
-    public class GameUI : ManagerBehaviour
+    public class GameUIWindow : WindowBase
     {
         private IGameManager _gameManager;
 
@@ -14,25 +14,35 @@ namespace Klaesh.Game.UI
         public Button RecruitButton;
         public Button AbortButton;
 
-        private void Start()
+        protected override void Init()
         {
             _gameManager = _locator.GetService<IGameManager>();
 
-            _bus.Subscribe<RefreshGameUIMessage>(OnRefresh);
+            Refresh(false);
+
+            AddSubscription(_bus.Subscribe<TurnBoundaryMessage>(OnTurnBoundary));
         }
 
-        private void OnRefresh(RefreshGameUIMessage msg)
+        private void OnTurnBoundary(TurnBoundaryMessage msg)
         {
             bool active = !_gameManager.TurnEnded && _gameManager.HomeSquadActive;
+            Refresh(active);
+        }
+
+        public void Refresh(bool active)
+        {
             EndTurnButton.gameObject.SetActive(active);
             RecruitButton.gameObject.SetActive(active);
             AbortButton.gameObject.SetActive(active);
 
             TurnNumberLabel.text = $"Turn: {_gameManager.TurnNumber}";
 
-            var config = _gameManager.CurrentConfig;
+            DebugInfoText.gameObject.SetActive(active);
+            if (active)
+            {
+                var config = _gameManager.CurrentConfig;
 
-            DebugInfoText.text = $@"GameId: {config.ServerId}
+                DebugInfoText.text = $@"GameId: {config.ServerId}
 HomeSquadId: {config.HomeSquadId}
 Player1: {config.Squads[0].ServerId}
 Player2: {config.Squads[1].ServerId}
@@ -42,12 +52,12 @@ TurnEnded: {_gameManager.TurnEnded}
 ActiveSquadIndex: {_gameManager.ActiveSquadIndex}
 HomeSquadActive: {_gameManager.HomeSquadActive}
 ";
+            }
         }
 
         public void OnEndTurn()
         {
             _gameManager.EndTurn();
-            OnRefresh(null);
         }
 
         public void OnAbortInput()

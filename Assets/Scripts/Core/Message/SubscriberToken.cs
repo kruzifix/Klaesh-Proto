@@ -4,18 +4,20 @@ namespace Klaesh.Core.Message
 {
     public class SubscriberToken
     {
-        private IMessageBus _bus;
-        private long _id;
-        private Type _type;
+        // the id is probably redundant, as the bus uses ReferenceEquals. ¯\_(ツ)_/¯
+        public long Id { get; }
 
-        public long Id => _id;
-        public Type Type => _type;
+        public Type Type { get; }
 
-        public SubscriberToken(IMessageBus bus, long id, Type type)
+        public SubscriberToken(long id, Type type)
         {
-            _bus = bus;
-            _id = id;
-            _type = type;
+            Id = id;
+            Type = type;
+        }
+
+        public override string ToString()
+        {
+            return $"{Type.Name}:{Id}";
         }
     }
 }

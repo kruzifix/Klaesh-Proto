@@ -10,7 +10,6 @@ using Klaesh.Network;
 using Klaesh.Utility;
 using Klaesh.Game.Data;
 using System;
-using Klaesh.Game.UI;
 using System.Linq;
 using Klaesh.Game.Job;
 using Klaesh.Game.Input;
@@ -160,8 +159,8 @@ namespace Klaesh.Game
 
             // Initialize Random with seed!
 
-
             Debug.Log($"[GameManager] Starting game! id: {_currentGameConfig.ServerId}; random seed: {_currentGameConfig.RandomSeed}");
+            _bus.Publish(new GameStartedMessage(this));
         }
 
         public void StartNextTurn(StartTurnData data)
@@ -187,7 +186,7 @@ namespace Klaesh.Game
             _squads.ForEach(s => s.Members.ForEach(ge => ge.GetComponent<HexMovementComp>().OnNextTurn()));
 
             _bus.Publish(new FocusCameraMessage(this, ActiveSquad.Members[0].transform.position));
-            _bus.Publish(new RefreshGameUIMessage(this));
+            _bus.Publish(new TurnBoundaryMessage(this, true));
         }
 
         private void OnDoJob(IJob job)
@@ -205,6 +204,7 @@ namespace Klaesh.Game
             SwitchTo(NullInputState.Instance);
 
             _networker.SendData(EventCode.EndTurn, new EndTurnData { TurnNumber = TurnNumber });
+            _bus.Publish(new TurnBoundaryMessage(this, false));
         }
 
         public void ActivateInput(string id)

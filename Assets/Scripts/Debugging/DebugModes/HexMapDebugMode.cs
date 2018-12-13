@@ -35,7 +35,7 @@ namespace Klaesh.Debugging
 
         public void OnHexMapInitialized(HexMapInitializedMessage msg)
         {
-            _currentMap = msg.Content;
+            _currentMap = msg.Value;
         }
     }
 }

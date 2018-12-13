@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Klaesh.Core.Message;
+﻿using Klaesh.Core.Message;
 using UnityEngine;
 
 namespace Klaesh.Core

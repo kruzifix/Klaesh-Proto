@@ -24,11 +24,13 @@ namespace Klaesh.Network
     }
 
     public delegate void DataReceivedCallback(EventCode eventCode, string data);
+    public delegate void ConnectCallback();
 
     public interface INetworker
     {
         //bool Connected { get; }
         event DataReceivedCallback DataReceived;
+        event ConnectCallback Connected;
 
         void ConnectTo(string url);
 
@@ -45,6 +47,7 @@ namespace Klaesh.Network
         //public bool Connected => _socket != null && _socket.isConnected;
 
         public event DataReceivedCallback DataReceived;
+        public event ConnectCallback Connected;
 
         private IEnumerator DoConnection(string url)
         {
@@ -53,6 +56,18 @@ namespace Klaesh.Network
             Debug.Log($"[Networker] connecting to server at {url}");
 
             yield return StartCoroutine(_socket.Connect());
+
+            if (_socket.Error != null)
+            {
+                Debug.LogError($"[Networker] Error: {_socket.Error}");
+
+                _socket.Close();
+                _socket = null;
+                _connectionRoutine = null;
+                yield break;
+            }
+
+            Connected?.Invoke();
 
             while (true)
             {

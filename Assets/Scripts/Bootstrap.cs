@@ -7,6 +7,8 @@ using Klaesh.Game.Config;
 using Klaesh.GameEntity;
 using Klaesh.Hex;
 using Klaesh.Network;
+using Klaesh.UI;
+using Klaesh.UI.Window;
 using Klaesh.Utility;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -36,11 +38,10 @@ namespace Klaesh
 
             var bus = _serviceLocator.GetService<IMessageBus>();
 
-            // TODO: get from current webgl context/provider?
-            // or from config file!
-            string url = "ws://localhost:3000";
+            bus.Publish(new Navigate(this, typeof(MainWindow)));
 
             // setup game board
+            /*
             bus.Subscribe<EntityPrefabsLoadedMessage>(msg =>
             {
                 if (useServer)
@@ -124,6 +125,7 @@ namespace Klaesh
                     _serviceLocator.GetService<IGameManager>().StartGame(config);
                 }
             });
+            */
         }
 
         private void Create()

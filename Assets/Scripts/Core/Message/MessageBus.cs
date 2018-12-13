@@ -92,7 +92,7 @@ namespace Klaesh.Core.Message
 
         private SubscriberToken GetToken(Type type)
         {
-            var token = new SubscriberToken(this, _tokenId, type);
+            var token = new SubscriberToken(_tokenId, type);
             _tokenId++;
             return token;
         }

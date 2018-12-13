@@ -2,7 +2,7 @@
 
 namespace Klaesh.Hex
 {
-    public class HexMapInitializedMessage : GenericMessage<IHexMap>
+    public class HexMapInitializedMessage : MessageBase<IHexMap>
     {
         public HexMapInitializedMessage(object sender, IHexMap content)
             : base(sender, content)

@@ -14,14 +14,14 @@ namespace Klaesh.Core.Message
         }
     }
 
-    public class GenericMessage<TContent> : MessageBase
+    public class MessageBase<TContent> : MessageBase
     {
-        public TContent Content { get; private set; }
+        public TContent Value { get; private set; }
 
-        public GenericMessage(object sender, TContent content)
+        public MessageBase(object sender, TContent value)
             : base(sender)
         {
-            Content = content;
+            Value = value;
         }
     }
 }
