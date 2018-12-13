@@ -48,7 +48,7 @@ namespace Klaesh.Game.Input
                         var job = new SpawnUnitJob
                         {
                             Position = tile.Position.OffsetCoord,
-                            EntityId = "knight"
+                            EntityId = "orc"
                         };
 
                         var jm = ServiceLocator.Instance.GetService<IJobManager>();
