@@ -162,7 +162,7 @@ namespace Klaesh.Game
                 TurnEnded = false;
             }
 
-            _squads.ForEach(s => s.Members.ForEach(ge => ge.GetComponent<HexMovementComp>().OnNextTurn()));
+            ActiveSquad.Members.ForEach(ge => ge.GetComponent<HexMovementComp>().OnNextTurn());
 
             _bus.Publish(new FocusCameraMessage(this, ActiveSquad.Members[0].transform.position));
             _bus.Publish(new TurnBoundaryMessage(this, true));

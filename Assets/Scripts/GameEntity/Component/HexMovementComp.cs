@@ -1,24 +1,32 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Klaesh.Core;
-using Klaesh.Game;
 using Klaesh.Hex;
 using UnityEngine;
 
 namespace Klaesh.GameEntity.Component
 {
+    public delegate void MovementChangedEvent();
+
     public class HexMovementComp : MonoBehaviour
     {
         private IHexMap _map;
         private Entity _owner;
 
+        private int _movementLeft;
+
         public HexCubeCoord Position { get; set; }
-        public int MovementLeft { get; set; }
+        public int MovementLeft
+        {
+            get { return _movementLeft; }
+            set { _movementLeft = value; MovementChanged?.Invoke(); }
+        }
 
         public int maxDistance;
         public int jumpHeight;
+
+        public event MovementChangedEvent MovementChanged;
 
         private void Awake()
         {
@@ -60,8 +68,6 @@ namespace Klaesh.GameEntity.Component
             var targetTile = path.Last();
             if (targetTile.HasEntityOnTop)
                 return false;
-
-            //path.Insert(0, _map.GetTile(Position));
 
             return true;
         }

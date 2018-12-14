@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Klaesh.Core;
 using Klaesh.Core.Message;
+using Klaesh.GameEntity.Message;
 using Klaesh.GameEntity.Module;
+using Klaesh.Utility;
 using UnityEngine;
 
 namespace Klaesh.GameEntity
@@ -57,6 +59,9 @@ namespace Klaesh.GameEntity
         {
             _entities = new List<Entity>();
             //_descriptors = Resources.LoadAll<GameEntityDescriptor>("Entities").ToDictionary(d => d.type);
+
+            // TODO & ATTENTION! loading all prefabs can maybe consume a lot of memory!
+            // maybe don't do this!
             _prefabs = Resources.LoadAll<GameObject>("Entities")
                 .Where(go => go.GetComponent<Entity>() != null)
                 .ToDictionary(go => go.name);
@@ -103,6 +108,8 @@ namespace Klaesh.GameEntity
 
             _idCounter++;
 
+            _bus.Publish(new EntityCreatedMessage(this, entity));
+
             return entity;
         }
 
@@ -115,17 +122,7 @@ namespace Klaesh.GameEntity
         public void KillAll()
         {
             _entities.Clear();
-            var children = new List<GameObject>();
-            foreach (Transform t in transform)
-                children.Add(t.gameObject);
-            children.ForEach(c => DestroyImmediate(c));
-        }
-    }
-
-    public class EntityPrefabsLoadedMessage : MessageBase
-    {
-        public EntityPrefabsLoadedMessage(object sender) : base(sender)
-        {
+            transform.DestroyAllChildrenImmediate();
         }
     }
 }

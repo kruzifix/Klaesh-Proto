@@ -1,5 +1,6 @@
 ﻿using Klaesh.Core;
 using Klaesh.Core.Message;
+using Klaesh.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -122,10 +123,7 @@ namespace Klaesh.Hex
         public void ClearMap()
         {
             _tiles = null;
-            var children = new List<GameObject>();
-            foreach (Transform t in transform)
-                children.Add(t.gameObject);
-            children.ForEach(c => DestroyImmediate(c));
+            transform.DestroyAllChildrenImmediate();
         }
 
         public HexTile GetTile(int col, int row)

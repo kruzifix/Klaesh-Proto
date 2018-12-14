@@ -28,6 +28,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxDistance: 3
   jumpHeight: 1
+--- !u!114 &6637410997430305419
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7542806183185671758}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc84fc9d08194684bb636c947195f622, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  health: 3
 --- !u!1001 &3015218732003422730
 PrefabInstance:
   m_ObjectHideFlags: 0

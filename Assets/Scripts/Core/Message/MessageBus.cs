@@ -10,10 +10,13 @@ namespace Klaesh.Core.Message
         private long _tokenId;
         private Dictionary<Type, List<ISubscription>> _subscribers;
 
+        //private List<IMessage> _delayedMessages;
+
         public MessageBus()
         {
             _tokenId = 0;
             _subscribers = new Dictionary<Type, List<ISubscription>>();
+            //_delayedMessages = new List<IMessage>();
         }
 
         public SubscriberToken Subscribe<TMessage>(Action<TMessage> deliveryAction)
@@ -85,9 +88,23 @@ namespace Klaesh.Core.Message
             }
         }
 
-        public void PublishLate()
+        public void PublishLate<TMessage>(TMessage message)
+            where TMessage : class, IMessage
         {
             throw new NotImplementedException();
+
+            // TODO: i think the missing type information after saving it as IMessage will be a problem!
+            //_delayedMessages.Add(message);
+        }
+
+        public void DoLatePublish()
+        {
+            // TODO: i think the missing type information after saving it as IMessage will be a problem!
+            //foreach (var msg in _delayedMessages)
+            //{
+            //    Publish(msg);
+            //}
+            //_delayedMessages.Clear();
         }
 
         private SubscriberToken GetToken(Type type)

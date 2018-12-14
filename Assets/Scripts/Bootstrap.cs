@@ -22,6 +22,7 @@ namespace Klaesh
         public bool useServer = false;
 
         private ServiceManager _serviceLocator;
+        private IMessageBus _bus;
 
         private void Awake()
         {
@@ -36,9 +37,7 @@ namespace Klaesh
             DontDestroyOnLoad(gameObject);
             Application.targetFrameRate = 60;
 
-            var bus = _serviceLocator.GetService<IMessageBus>();
-
-            bus.Publish(new Navigate(this, typeof(MainWindow)));
+            _bus.Publish(new Navigate(this, typeof(MainWindow)));
 
             // setup game board
             /*
@@ -128,6 +127,11 @@ namespace Klaesh
             */
         }
 
+        private void LateUpdate()
+        {
+            _bus.DoLatePublish();
+        }
+
         private void Create()
         {
             // load config
@@ -135,7 +139,8 @@ namespace Klaesh
             _serviceLocator = new ServiceManager();
             ServiceLocator.Instance = _serviceLocator;
             _serviceLocator.RegisterSingleton<ICoroutineStarter>(this);
-            _serviceLocator.RegisterSingleton<IMessageBus>(new MessageBus());
+            _bus = new MessageBus();
+            _serviceLocator.RegisterSingleton<IMessageBus>(_bus);
             _serviceLocator.RegisterSingleton<IJsonConverter>(new CustomJsonConverter());
         }
     }

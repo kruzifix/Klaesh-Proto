@@ -10,6 +10,8 @@ namespace Klaesh.Core.Message
         void Publish<TMessage>(TMessage message) where TMessage : class, IMessage;
 
         // publish in late update?
-        void PublishLate();
+        void PublishLate<TMessage>(TMessage message) where TMessage : class, IMessage;
+
+        void DoLatePublish();
     }
 }
