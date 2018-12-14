@@ -4,9 +4,9 @@
 
 ## Setup:
 - Download & Install UnityHub
-- Install Unity 2018.3.0b12
+- Install Unity 2018.3.0f2
 - Clone repo
-- Start project with Unity version 2018.3.0b12
+- Start project with Unity version 2018.3.0f2
 
 ## Server:
 To run the server locally:
@@ -23,13 +23,12 @@ the editor can connect to the local server!
 
 But you need a second client to test!
 For this: build the project as Windows Standalone (this is faster than a webgl build) and just start it!
+
 It should connect to the local server and you can test your stuff! awesome!
 
 
 ## TODO
 - You can reduce your startup time if you configure your web server to host .unityweb files using gzip compression.
-
-- configure to never strip JSON.net code!!!
 
 - on hover entity/tile (in inputstate)
 - action point system?
@@ -44,3 +43,10 @@ It should connect to the local server and you can test your stuff! awesome!
 
 ## NICE TA HAVE
 - Give Orders over multiple turns (longer walk path)
+
+## Games for Inspiration
+- Endless Legend
+- Shardbound
+- For The King
+- Northgard
+- Bad North

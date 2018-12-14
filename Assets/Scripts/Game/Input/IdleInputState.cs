@@ -71,6 +71,10 @@ namespace Klaesh.Game.Input
         {
             if (_gm.IsPartOfActiveSquad(entity))
             {
+                var moveComp = entity.GetComponent<HexMovementComp>();
+                if (moveComp != null && moveComp.MovementLeft == 0)
+                    return;
+
                 Context.SetState(new EntitySelectedInputState(Context, entity));
             }
         }

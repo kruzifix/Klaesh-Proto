@@ -1,0 +1,10 @@
+<linker>
+  <assembly fullname="Klaesh">
+    <type fullname="Klaesh.*" preserve="all"/>
+  </assembly>
+  <assembly fullname="System">
+    <type fullname="System.ComponentModel.*" preserve="all"/>
+    <type fullname="System.Diagnostics.*" preserve="all"/>
+    <type fullname="System.UriTypeConverter" preserve="all"/>
+  </assembly>
+</linker>
