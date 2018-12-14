@@ -7,6 +7,7 @@ using Klaesh.Hex;
 using UnityEngine;
 using Klaesh.GameEntity.Component;
 using Klaesh.Core;
+using Klaesh.Utility;
 
 namespace Klaesh.Game
 {
@@ -54,6 +55,7 @@ namespace Klaesh.Game
             });
 
             ent.GetComponent<HexMovementComp>().SetPosition(position);
+            ent.GetComponent<ModelColorizer>().Colorize(Config.Color);
 
             var map = ServiceLocator.Instance.GetService<IHexMap>();
             var center = map.GetTile(map.Columns / 2, map.Rows / 2);
