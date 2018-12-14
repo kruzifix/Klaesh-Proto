@@ -57,7 +57,9 @@ namespace Klaesh.Game
 
             var map = ServiceLocator.Instance.GetService<IHexMap>();
             var center = map.GetTile(map.Columns / 2, map.Rows / 2);
-            ent.transform.rotation = Quaternion.LookRotation(center.GetTop() - ent.transform.position);
+            var dir = center.GetTop() - ent.transform.position;
+            dir.y = 0;
+            ent.transform.rotation = Quaternion.LookRotation(dir);
 
             Members.Add(ent);
             _number++;
