@@ -33,7 +33,7 @@ namespace Klaesh.Game.Input
 
         public override void ProcessInput(InputCode code, object data)
         {
-            if (code == InputCode.RecruitUnit)
+            if (code == InputCode.RecruitUnit && data != null && data is string)
             {
                 var originCoord = _gm.ActiveSquad.Config.Origin;
                 var originTile = _map.GetTile(originCoord);
@@ -48,7 +48,7 @@ namespace Klaesh.Game.Input
                         var job = new SpawnUnitJob
                         {
                             Position = tile.Position.OffsetCoord,
-                            EntityId = "orc"
+                            EntityId = data as string
                         };
 
                         var jm = ServiceLocator.Instance.GetService<IJobManager>();

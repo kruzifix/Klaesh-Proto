@@ -1,6 +1,7 @@
 ﻿using Klaesh.Game;
 using Klaesh.Game.Input;
 using Klaesh.Game.Message;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Klaesh.UI.Window
@@ -10,10 +11,12 @@ namespace Klaesh.UI.Window
         private IGameManager _gameManager;
 
         public Button EndTurnButton;
+        public Text EndTurnButtonText;
+
         public Text TurnNumberLabel;
         public Text DebugInfoText;
 
-        public Button RecruitButton;
+        public GameObject RecruitmentButtonGroup;
 
         protected override void Init()
         {
@@ -38,8 +41,10 @@ namespace Klaesh.UI.Window
 
         public void Refresh(bool active)
         {
-            EndTurnButton.gameObject.SetActive(active);
-            RecruitButton.gameObject.SetActive(active);
+            EndTurnButton.interactable = active;
+            EndTurnButtonText.text = active ? "End Turn" : "Enemy's Turn";
+
+            RecruitmentButtonGroup.SetActive(active);
 
             TurnNumberLabel.text = $"Turn: {_gameManager.TurnNumber}";
 
@@ -67,10 +72,9 @@ HomeSquadActive: {_gameManager.HomeSquadActive}
             _gameManager.EndTurn();
         }
 
-        public void OnRecruitUnit()
+        public void OnRecruitUnit(string entity)
         {
-            // TODO: pass unit type here!
-            _gameManager.ProcessInput(InputCode.RecruitUnit, null);
+            _gameManager.ProcessInput(InputCode.RecruitUnit, entity);
         }
     }
 }
