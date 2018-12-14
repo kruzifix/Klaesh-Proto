@@ -80,9 +80,14 @@ namespace Klaesh.Game.Input
         {
             if (_gm.IsPartOfActiveSquad(entity))
             {
-                Exit();
-                Entity = entity;
-                Enter();
+                var moveComp = entity.GetComponent<HexMovementComp>();
+                if (moveComp != null && moveComp.MovementLeft > 0)
+                {
+                    Exit();
+                    Entity = entity;
+                    Enter();
+                    return;
+                }
             }
 
             // ATTAC other unit!

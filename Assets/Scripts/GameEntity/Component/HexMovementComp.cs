@@ -61,7 +61,7 @@ namespace Klaesh.GameEntity.Component
             if (targetTile.HasEntityOnTop)
                 return false;
 
-            path.Insert(0, _map.GetTile(Position));
+            //path.Insert(0, _map.GetTile(Position));
 
             return true;
         }

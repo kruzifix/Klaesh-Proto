@@ -13,7 +13,7 @@ namespace Klaesh
         void RegisterHandler<T>(string tag, Action<T> handler);
     }
 
-    public class GameInputComponent : ManagerBehaviour, IGameInputComponent, IPointerDownHandler, IPointerUpHandler
+    public class GameInputComponent : ManagerBehaviour, IGameInputComponent, IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler
     {
         private Dictionary<string, List<Action<GameObject>>> _handlers;
 
@@ -46,12 +46,18 @@ namespace Klaesh
 
         public void OnPointerDown(PointerEventData eventData)
         {
+            if (eventData.button == PointerEventData.InputButton.Left)
+            {
+                Debug.Log($"POINTER DOWN {eventData.pointerEnter} {eventData.pointerPress?.name}");
+            }
         }
 
         public void OnPointerUp(PointerEventData eventData)
         {
             if (eventData.button == PointerEventData.InputButton.Left)
             {
+                Debug.Log($"POINTER UP {eventData.pointerEnter} {eventData.pointerPress?.name}");
+
                 if (eventData.pointerEnter != null && eventData.rawPointerPress != null && eventData.pointerEnter == eventData.rawPointerPress)
                 {
                     var tag = eventData.pointerEnter.tag;
@@ -64,6 +70,14 @@ namespace Klaesh
                         handler(eventData.pointerEnter);
                     }
                 }
+            }
+        }
+
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            if (eventData.button == PointerEventData.InputButton.Left)
+            {
+                Debug.Log($"POINTER ENTER {eventData.pointerEnter} {eventData.pointerPress?.name}");
             }
         }
     }

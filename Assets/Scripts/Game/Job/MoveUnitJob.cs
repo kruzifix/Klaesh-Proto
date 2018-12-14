@@ -55,10 +55,13 @@ namespace Klaesh.Game.Job
 
             bus.Publish(new FocusCameraMessage(this, endTile.GetTop()));
 
+            var targetTile = map.GetTile(Path[0]);
+            yield return _starter.StartCoroutine(AnimatedMoveTo(targetTile.GetTop(), targetTile.Height - oldTile.Height));
+
             for (int i = 1; i < Path.Count; i++)
             {
                 var lastTile = map.GetTile(Path[i - 1]);
-                var targetTile = map.GetTile(Path[i]);
+                targetTile = map.GetTile(Path[i]);
 
                 yield return _starter.StartCoroutine(AnimatedMoveTo(targetTile.GetTop(), targetTile.Height - lastTile.Height));
             }
@@ -78,7 +81,7 @@ namespace Klaesh.Game.Job
             var currentRot = transform.rotation;
             while (currentRot != targetRot)
             {
-                currentRot = Quaternion.RotateTowards(currentRot, targetRot, 4);
+                currentRot = Quaternion.RotateTowards(currentRot, targetRot, 6);
 
                 transform.rotation = currentRot;
 
