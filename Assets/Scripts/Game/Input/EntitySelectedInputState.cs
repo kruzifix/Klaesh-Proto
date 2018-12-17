@@ -49,7 +49,13 @@ namespace Klaesh.Game.Input
             ServiceLocator.Instance.GetService<IMessageBus>().Publish(new FocusCameraMessage(this, tile.GetTop()));
         }
 
-        public override void ProcessHexTile(HexTile tile)
+        public override void OnClick(GameObject go)
+        {
+            ForwardCall<Entity>(go, DoEntity);
+            ForwardCall<HexTile>(go, DoHexTile);
+        }
+
+        public void DoHexTile(HexTile tile)
         {
             if (_reachableTiles.Any(tup => tup.Item1 == tile))
             {
@@ -57,7 +63,7 @@ namespace Klaesh.Game.Input
                 {
                     Debug.LogFormat("[EntitySelected Input] unable to move there.");
                     if (tile.HasEntityOnTop)
-                        ProcessEntity(tile.Entity);
+                        DoEntity(tile.Entity);
                     return;
                 }
 
@@ -76,7 +82,7 @@ namespace Klaesh.Game.Input
             Context.SetState(new IdleInputState(Context));
         }
 
-        public override void ProcessEntity(Entity entity)
+        public void DoEntity(Entity entity)
         {
             if (_gm.IsPartOfActiveSquad(entity))
             {

@@ -42,7 +42,7 @@ namespace Klaesh.Debugging
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.F11))
+            if (UnityEngine.Input.GetKeyDown(KeyCode.F11))
                 ToggleEnable();
 
             if (_enabled)

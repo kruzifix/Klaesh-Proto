@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5471691188992119490}
   - component: {fileID: 5633672936550350761}
   - component: {fileID: 8230173430343762517}
+  - component: {fileID: 4775140902720203716}
   m_Layer: 0
   m_Name: base-plate
   m_TagString: Untagged
@@ -79,6 +80,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   meshes:
   - {fileID: 6519756903903299557}
+--- !u!114 &4775140902720203716
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4716776466712106052}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82eb4ac3fa0b4fe46a25e1e9070811d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7703061099567042232
 GameObject:
   m_ObjectHideFlags: 0

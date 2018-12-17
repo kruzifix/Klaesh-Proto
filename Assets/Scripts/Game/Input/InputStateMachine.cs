@@ -1,10 +1,9 @@
-﻿using Klaesh.GameEntity;
-using Klaesh.Hex;
+﻿using Klaesh.Input;
 using UnityEngine;
 
 namespace Klaesh.Game.Input
 {
-    public class InputStateMachine
+    public class InputStateMachine : IInputProcessor, IGameInputProcessor
     {
         private IInputState _currentState;
 
@@ -22,14 +21,29 @@ namespace Klaesh.Game.Input
             _currentState?.ProcessInput(code, data);
         }
 
-        public void ProcessHexTile(HexTile tile)
+        public void OnEnter(GameObject go)
         {
-            _currentState?.ProcessHexTile(tile);
+            _currentState?.OnEnter(go);
         }
 
-        public void ProcessEntity(Entity entity)
+        public void OnExit(GameObject go)
         {
-            _currentState?.ProcessEntity(entity);
+            _currentState?.OnExit(go);
+        }
+
+        public void OnDown(GameObject go)
+        {
+            _currentState?.OnDown(go);
+        }
+
+        public void OnUp(GameObject go)
+        {
+            _currentState?.OnUp(go);
+        }
+
+        public void OnClick(GameObject go)
+        {
+            _currentState?.OnClick(go);
         }
     }
 }

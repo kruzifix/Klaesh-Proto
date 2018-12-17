@@ -5,6 +5,7 @@ using Klaesh.GameEntity;
 using Klaesh.GameEntity.Component;
 using Klaesh.Hex;
 using Klaesh.Network;
+using UnityEngine;
 
 namespace Klaesh.Game.Input
 {
@@ -67,7 +68,13 @@ namespace Klaesh.Game.Input
             }
         }
 
-        public override void ProcessEntity(Entity entity)
+        public override void OnClick(GameObject go)
+        {
+            ForwardCall<Entity>(go, DoEntity);
+            ForwardCall<HexTile>(go, DoHexTile);
+        }
+
+        public void DoEntity(Entity entity)
         {
             if (_gm.IsPartOfActiveSquad(entity))
             {
@@ -80,11 +87,11 @@ namespace Klaesh.Game.Input
             }
         }
 
-        public override void ProcessHexTile(HexTile tile)
+        public void DoHexTile(HexTile tile)
         {
             if (tile.HasEntityOnTop)
             {
-                ProcessEntity(tile.Entity);
+                DoEntity(tile.Entity);
                 return;
             }
             ServiceLocator.Instance.GetService<IMessageBus>().Publish(new FocusCameraMessage(this, tile.GetTop()));

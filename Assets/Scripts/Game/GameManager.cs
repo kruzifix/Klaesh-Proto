@@ -13,6 +13,7 @@ using System.Linq;
 using Klaesh.Game.Job;
 using Klaesh.Game.Input;
 using Klaesh.Game.Message;
+using Klaesh.Input;
 
 namespace Klaesh.Game
 {
@@ -70,9 +71,8 @@ namespace Klaesh.Game
             _inputMachine = new InputStateMachine();
             _inputMachine.SetState(null);
 
-            var input = _locator.GetService<IGameInputComponent>();
-            input.RegisterHandler<Entity>("Entity", OnProcessEntity);
-            input.RegisterHandler<HexTile>("HexTile", OnProcessHexTile);
+            var input = _locator.GetService<IGameInputManager>();
+            input.RegisterProcessor(_inputMachine);
 
             _jconverter = _locator.GetService<IJsonConverter>();
             _jobManager = _locator.GetService<IJobManager>();
@@ -224,16 +224,6 @@ namespace Klaesh.Game
         public void ProcessInput(InputCode code, object data)
         {
             _inputMachine.ProcessInput(code, data);
-        }
-
-        public void OnProcessHexTile(HexTile comp)
-        {
-            _inputMachine.ProcessHexTile(comp);
-        }
-
-        public void OnProcessEntity(Entity comp)
-        {
-            _inputMachine.ProcessEntity(comp);
         }
     }
 }

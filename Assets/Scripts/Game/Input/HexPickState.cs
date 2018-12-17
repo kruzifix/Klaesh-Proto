@@ -37,7 +37,15 @@ namespace Klaesh.Game.Input
             map.DeselectAllTiles();
         }
 
-        public override void ProcessHexTile(HexTile tile)
+        public override void OnClick(GameObject go)
+        {
+            if (!ForwardCall<HexTile>(go, DoHexTile))
+            {
+                _otherCallback?.Invoke();
+            }
+        }
+
+        public void DoHexTile(HexTile tile)
         {
             if (_pickableTiles.Contains(tile))
             {

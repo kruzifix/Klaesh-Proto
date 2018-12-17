@@ -1,16 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using Klaesh.Core;
 using Klaesh.Core.Message;
-using Klaesh.Game;
-using Klaesh.Game.Config;
-using Klaesh.GameEntity;
-using Klaesh.Hex;
-using Klaesh.Network;
 using Klaesh.UI;
 using Klaesh.UI.Window;
 using Klaesh.Utility;
-using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Klaesh
