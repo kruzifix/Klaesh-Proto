@@ -30,8 +30,6 @@ It should connect to the local server and you can test your stuff! awesome!
 ## TODO
 - You can reduce your startup time if you configure your web server to host .unityweb files using gzip compression.
 
-- on hover entity/tile (in inputstate); every entity/hextile needs own PointerHandler for hovering to work!
-
 - action point system?
 - floating/scrolling text in screen and worldspace (i.e. above unit)
 
