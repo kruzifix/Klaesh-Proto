@@ -104,7 +104,7 @@ namespace Klaesh.Hex
 
                     var tile = go.GetComponent<HexTile>();
                     float height = Mathf.PerlinNoise(genParams.noiseOffset + c * genParams.noiseScale, genParams.noiseOffset + r * genParams.noiseScale);
-                    tile.Height = Mathf.CeilToInt(height * genParams.heightScale);
+                    tile.Height = 5 + Mathf.CeilToInt(height * genParams.heightScale);
                     tile.Position = new HexOffsetCoord(c, r).CubeCoord;
                     tile.Refresh();
 

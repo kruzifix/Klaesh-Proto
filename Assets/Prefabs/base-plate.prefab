@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 4775140902720203716}
   m_Layer: 0
   m_Name: base-plate
-  m_TagString: Untagged
+  m_TagString: Entity
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

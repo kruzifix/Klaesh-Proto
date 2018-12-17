@@ -369,22 +369,26 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 534669902}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 66e1f0536f8b0574691c467c17d8afe5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   mouseButton: 1
   root: {fileID: 509291793}
-  rotationSensivity: 0.4
-  zoomSensitivity: 0.6
+  rotationSensivity: 0.3
+  zoomSensitivity: 0.5
   rotationLerpConst: 0.9
   moveLerpConst: 0.05
   zoomLerpConst: 0.3
-  minDistance: 1
-  maxDistance: 30
-  minPitch: 20
-  maxPitch: 75
+  minDistance: 8
+  maxDistance: 12
+  minYaw: -40
+  maxYaw: 40
+  minPitch: 40
+  maxPitch: 60
+  startYaw: 0
+  startPitch: 50
 --- !u!114 &534669908
 MonoBehaviour:
   m_ObjectHideFlags: 0

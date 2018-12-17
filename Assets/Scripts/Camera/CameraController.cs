@@ -1,24 +1,38 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Klaesh.Core;
+﻿using Klaesh.Core;
 using Klaesh.Core.Message;
+using Klaesh.Game;
+using Klaesh.Game.Message;
 using UnityEngine;
 
-public class CameraController : MonoBehaviour
+public class CameraController : ManagerBehaviour
 {
     public int mouseButton = 1;
     public Transform root;
-    public float rotationSensivity = 1f;
-    public float zoomSensitivity = 0.6f;
+
+    [Header("Sensitivity")]
+    public float rotationSensivity = 0f;
+    public float zoomSensitivity = 0f;
+
+    [Header("Lerping")]
     public float rotationLerpConst = 0.9f;
     public float moveLerpConst = 0.1f;
     public float zoomLerpConst = 0.3f;
 
+    [Header("Zoom")]
     public float minDistance = 1f;
     public float maxDistance = 20f;
 
+    [Header("Yaw")]
+    public float minYaw = 0f;
+    public float maxYaw = 360f;
+
+    [Header("Pitch")]
     public float minPitch = 20f;
     public float maxPitch = 70f;
+
+    [Header("Start Orientation")]
+    public float startYaw;
+    public float startPitch;
 
     public float Yaw => _yaw;
     public float Pitch => _pitch;
@@ -26,22 +40,31 @@ public class CameraController : MonoBehaviour
     public Vector3 TargetPos => _rootTargetPos;
 
     private Vector3 _lastMousePos;
-    private float _yaw = 0f;
-    private float _yawTarget = 0f;
-    private float _pitch = 45f;
-    private float _pitchTarget = 45f;
-    private float _distance = 0f;
-    private float _targetDistance = 0f;
+    private float _yaw = -30f;
+    private float _yawTarget = -30f;
+    private float _pitch = 50f;
+    private float _pitchTarget = 50f;
+    private float _distance = 10f;
+    private float _targetDistance = 10f;
+
+    private float _yawMin;
+    private float _yawMax;
 
     private Vector3 _rootTargetPos;
 
     private void Start()
     {
         _rootTargetPos = root.transform.position;
-        _targetDistance = Vector3.Distance(transform.position, _rootTargetPos);
+        _targetDistance = Mathf.Lerp(minDistance, maxDistance, 0.5f);
 
-        var bus = ServiceLocator.Instance.GetService<IMessageBus>();
-        bus.Subscribe<FocusCameraMessage>(OnFocusCamera);
+        _yaw = _yawTarget = startYaw;
+        _pitch = _pitchTarget = startPitch;
+
+        _yawMin = minYaw;
+        _yawMax = maxYaw;
+
+        _bus.Subscribe<FocusCameraMessage>(OnFocusCamera);
+        _bus.Subscribe<GameStartedMessage>(OnGameStarted);
     }
 
     private void LateUpdate()
@@ -60,6 +83,7 @@ public class CameraController : MonoBehaviour
             Vector3 delta = mousePos - _lastMousePos;
 
             _yawTarget = _yawTarget + delta.x * rotationSensivity;
+            _yawTarget = Mathf.Clamp(_yawTarget, _yawMin, _yawMax);
             _pitchTarget = Mathf.Clamp(_pitchTarget - delta.y * rotationSensivity, minPitch, maxPitch);
 
             _lastMousePos = mousePos;
@@ -83,5 +107,21 @@ public class CameraController : MonoBehaviour
         _rootTargetPos = msg.Position;
         if (!msg.InterpolatePosition)
             root.transform.position = msg.Position;
+    }
+
+    private void OnGameStarted(GameStartedMessage msg)
+    {
+        bool homeTeam = _locator.GetService<IGameManager>().GameConfig.HomeSquadId == 0;
+
+        _yawMin = minYaw;
+        _yawMax = maxYaw;
+
+        if (!homeTeam)
+        {
+            _yawMin += 180f;
+            _yawMax += 180f;
+        }
+        float yaw = startYaw + (homeTeam? 0f : 180f);
+        _yaw = _yawTarget = yaw;
     }
 }

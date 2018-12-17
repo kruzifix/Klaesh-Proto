@@ -134,10 +134,24 @@ namespace Klaesh.Game
                 _squads.Add(squad);
             }
 
+            // Initialize Random with seed!
+            NetRand.Seed(GameConfig.RandomSeed);
+
+            // spawn debris on map
+            int debrisCount = NetRand.Range(5, 11);
+            for (int i = 0; i < debrisCount; i++)
+            {
+                // find empty position
+                var pos = NetRand.HexOffset(_map.Columns, _map.Rows);
+                while (_map.GetTile(pos).HasEntityOnTop)
+                    pos = NetRand.HexOffset(_map.Columns, _map.Rows);
+
+                var deb = _gem.CreateEntity("debris-stone");
+                deb.GetComponent<HexPosComp>().SetPosition(pos);
+            }
+
             TurnNumber = 0;
             TurnEnded = true;
-
-            // Initialize Random with seed!
 
             Debug.Log($"[GameManager] Starting game! id: {GameConfig.ServerId}");
             _bus.Publish(new GameStartedMessage(this));

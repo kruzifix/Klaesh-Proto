@@ -3,7 +3,7 @@
     "rows": 12,
     "cols": 7,
     "noffset": 0,
-    "nscale": 0.5,
+    "nscale": 0.1,
     "hscale": 7.0
   },
   "squads": [
