@@ -22,7 +22,6 @@ namespace Klaesh.Game.Config
         public int ServerId { get; set; }
         [JsonProperty("name")]
         public string Name { get; set; }
-        // TODO: fix this!
         [JsonProperty("color")]
         public Color Color { get; set; }
 

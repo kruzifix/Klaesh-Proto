@@ -24,7 +24,7 @@ namespace Klaesh.Game.Input
         public override void Enter()
         {
             // highlight active squad units
-            _map.DeselectAllTiles();
+            //_map.DeselectAllTiles();
 
             foreach (var unit in _gm.ActiveSquad.Members)
             {
@@ -32,14 +32,17 @@ namespace Klaesh.Game.Input
             }
         }
 
+        public override void Exit()
+        {
+            _map.DeselectAllTiles();
+        }
+
         public override void ProcessInput(InputCode code, object data)
         {
             if (code == InputCode.RecruitUnit && data != null && data is string)
             {
                 var originCoord = _gm.ActiveSquad.Config.Origin;
-                var originTile = _map.GetTile(originCoord);
-                var pickableTiles = _map.GetNeighbors(originCoord);
-                pickableTiles.Add(originTile);
+                var pickableTiles = _map.Tiles(HexCubeCoord.Ring(originCoord));
 
                 var state = new HexPickState(Context, pickableTiles, (tile) =>
                     {
@@ -64,7 +67,6 @@ namespace Klaesh.Game.Input
                         Context.SetState(this);
                     });
                 Context.SetState(state);
-                ServiceLocator.Instance.GetService<IMessageBus>().Publish(new FocusCameraMessage(this, originTile.GetTop()));
             }
         }
 

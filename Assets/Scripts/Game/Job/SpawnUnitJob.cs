@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Klaesh.Core;
+﻿using Klaesh.Core;
+using Klaesh.Core.Message;
 using Klaesh.GameEntity;
 using Klaesh.Hex;
 using Newtonsoft.Json;
@@ -24,6 +20,10 @@ namespace Klaesh.Game.Job
             var gm = ServiceLocator.Instance.GetService<IGameManager>();
 
             gm.ActiveSquad.AddMember(em, Position, EntityId);
+
+            var bus = ServiceLocator.Instance.GetService<IMessageBus>();
+            var map = ServiceLocator.Instance.GetService<IHexMap>();
+            bus.Publish(new FocusCameraMessage(this, map.GetTile(Position).GetTop()));
 
             Completed();
         }

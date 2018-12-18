@@ -1,22 +1,33 @@
-﻿using Klaesh.GameEntity;
+﻿using Klaesh.Core;
+using Klaesh.GameEntity;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace Klaesh.Hex
 {
-    public class HexTile : MonoBehaviour//, IPointerEnterHandler
+    public class HexTile : MonoBehaviour
     {
         private const float heightScale = 0.5f;
 
+        private static IHexMap _map;
+
+        private int _height;
+        private Entity _entity;
+
         public GameObject model;
 
-        public int Height { get; set; }
+        public int Height { get => _height; set { _height = value; _map.StateChanged(); } }
         public HexCubeCoord Position { get; set; }
 
         private MeshRenderer _renderer;
 
-        public Entity Entity { get; set; }
+        public Entity Entity { get => _entity; set { _entity = value; _map.StateChanged(); } }
         public bool HasEntityOnTop { get { return Entity != null; } }
+
+        private void Awake()
+        {
+            if (_map == null)
+                _map = ServiceLocator.Instance.GetService<IHexMap>();
+        }
 
         public void Refresh()
         {
@@ -36,10 +47,5 @@ namespace Klaesh.Hex
         {
             return model.transform.position + new Vector3(0, Height * heightScale, 0);
         }
-
-        //public void OnPointerEnter(PointerEventData eventData)
-        //{
-        //    Debug.Log($"ENTER {name}");
-        //}
     }
 }

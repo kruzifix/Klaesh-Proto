@@ -7,6 +7,7 @@ using Klaesh.Game.Job;
 using Klaesh.GameEntity;
 using Klaesh.GameEntity.Component;
 using Klaesh.Hex;
+using Klaesh.Hex.Navigation;
 using Klaesh.Network;
 using Klaesh.Utility;
 using UnityEngine;
@@ -18,35 +19,41 @@ namespace Klaesh.Game.Input
         private IGameManager _gm;
         private IHexMap _map;
 
-        private List<Tuple<HexTile, int>> _reachableTiles;
+        private IHexNav _navField;
 
-        public Entity Entity { get; private set; }
+        public Entity Entity { get; }
+
+        private HexMovementComp _moveComp;
 
         public EntitySelectedInputState(InputStateMachine context, Entity entity)
             : base(context)
         {
             Entity = entity;
+            _moveComp = entity.GetComponent<HexMovementComp>();
 
             _gm = ServiceLocator.Instance.GetService<IGameManager>();
             _map = ServiceLocator.Instance.GetService<IHexMap>();
+
+            _navField = _map.GetNav(new HexNavSettings(_moveComp.Position, _moveComp.jumpHeight));
         }
 
         public override void Enter()
         {
-            var moveComp = Entity.GetComponent<HexMovementComp>();
+            var originTile = _map.GetTile(_navField.Settings.Origin);
+            originTile.SetColor(Colors.TileOrigin);
 
-            _map.DeselectAllTiles();
-
-            var tile = _map.GetTile(moveComp.Position);
-            tile.SetColor(Colors.TileOrigin);
-
-            _reachableTiles = _map.GetReachableTiles(moveComp.Position, moveComp.MovementLeft, moveComp.jumpHeight);
-            foreach (var t in _reachableTiles)
+            foreach (var tile in _map.Tiles(_navField.Reachable(_moveComp.MovementLeft)))
             {
-                t.Item1.SetColor(t.Item1.HasEntityOnTop ? Colors.TileOccupied : Colors.TileDistances[t.Item2 - 1]);
+                int dist = _navField.GetDistance(tile.Position).Value;
+                tile.SetColor(tile.HasEntityOnTop ? Colors.TileOccupied : Colors.TileDistances[dist - 1]);
             }
 
-            ServiceLocator.Instance.GetService<IMessageBus>().Publish(new FocusCameraMessage(this, tile.GetTop()));
+            ServiceLocator.Instance.GetService<IMessageBus>().Publish(new FocusCameraMessage(this, originTile.GetTop()));
+        }
+
+        public override void Exit()
+        {
+            _map.DeselectAllTiles();
         }
 
         public override void OnClick(GameObject go)
@@ -57,27 +64,35 @@ namespace Klaesh.Game.Input
 
         public void DoHexTile(HexTile tile)
         {
-            if (_reachableTiles.Any(tup => tup.Item1 == tile))
+            if (tile.HasEntityOnTop)
             {
-                if (!Entity.GetComponent<HexMovementComp>().CanMoveTo(tile.Position, out List<HexTile> path))
-                {
-                    Debug.LogFormat("[EntitySelected Input] unable to move there.");
-                    if (tile.HasEntityOnTop)
-                        DoEntity(tile.Entity);
-                    return;
-                }
+                Debug.LogFormat("[EntitySelected Input] unable to move there.");
+                DoEntity(tile.Entity);
+                return;
+            }
 
-                var coordPath = path.Select(t => t.Position).ToList();
+            var dist = _navField.GetDistance(tile.Position);
+            bool reachable = dist != null && dist <= _moveComp.MovementLeft;
+
+            if (reachable)
+            {
+                // path is reversed!
+                var coordPath = _navField.PathToOrigin(tile.Position)
+                    .Select(c => c.CubeCoord)
+                    .Reverse()
+                    .Skip(1)
+                    .ToList();
                 var job = new MoveUnitJob(Entity, coordPath);
+
+                Context.SetState(new WaitForJobState(Context, job, new IdleInputState(Context)));
 
                 var jm = ServiceLocator.Instance.GetService<IJobManager>();
                 jm.AddJob(job);
                 jm.ExecuteJobs();
                 ServiceLocator.Instance.GetService<INetworker>().SendData(EventCode.DoJob, job);
-
-                Context.SetState(new IdleInputState(Context));
+                return;
             }
-            Debug.LogFormat("[EntitySelected Input] can't move there. out of range");
+            Debug.LogFormat("[EntitySelected Input] can't move there. aborting movement");
 
             Context.SetState(new IdleInputState(Context));
         }
@@ -89,14 +104,12 @@ namespace Klaesh.Game.Input
                 var moveComp = entity.GetComponent<HexMovementComp>();
                 if (moveComp != null && moveComp.MovementLeft > 0)
                 {
-                    Exit();
-                    Entity = entity;
-                    Enter();
+                    Context.SetState(new EntitySelectedInputState(Context, entity));
                     return;
                 }
             }
 
-            // ATTAC other unit!
+            // ATTAC other unit?
         }
     }
 }

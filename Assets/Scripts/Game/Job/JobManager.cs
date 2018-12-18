@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Klaesh.Core;
 
 namespace Klaesh.Game.Job
@@ -25,10 +21,10 @@ namespace Klaesh.Game.Job
             _jobQueue = new Queue<IJob>();
         }
 
-        private void OnDestroy()
-        {
-            _locator.DeregisterSingleton<IJobManager>();
-        }
+        //private void OnDestroy()
+        //{
+        //    _locator.DeregisterSingleton<IJobManager>();
+        //}
 
         public void AddJob(IJob job)
         {
@@ -45,7 +41,7 @@ namespace Klaesh.Game.Job
             job.StartJob();
         }
 
-        private void OnJobComplete()
+        private void OnJobComplete(IJob job)
         {
             ExecuteJobs();
         }

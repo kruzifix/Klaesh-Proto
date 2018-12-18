@@ -98,10 +98,10 @@ namespace Klaesh.Game
             networkDataHandler.Add(EventCode.DoJob, MakeHandlerBridge<IJob>(OnDoJob));
         }
 
-        private void OnDestroy()
-        {
-            _locator.DeregisterSingleton<IGameManager>();
-        }
+        //private void OnDestroy()
+        //{
+        //    _locator.DeregisterSingleton<IGameManager>();
+        //}
 
         private Action<string> MakeHandlerBridge<T>(Action<T> action)
         {

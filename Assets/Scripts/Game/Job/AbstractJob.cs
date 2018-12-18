@@ -9,7 +9,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Klaesh.Game.Job
 {
-    public delegate void JobCompleteEvent();
+    public delegate void JobCompleteEvent(IJob job);
 
     [JsonConverter(typeof(JobCreationConverter))]
     public interface IJob
@@ -30,7 +30,7 @@ namespace Klaesh.Game.Job
 
         protected void Completed()
         {
-            OnComplete?.Invoke();
+            OnComplete?.Invoke(this);
         }
     }
 

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using Klaesh.GameEntity;
-using Klaesh.Hex;
 using Klaesh.Input;
 using UnityEngine;
 

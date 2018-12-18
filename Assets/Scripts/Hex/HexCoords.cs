@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace Klaesh.Hex
@@ -24,9 +25,9 @@ namespace Klaesh.Hex
     public struct HexOffsetCoord : IHexCoord
     {
         // horizontal (Unity X axis)
-        public int col { get; set; }
+        public int col { get; set; } // This has a public setter for JSON serialization! but don't use it elsewhere!
         // vertical (Unity Z axis)
-        public int row { get; set; }
+        public int row { get; set; } // This has a public setter for JSON serialization! but don't use it elsewhere!
 
         [JsonIgnore]
         public HexCubeCoord CubeCoord => ToCube();
@@ -85,11 +86,11 @@ namespace Klaesh.Hex
     public struct HexCubeCoord : IHexCoord
     {
         // skewed vertical (to the left)
-        public int x { get; set; }
+        public int x { get; set; } // This has a public setter for JSON serialization! but don't use it elsewhere!
         // skewed vertical (to the right)
-        public int y { get; set; }
+        public int y { get; set; } // This has a public setter for JSON serialization! but don't use it elsewhere!
         // horizontal (Unity X axis)
-        public int z { get; set; }
+        public int z { get; set; } // This has a public setter for JSON serialization! but don't use it elsewhere!
 
         [JsonIgnore]
         public HexCubeCoord CubeCoord => this;
@@ -170,6 +171,20 @@ namespace Klaesh.Hex
         public static HexCubeCoord Offset(HexDirection dir, int dist)
         {
             return Offsets[(int)dir] * dist;
+        }
+
+        public static IEnumerable<IHexCoord> Ring(IHexCoord origin, int minDist = 1, int maxDist = 1)
+        {
+            var cubeOrigin = origin.CubeCoord;
+
+            for (int d = minDist; d <= maxDist; d++)
+            {
+                foreach (var o in Offsets)
+                {
+                    var coord = cubeOrigin + o * d;
+                    yield return coord;
+                }
+            }
         }
     }
 

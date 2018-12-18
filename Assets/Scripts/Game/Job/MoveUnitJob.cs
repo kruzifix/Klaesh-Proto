@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Klaesh.Core;
 using Klaesh.Core.Message;
 using Klaesh.GameEntity;
 using Klaesh.GameEntity.Component;
 using Klaesh.Hex;
+using Klaesh.Utility;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -42,6 +40,11 @@ namespace Klaesh.Game.Job
             var map = ServiceLocator.Instance.GetService<IHexMap>();
             var movement = Entity.GetComponent<HexMovementComp>();
 
+            for (int i = 0; i < Path.Count; i++)
+            {
+                map.GetTile(Path[i]).SetColor(Colors.TileDistances[i]);
+            }
+
             var oldTile = map.GetTile(movement.Position);
             oldTile.Entity = null;
 
@@ -65,6 +68,8 @@ namespace Klaesh.Game.Job
 
                 yield return _starter.StartCoroutine(AnimatedMoveTo(targetTile.GetTop(), targetTile.Height - lastTile.Height));
             }
+
+            map.DeselectAllTiles();
 
             Completed();
         }
