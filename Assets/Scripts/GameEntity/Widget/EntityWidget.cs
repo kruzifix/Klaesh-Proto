@@ -1,6 +1,7 @@
 ﻿using System;
 using Klaesh.GameEntity.Component;
 using Klaesh.UI;
+using Klaesh.Utility;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -57,6 +58,9 @@ namespace Klaesh.GameEntity.Widget
             var screen = Camera.main.WorldToScreenPoint(Target.transform.position);
 
             _rt.position = screen;
+
+            float s = Mathk.Map(_rt.position.z, 5f, 20f, 1f, 0.4f);
+            _rt.localScale = new Vector3(s, s, s);
         }
     }
 }
