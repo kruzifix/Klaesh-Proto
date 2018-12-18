@@ -60,6 +60,9 @@ namespace Klaesh.Hex.Navigation
                     var p = tile.Position;
                     if (visited.Contains(p))
                         continue;
+                    int heightDiff = Math.Abs(Map.GetTile(pos).Height - tile.Height);
+                    if (heightDiff > Settings.MaxHeightDiff)
+                        continue;
 
                     frontLine.Enqueue(p);
                     visited.Add(p);

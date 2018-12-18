@@ -16,6 +16,11 @@ namespace Klaesh.Game.Input
             _targetState = targetState;
         }
 
+        public override void Exit()
+        {
+            _job.OnComplete -= OnJobComplete;
+        }
+
         private void OnJobComplete(IJob job)
         {
             Context.SetState(_targetState);

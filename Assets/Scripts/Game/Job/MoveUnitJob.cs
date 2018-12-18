@@ -69,7 +69,8 @@ namespace Klaesh.Game.Job
                 yield return _starter.StartCoroutine(AnimatedMoveTo(targetTile.GetTop(), targetTile.Height - lastTile.Height));
             }
 
-            map.DeselectAllTiles();
+            //map.DeselectAllTiles();
+            Path.ForEach(c => map.GetTile(c).SetColor(Color.white));
 
             Completed();
         }

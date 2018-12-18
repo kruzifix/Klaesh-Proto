@@ -42,7 +42,8 @@ namespace Klaesh.Game.Input
             var originTile = _map.GetTile(_navField.Settings.Origin);
             originTile.SetColor(Colors.TileOrigin);
 
-            foreach (var tile in _map.Tiles(_navField.Reachable(_moveComp.MovementLeft)))
+            // Rechable includes origin tile, we dont want that
+            foreach (var tile in _map.Tiles(_navField.Reachable(_moveComp.MovementLeft).Skip(1)))
             {
                 int dist = _navField.GetDistance(tile.Position).Value;
                 tile.SetColor(tile.HasEntityOnTop ? Colors.TileOccupied : Colors.TileDistances[dist - 1]);
@@ -99,6 +100,9 @@ namespace Klaesh.Game.Input
 
         public void DoEntity(Entity entity)
         {
+            if (entity == Entity)
+                return;
+
             if (_gm.IsPartOfActiveSquad(entity))
             {
                 var moveComp = entity.GetComponent<HexMovementComp>();
