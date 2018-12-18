@@ -1,5 +1,8 @@
 ﻿using System;
+using Klaesh.Core;
+using Klaesh.Game.Job;
 using Klaesh.Input;
+using Klaesh.Network;
 using UnityEngine;
 
 namespace Klaesh.Game.Input
@@ -56,6 +59,14 @@ namespace Klaesh.Game.Input
                 return true;
             }
             return false;
+        }
+
+        protected void ExecuteAndSendJob(IJob job)
+        {
+            var jm = ServiceLocator.Instance.GetService<IJobManager>();
+            jm.AddJob(job);
+            jm.ExecuteJobs();
+            ServiceLocator.Instance.GetService<INetworker>().SendData(EventCode.DoJob, job);
         }
     }
 }

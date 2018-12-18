@@ -58,10 +58,7 @@ namespace Klaesh.Game.Input
                             EntityId = data as string
                         };
 
-                        var jm = ServiceLocator.Instance.GetService<IJobManager>();
-                        jm.AddJob(job);
-                        jm.ExecuteJobs();
-                        ServiceLocator.Instance.GetService<INetworker>().SendData(EventCode.DoJob, job);
+                        ExecuteAndSendJob(job);
 
                         // callback
                         Context.SetState(this);

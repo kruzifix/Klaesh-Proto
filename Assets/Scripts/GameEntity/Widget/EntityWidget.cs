@@ -1,5 +1,4 @@
-﻿using System;
-using Klaesh.GameEntity.Component;
+﻿using Klaesh.GameEntity.Component;
 using Klaesh.UI;
 using Klaesh.Utility;
 using UnityEngine;
@@ -11,6 +10,7 @@ namespace Klaesh.GameEntity.Widget
     {
         private RectTransform _rt;
         private HexMovementComp _moveComp;
+        private VitalityComp _vitalityComp;
 
         public Entity Target { get; private set; }
 
@@ -19,6 +19,10 @@ namespace Klaesh.GameEntity.Widget
         [Header("Movement")]
         public GameObject movementGroup;
         public Text movementText;
+
+        [Header("Vitality")]
+        public GameObject vitalityGroup;
+        public Text vitalityText;
 
         protected override void OnAwake()
         {
@@ -31,25 +35,34 @@ namespace Klaesh.GameEntity.Widget
                 return;
 
             Target = target;
+
             _moveComp = Target.GetComponent<HexMovementComp>();
             movementGroup.SetActive(_moveComp != null);
             if (_moveComp != null)
             {
                 _moveComp.MovementChanged += OnMovementChanged;
-                movementText.text = $"{_moveComp.MovementLeft}/{_moveComp.maxDistance}";
+                OnMovementChanged();
             }
 
-            Refresh();
-        }
+            _vitalityComp = Target.GetComponent<VitalityComp>();
+            vitalityGroup.SetActive(_vitalityComp != null);
+            if (_vitalityComp != null)
+            {
+                _vitalityComp.HealthChanged += OnHealthChanged;
+                OnHealthChanged();
+            }
 
-        public void Refresh()
-        {
             nameText.text = Target.name;
         }
 
         private void OnMovementChanged()
         {
             movementText.text = $"{_moveComp.MovementLeft}/{_moveComp.maxDistance}";
+        }
+
+        private void OnHealthChanged()
+        {
+            vitalityText.text = $"{_vitalityComp.Health}/{_vitalityComp.maxHealth}";
         }
 
         public void Update()

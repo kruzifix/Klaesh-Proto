@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 5633672936550350761}
   - component: {fileID: 8230173430343762517}
   - component: {fileID: 4775140902720203716}
+  - component: {fileID: 34199720343507416}
   m_Layer: 0
   m_Name: base-plate
   m_TagString: Entity
@@ -47,6 +48,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07f51b11b7beb1a44a7a567a186b285f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  createWidget: 0
 --- !u!95 &5633672936550350761
 Animator:
   serializedVersion: 3
@@ -90,6 +92,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 82eb4ac3fa0b4fe46a25e1e9070811d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &34199720343507416
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4716776466712106052}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 499a6034d8d840548b38de925f6ee802, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &7703061099567042232

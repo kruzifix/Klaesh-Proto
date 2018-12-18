@@ -83,7 +83,7 @@ namespace Klaesh.GameEntity
 
         public void KillEntity(Entity entity)
         {
-            // TODO: entity died message?
+            _bus.Publish(new EntityKilledMessage(this, entity));
 
             _entities.Remove(entity);
             Destroy(entity.gameObject);

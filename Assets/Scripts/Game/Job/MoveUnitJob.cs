@@ -112,10 +112,9 @@ namespace Klaesh.Game.Job
             anim.SetFloat("heightDiff", heightDiff);
             yield return null;
 
-            while (anim.GetCurrentAnimatorStateInfo(0).IsName("ForwardMovement"))
-            {
+            while (!anim.GetCurrentAnimatorStateInfo(0).IsName("Idle"))
                 yield return null;
-            }
+
             transform.position = target;
         }
     }

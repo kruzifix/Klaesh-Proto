@@ -40,7 +40,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc84fc9d08194684bb636c947195f622, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 3
+  maxHealth: 3
+--- !u!114 &8040288664952291671
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7542806183185671758}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25bc8c3097b7ac44b82e19f87fcf2db8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  range: 1
+  damage: 1
 --- !u!1001 &3015218732003422730
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -61,16 +75,6 @@ PrefabInstance:
     - target: {fileID: 5471691188992119490, guid: 6c2d809c81d571a48ae9c92ba7f68896,
         type: 3}
       propertyPath: createWidget
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8337493528376654199, guid: 6c2d809c81d571a48ae9c92ba7f68896,
-        type: 3}
-      propertyPath: m_LocalScale.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8337493528376654199, guid: 6c2d809c81d571a48ae9c92ba7f68896,
-        type: 3}
-      propertyPath: m_LocalScale.z
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5355785576713080766}
@@ -201,18 +205,6 @@ PrefabInstance:
     - target: {fileID: 400052, guid: f3392e95529ae7540ad53657e3d0ce7d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400052, guid: f3392e95529ae7540ad53657e3d0ce7d, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 0.8
-      objectReference: {fileID: 0}
-    - target: {fileID: 400052, guid: f3392e95529ae7540ad53657e3d0ce7d, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 0.8
-      objectReference: {fileID: 0}
-    - target: {fileID: 400052, guid: f3392e95529ae7540ad53657e3d0ce7d, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 0.8
       objectReference: {fileID: 0}
     - target: {fileID: 9500000, guid: f3392e95529ae7540ad53657e3d0ce7d, type: 3}
       propertyPath: m_Controller

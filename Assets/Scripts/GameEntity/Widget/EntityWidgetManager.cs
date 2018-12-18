@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Klaesh.GameEntity.Message;
 using Klaesh.UI;
 using Klaesh.Utility;
@@ -16,6 +17,7 @@ namespace Klaesh.GameEntity.Widget
             _widgets = new List<EntityWidget>();
 
             AddSubscription(_bus.Subscribe<EntityCreatedMessage>(OnEntityCreated));
+            AddSubscription(_bus.Subscribe<EntityKilledMessage>(OnEntityKilled));
 
             // create widgets for exisiting entities!!??
         }
@@ -40,6 +42,18 @@ namespace Klaesh.GameEntity.Widget
             widget.SetTarget(target);
 
             _widgets.Add(widget);
+        }
+
+        private void OnEntityKilled(EntityKilledMessage msg)
+        {
+            var ent = msg.Value;
+
+            var widschets = _widgets.Where(w => w.Target == ent);
+            foreach (var w in widschets)
+            {
+                _widgets.Remove(w);
+                Destroy(w.gameObject);
+            }
         }
     }
 }

@@ -6,10 +6,10 @@ namespace Klaesh.GameEntity.Component
 {
     public class HexPosComp : MonoBehaviour
     {
-        private IHexMap _map;
-        private Entity _owner;
+        protected IHexMap _map;
+        protected Entity _owner;
 
-        public HexCubeCoord Position { get; private set; }
+        public virtual HexCubeCoord Position { get; set; }
 
         private void Awake()
         {

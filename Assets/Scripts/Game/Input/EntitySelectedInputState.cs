@@ -6,6 +6,7 @@ using Klaesh.Core.Message;
 using Klaesh.Game.Job;
 using Klaesh.GameEntity;
 using Klaesh.GameEntity.Component;
+using Klaesh.GameEntity.Module;
 using Klaesh.Hex;
 using Klaesh.Hex.Navigation;
 using Klaesh.Network;
@@ -87,10 +88,7 @@ namespace Klaesh.Game.Input
 
                 Context.SetState(new WaitForJobState(Context, job, new IdleInputState(Context)));
 
-                var jm = ServiceLocator.Instance.GetService<IJobManager>();
-                jm.AddJob(job);
-                jm.ExecuteJobs();
-                ServiceLocator.Instance.GetService<INetworker>().SendData(EventCode.DoJob, job);
+                ExecuteAndSendJob(job);
                 return;
             }
             Debug.LogFormat("[EntitySelected Input] can't move there. aborting movement");
@@ -114,6 +112,30 @@ namespace Klaesh.Game.Input
             }
 
             // ATTAC other unit?
+            var weapon = Entity.GetComponent<WeaponComp>();
+            if (weapon == null)
+                return;
+            // can other be attacked?
+            var otherVitality = entity.GetComponent<VitalityComp>();
+            if (otherVitality == null)
+                return;
+            // is it in the enemy squad?
+            if (entity.GetModule<SquadMember>() == null)
+                return;
+
+            // check range
+            var pos = entity.GetComponent<HexPosComp>().Position;
+            if (HexCubeCoord.Distance(_moveComp.Position, pos) > weapon.range)
+                return;
+            if (weapon.UsesLeft <= 0)
+                return;
+
+            // TODO: CONSIDER HEIGHT DIFFERENCE!!!
+
+            // ATACK!
+            var job = new AttackUnitJob(Entity, entity);
+            Context.SetState(new WaitForJobState(Context, job, new IdleInputState(Context)));
+            ExecuteAndSendJob(job);
         }
 
         public override void OnEnter(GameObject go)
