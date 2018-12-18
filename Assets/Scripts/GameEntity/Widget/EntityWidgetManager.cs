@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Klaesh.GameEntity.Message;
 using Klaesh.UI;
 using Klaesh.Utility;
@@ -18,7 +17,7 @@ namespace Klaesh.GameEntity.Widget
 
             AddSubscription(_bus.Subscribe<EntityCreatedMessage>(OnEntityCreated));
 
-            // create widgets for exisiting entiteis?
+            // create widgets for exisiting entities!!??
         }
 
         protected override void DeInit()
@@ -29,7 +28,8 @@ namespace Klaesh.GameEntity.Widget
 
         private void OnEntityCreated(EntityCreatedMessage msg)
         {
-            CreateWidget(msg.Value);
+            if (msg.Value.createWidget)
+                CreateWidget(msg.Value);
         }
 
         private void CreateWidget(Entity target)

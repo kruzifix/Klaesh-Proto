@@ -14,6 +14,19 @@ CapsuleCollider:
   m_Height: 2.09
   m_Direction: 1
   m_Center: {x: 0, y: 0.8, z: 0}
+--- !u!114 &1169787502090794497
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1686971405337167288}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc84fc9d08194684bb636c947195f622, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  health: 5
 --- !u!114 &4373286383195650008
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -28,19 +41,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxDistance: 2
   jumpHeight: 1
---- !u!114 &1169787502090794497
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1686971405337167288}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cc84fc9d08194684bb636c947195f622, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  health: 5
 --- !u!1001 &6204843984084341244
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -57,6 +57,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_TagString
       value: Entity
+      objectReference: {fileID: 0}
+    - target: {fileID: 5471691188992119490, guid: 6c2d809c81d571a48ae9c92ba7f68896,
+        type: 3}
+      propertyPath: createWidget
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1686971405337167288}
       propertyPath: m_Name

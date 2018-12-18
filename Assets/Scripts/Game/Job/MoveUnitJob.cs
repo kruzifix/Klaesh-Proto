@@ -5,6 +5,7 @@ using Klaesh.Core;
 using Klaesh.Core.Message;
 using Klaesh.GameEntity;
 using Klaesh.GameEntity.Component;
+using Klaesh.GameEntity.Module;
 using Klaesh.Hex;
 using Klaesh.Utility;
 using Newtonsoft.Json;
@@ -40,9 +41,23 @@ namespace Klaesh.Game.Job
             var map = ServiceLocator.Instance.GetService<IHexMap>();
             var movement = Entity.GetComponent<HexMovementComp>();
 
+            var gem = ServiceLocator.Instance.GetService<IEntityManager>();
+
+            var arrows = new List<Entity>();
+
+            var lastTile = map.GetTile(movement.Position);
             for (int i = 0; i < Path.Count; i++)
             {
-                map.GetTile(Path[i]).SetColor(Colors.TileDistances[i]);
+                var tile = map.GetTile(Path[i]);
+                tile.SetColor(Colors.TileDistances[i]);
+
+                var arrow = gem.CreateEntity("arrow");
+                arrows.Add(arrow);
+                var line = arrow.GetComponent<LineArrowComp>();
+                line.UpdateLine(lastTile.GetTop(), tile.GetTop());
+                line.SetColor(Entity.GetModule<SquadMember>().Squad.Config.Color);
+
+                lastTile = tile;
             }
 
             var oldTile = map.GetTile(movement.Position);
@@ -58,19 +73,18 @@ namespace Klaesh.Game.Job
 
             bus.Publish(new FocusCameraMessage(this, endTile.GetTop()));
 
-            var targetTile = map.GetTile(Path[0]);
-            yield return _starter.StartCoroutine(AnimatedMoveTo(targetTile.GetTop(), targetTile.Height - oldTile.Height));
-
-            for (int i = 1; i < Path.Count; i++)
+            lastTile = oldTile;
+            for (int i = 0; i < Path.Count; i++)
             {
-                var lastTile = map.GetTile(Path[i - 1]);
-                targetTile = map.GetTile(Path[i]);
+                var targetTile = map.GetTile(Path[i]);
 
                 yield return _starter.StartCoroutine(AnimatedMoveTo(targetTile.GetTop(), targetTile.Height - lastTile.Height));
+                lastTile = targetTile;
             }
 
-            //map.DeselectAllTiles();
+            // Cleanup!
             Path.ForEach(c => map.GetTile(c).SetColor(Color.white));
+            gem.KillEntities(arrows);
 
             Completed();
         }

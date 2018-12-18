@@ -17,6 +17,8 @@ namespace Klaesh.GameEntity
         Entity CreateEntity(string type, Action<Entity> addModules = null);
         Entity GetEntity(int id);
 
+        void KillEntity(Entity entity);
+        void KillEntities(IEnumerable<Entity> entities);
         void KillAll();
     }
 
@@ -64,6 +66,8 @@ namespace Klaesh.GameEntity
 
             _entities.Add(entity);
 
+            entity.InitModules();
+
             _idCounter++;
 
             _bus.Publish(new EntityCreatedMessage(this, entity));
@@ -75,6 +79,22 @@ namespace Klaesh.GameEntity
         {
             // TODO: add dict map cache for fast lookup
             return _entities.FirstOrDefault(e => e.Id == id);
+        }
+
+        public void KillEntity(Entity entity)
+        {
+            // TODO: entity died message?
+
+            _entities.Remove(entity);
+            Destroy(entity.gameObject);
+        }
+
+        public void KillEntities(IEnumerable<Entity> entities)
+        {
+            foreach (var ent in entities)
+            {
+                KillEntity(ent);
+            }
         }
 
         public void KillAll()

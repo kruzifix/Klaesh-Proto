@@ -13,6 +13,10 @@ namespace Klaesh.Utility
         public static Color TileOccupied;
         public static Color[] TileDistances;
 
+        public static Color TileHighlight = new Color32(214, 214, 214, 255);
+        public static Color ValidMovementTarget = Color.green;
+        public static Color InValidMovementTarget = new Color32(255, 172, 170, 255);
+
         public static Color[] SquadColors = new Color[] { new Color32(66, 134, 244, 255), new Color32(244, 172, 65, 255) };
 
         public static Color HighlightOrange = new Color32(255, 185, 94, 255);

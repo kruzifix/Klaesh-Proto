@@ -58,6 +58,21 @@ PrefabInstance:
       propertyPath: m_TagString
       value: Entity
       objectReference: {fileID: 0}
+    - target: {fileID: 5471691188992119490, guid: 6c2d809c81d571a48ae9c92ba7f68896,
+        type: 3}
+      propertyPath: createWidget
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8337493528376654199, guid: 6c2d809c81d571a48ae9c92ba7f68896,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8337493528376654199, guid: 6c2d809c81d571a48ae9c92ba7f68896,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5355785576713080766}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -186,6 +201,18 @@ PrefabInstance:
     - target: {fileID: 400052, guid: f3392e95529ae7540ad53657e3d0ce7d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400052, guid: f3392e95529ae7540ad53657e3d0ce7d, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 400052, guid: f3392e95529ae7540ad53657e3d0ce7d, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 400052, guid: f3392e95529ae7540ad53657e3d0ce7d, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.8
       objectReference: {fileID: 0}
     - target: {fileID: 9500000, guid: f3392e95529ae7540ad53657e3d0ce7d, type: 3}
       propertyPath: m_Controller

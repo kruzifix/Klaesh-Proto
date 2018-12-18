@@ -1,10 +1,13 @@
-﻿using Klaesh.Core;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Klaesh.Core;
 using Klaesh.Core.Message;
 using Klaesh.Game.Job;
 using Klaesh.GameEntity;
 using Klaesh.GameEntity.Component;
 using Klaesh.Hex;
 using Klaesh.Network;
+using Klaesh.Utility;
 using UnityEngine;
 
 namespace Klaesh.Game.Input
@@ -13,6 +16,8 @@ namespace Klaesh.Game.Input
     {
         private IGameManager _gm;
         private IHexMap _map;
+
+        private List<HexTile> _tiles;
 
         public IdleInputState(InputStateMachine context)
             : base(context)
@@ -23,13 +28,11 @@ namespace Klaesh.Game.Input
 
         public override void Enter()
         {
+            _tiles = _gm.ActiveSquad.Members
+                .Select(m => _map.GetTile(m.GetComponent<HexMovementComp>().Position))
+                .ToList();
             // highlight active squad units
-            //_map.DeselectAllTiles();
-
-            foreach (var unit in _gm.ActiveSquad.Members)
-            {
-                _map.GetTile(unit.GetComponent<HexMovementComp>().Position).SetColor(_gm.ActiveSquad.Config.Color);
-            }
+            _tiles.ForEach(t => t.SetColor(_gm.ActiveSquad.Config.Color));
         }
 
         public override void Exit()
@@ -97,6 +100,28 @@ namespace Klaesh.Game.Input
                 return;
             }
             ServiceLocator.Instance.GetService<IMessageBus>().Publish(new FocusCameraMessage(this, tile.GetTop()));
+        }
+
+        public override void OnEnter(GameObject go)
+        {
+            ForwardCall<HexTile>(go, tile =>
+            {
+                if (_tiles.Contains(tile))
+                    return;
+
+                tile.SetColor(Colors.TileHighlight);
+            });
+        }
+
+        public override void OnExit(GameObject go)
+        {
+            ForwardCall<HexTile>(go, tile =>
+            {
+                if (_tiles.Contains(tile))
+                    return;
+
+                tile.SetColor(Color.white);
+            });
         }
     }
 }

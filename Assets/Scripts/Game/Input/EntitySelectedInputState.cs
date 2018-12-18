@@ -115,5 +115,31 @@ namespace Klaesh.Game.Input
 
             // ATTAC other unit?
         }
+
+        public override void OnEnter(GameObject go)
+        {
+            ForwardCall<HexTile>(go, tile =>
+            {
+                var dist = _navField.GetDistance(tile.Position);
+                bool reachable = dist != null && dist <= _moveComp.MovementLeft;
+                if (reachable && dist == 0)
+                    return;
+
+                tile.SetColor(reachable ? Colors.ValidMovementTarget : Colors.InValidMovementTarget);
+            });
+        }
+
+        public override void OnExit(GameObject go)
+        {
+            ForwardCall<HexTile>(go, tile =>
+            {
+                var dist = _navField.GetDistance(tile.Position);
+                bool reachable = dist != null && dist <= _moveComp.MovementLeft;
+                if (reachable && dist == 0)
+                    return;
+
+                tile.SetColor(reachable ? Colors.TileDistances[dist.Value - 1] : Color.white);
+            });
+        }
     }
 }

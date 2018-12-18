@@ -31,7 +31,8 @@ It should connect to the local server and you can test your stuff! awesome!
 - You can reduce your startup time if you configure your web server to host .unityweb files using gzip compression.
 
 - action point system?
-- floating/scrolling text in screen and worldspace (i.e. above unit)
+
+- add EntityWidget as Field to Entity Monobehaviour? or make an additional component for that? who knows..
 
 - Navigator that builds 'Nav-Mesh/Map' from properties of Hextiles
 - has methods like Flood(origin)

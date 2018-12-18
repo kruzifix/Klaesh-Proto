@@ -26,6 +26,19 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.8, y: 1, z: 0.8}
   m_Center: {x: 0, y: 0.5, z: 0}
+--- !u!114 &2173360569561339728
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6937343521671583789}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc84fc9d08194684bb636c947195f622, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  health: 4
 --- !u!114 &5484435076320657916
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -40,19 +53,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxDistance: 2
   jumpHeight: 2
---- !u!114 &2173360569561339728
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6937343521671583789}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cc84fc9d08194684bb636c947195f622, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  health: 4
 --- !u!1001 &2392324107671407721
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -69,6 +69,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_TagString
       value: Entity
+      objectReference: {fileID: 0}
+    - target: {fileID: 5471691188992119490, guid: 6c2d809c81d571a48ae9c92ba7f68896,
+        type: 3}
+      propertyPath: createWidget
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4807761879383781853}
       propertyPath: m_LocalPosition.x
