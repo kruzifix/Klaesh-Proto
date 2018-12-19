@@ -49,6 +49,8 @@ namespace Klaesh.Game
         private InputStateMachine _inputMachine;
         private List<Squad> _squads;
 
+        private StartTurnData _nextTurnData;
+
         public int TurnNumber { get; private set; }
         public int ActiveSquadIndex { get; private set; }
         public ISquad ActiveSquad => _squads?[ActiveSquadIndex] ?? null;
@@ -152,6 +154,7 @@ namespace Klaesh.Game
 
             TurnNumber = 0;
             TurnEnded = true;
+            _nextTurnData = null;
 
             Debug.Log($"[GameManager] Starting game! id: {GameConfig.ServerId}");
             _bus.Publish(new GameStartedMessage(this));
@@ -165,22 +168,40 @@ namespace Klaesh.Game
                 throw new Exception($"got wrong turn number. expected {TurnNumber + 1}, got {data.TurnNumber}");
             }
 
-            TurnNumber = data.TurnNumber;
-            ActiveSquadIndex = data.ActiveSquadIndex;
+            _nextTurnData = data;
 
-            _inputMachine.SetState(null);
-
-            if (HomeSquadActive)
+            if (_jobManager.NoJobsLeft)
             {
-                _inputMachine.SetState(new IdleInputState(_inputMachine));
-                TurnEnded = false;
+                DoStartTurn();
             }
+            else
+            {
+                _jobManager.AllJobsFinished += DoStartTurn;
+            }
+        }
+
+        private void DoStartTurn()
+        {
+            if (_nextTurnData == null)
+                throw new Exception("Missing data for next turn?");
+
+            _jobManager.AllJobsFinished -= DoStartTurn;
+
+            TurnNumber = _nextTurnData.TurnNumber;
+            ActiveSquadIndex = _nextTurnData.ActiveSquadIndex;
+
+            _nextTurnData = null;
+
+            _inputMachine.SetState(HomeSquadActive ? new IdleInputState(_inputMachine) : null);
+
+            TurnEnded = false;
 
             var handler = new List<INewTurnHandler>();
-            ActiveSquad.Members.ForEach(ent => handler.AddRange(ent.GetComponents<INewTurnHandler>()));
+            ActiveSquad.AliveMembers.ForEach(ent => handler.AddRange(ent.GetComponents<INewTurnHandler>()));
             handler.ForEach(h => h.OnNewTurn());
 
-            _bus.Publish(new FocusCameraMessage(this, ActiveSquad.Members[0].transform.position));
+            _bus.Publish(new FocusCameraMessage(this, ActiveSquad.AliveMembers.Last().transform.position));
+
             _bus.Publish(new TurnBoundaryMessage(this, true));
         }
 
@@ -213,6 +234,7 @@ namespace Klaesh.Game
             // cleanup!
             GameConfig = null;
             // kill all entities
+            _squads.Clear();
             _gem.KillAll();
 
             // clear map
@@ -223,7 +245,7 @@ namespace Klaesh.Game
 
         public bool IsPartOfActiveSquad(Entity entity)
         {
-            return ActiveSquad.Members.Contains(entity);
+            return ActiveSquad.AliveMembers.Contains(entity);
         }
 
         public Entity ResolveEntityRef(SquadEntityRefData data)

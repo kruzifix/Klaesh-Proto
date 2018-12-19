@@ -11,6 +11,7 @@ namespace Klaesh.GameEntity.Component
         public event HealthChangedEvent HealthChanged;
 
         public int Health { get; private set; }
+        public bool IsDead => Health <= 0;
 
         private void Start()
         {

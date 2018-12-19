@@ -25,5 +25,12 @@ namespace Klaesh.GameEntity.Component
             tile.Entity = _owner;
             transform.position = tile.GetTop();
         }
+
+        private void OnDestroy()
+        {
+            var tile = _map.GetTile(Position);
+            if (tile != null)
+                tile.Entity = null;
+        }
     }
 }

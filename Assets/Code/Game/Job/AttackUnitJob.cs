@@ -5,6 +5,7 @@ using Klaesh.Game.Data;
 using Klaesh.GameEntity;
 using Klaesh.GameEntity.Component;
 using Klaesh.GameEntity.Module;
+using Klaesh.Hex;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -46,8 +47,6 @@ namespace Klaesh.Game.Job
 
         private IEnumerator DoAttack()
         {
-            // PLAY ANIMATION
-            // parallel ausführen???
             var routine1 = _starter.StartCoroutine(RotateTowards(Entity.transform, Target.transform.position));
             var routine2 = _starter.StartCoroutine(RotateTowards(Target.transform, Entity.transform.position));
 
@@ -57,7 +56,7 @@ namespace Klaesh.Game.Job
             var weapon = Entity.GetComponent<WeaponComp>();
             var vitality = Target.GetComponent<VitalityComp>();
 
-            // MELEE ANIMATION; TODO: TEST FOR OTHER
+            // MELEE ANIMATION; TODO: RANGED ATTACK? effects for individual attacks???
             var myAnim = Entity.GetComponent<Animator>();
             var targetAnim = Target.GetComponent<Animator>();
 
@@ -67,10 +66,7 @@ namespace Klaesh.Game.Job
                 vitality.Damage(weapon.damage);
                 weapon.Use();
 
-                if (vitality.Health <= 0)
-                    targetAnim.SetTrigger("fallOver");
-                else
-                    targetAnim.SetTrigger("shake");
+                targetAnim.SetTrigger(vitality.IsDead ? "fallOver" : "shake");
             };
 
             animEvent.AnimationEvent += hand;
@@ -88,6 +84,21 @@ namespace Klaesh.Game.Job
             animEvent.AnimationEvent -= hand;
 
             // do scrolling text!
+
+            yield return new WaitForSecondsRealtime(0.5f);
+
+            if (vitality.IsDead)
+            {
+                var pos = Target.GetComponent<HexPosComp>().Position;
+
+                var gem = ServiceLocator.Instance.GetService<IEntityManager>();
+                gem.KillEntity(Target);
+
+                var map = ServiceLocator.Instance.GetService<IHexMap>();
+                var tile = map.GetTile(pos);
+
+                Debug.Log($"AFTER DAETH: entityontop {tile.HasEntityOnTop}  {tile.Entity}");
+            }
 
             Completed();
         }

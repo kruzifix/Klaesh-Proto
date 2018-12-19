@@ -3,22 +3,33 @@ using Klaesh.Core;
 
 namespace Klaesh.Game.Job
 {
+    public delegate void AllJobsFinishedEvent();
+
     public interface IJobManager
     {
-        void AddJob(IJob job);
+        bool NoJobsLeft { get; }
 
+        event AllJobsFinishedEvent AllJobsFinished;
+
+        void AddJob(IJob job);
         void ExecuteJobs();
     }
 
     public class JobManager : ManagerBehaviour, IJobManager
     {
         private Queue<IJob> _jobQueue;
+        private IJob _currentJob;
+
+        public bool NoJobsLeft => _currentJob == null && _jobQueue.Count == 0;
+
+        public event AllJobsFinishedEvent AllJobsFinished;
 
         protected override void OnAwake()
         {
             _locator.RegisterSingleton<IJobManager>(this);
 
             _jobQueue = new Queue<IJob>();
+            _currentJob = null;
         }
 
         //private void OnDestroy()
@@ -34,15 +45,21 @@ namespace Klaesh.Game.Job
         public void ExecuteJobs()
         {
             if (_jobQueue.Count == 0)
+            {
+                AllJobsFinished?.Invoke();
                 return;
-            var job = _jobQueue.Dequeue();
-            job.OnComplete += OnJobComplete;
+            }
+            _currentJob = _jobQueue.Dequeue();
+            _currentJob.OnComplete += OnJobComplete;
 
-            job.StartJob();
+            _currentJob.StartJob();
         }
 
         private void OnJobComplete(IJob job)
         {
+            _currentJob.OnComplete -= OnJobComplete;
+            _currentJob = null;
+
             ExecuteJobs();
         }
     }

@@ -8,6 +8,8 @@ using UnityEngine;
 using Klaesh.GameEntity.Component;
 using Klaesh.Core;
 using Klaesh.Utility;
+using Klaesh.Core.Message;
+using Klaesh.GameEntity.Message;
 
 namespace Klaesh.Game
 {
@@ -16,6 +18,7 @@ namespace Klaesh.Game
         ISquadConfiguration Config { get; }
 
         List<Entity> Members { get; }
+        List<Entity> AliveMembers { get; }
 
         void CreateMembers(IEntityManager man);
         void AddMember(IEntityManager gem, IHexCoord position, string entityId);
@@ -24,14 +27,35 @@ namespace Klaesh.Game
     public class Squad : ISquad
     {
         private int _number;
+        private SubscriberToken _token;
 
         public ISquadConfiguration Config { get; private set; }
 
         public List<Entity> Members { get; private set; }
+        public List<Entity> AliveMembers { get; private set; }
 
         public Squad(ISquadConfiguration config)
         {
             Config = config;
+
+            var bus = ServiceLocator.Instance.GetService<IMessageBus>();
+            _token = bus.Subscribe<EntityKilledMessage>(OnEntityKilled);
+        }
+
+        ~Squad()
+        {
+            var bus = ServiceLocator.Instance.GetService<IMessageBus>();
+            bus.Unsubscribe(_token);
+        }
+
+        private void OnEntityKilled(EntityKilledMessage msg)
+        {
+            int index = Members.IndexOf(msg.Value);
+            if (index < 0)
+                return;
+            Debug.Log($"[Squad] Entity kill registered! {Config.ServerId}|{index}");
+            Members[index] = null;
+            AliveMembers.Remove(msg.Value);
         }
 
         public void CreateMembers(IEntityManager gem)
@@ -40,6 +64,7 @@ namespace Klaesh.Game
                 return;
 
             Members = new List<Entity>();
+            AliveMembers = new List<Entity>();
             _number = 0;
 
             foreach (var unit in Config.Units)
@@ -64,6 +89,7 @@ namespace Klaesh.Game
             ent.transform.rotation = Quaternion.LookRotation(dir);
 
             Members.Add(ent);
+            AliveMembers.Add(ent);
             _number++;
         }
     }

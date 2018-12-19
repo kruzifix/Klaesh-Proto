@@ -6,7 +6,6 @@ using Klaesh.Game.Job;
 using Klaesh.GameEntity;
 using Klaesh.GameEntity.Component;
 using Klaesh.Hex;
-using Klaesh.Network;
 using Klaesh.Utility;
 using UnityEngine;
 
@@ -28,7 +27,7 @@ namespace Klaesh.Game.Input
 
         public override void Enter()
         {
-            _tiles = _gm.ActiveSquad.Members
+            _tiles = _gm.ActiveSquad.AliveMembers
                 .Select(m => _map.GetTile(m.GetComponent<HexMovementComp>().Position))
                 .ToList();
             // highlight active squad units
@@ -45,6 +44,9 @@ namespace Klaesh.Game.Input
             if (code == InputCode.RecruitUnit && data != null && data is string)
             {
                 var originCoord = _gm.ActiveSquad.Config.Origin;
+
+                ServiceLocator.Instance.GetService<IMessageBus>().Publish(new FocusCameraMessage(this, _map.GetTile(originCoord).GetTop()));
+
                 var pickableTiles = _map.Tiles(HexCubeCoord.Ring(originCoord));
 
                 var state = new HexPickState(Context, pickableTiles, (tile) =>

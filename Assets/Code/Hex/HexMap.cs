@@ -1,10 +1,8 @@
 ﻿using Klaesh.Core;
-using Klaesh.Core.Message;
 using Klaesh.Hex.Navigation;
 using Klaesh.Utility;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEditor;
 using UnityEngine;
 

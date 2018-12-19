@@ -47,8 +47,11 @@ namespace Klaesh.GameEntity.Widget
         private void OnEntityKilled(EntityKilledMessage msg)
         {
             var ent = msg.Value;
+            // didn't create a widget in the first place -> so we don't have to remove one
+            if (!ent.createWidget)
+                return;
 
-            var widschets = _widgets.Where(w => w.Target == ent);
+            var widschets = _widgets.Where(w => w.Target == ent).ToList();
             foreach (var w in widschets)
             {
                 _widgets.Remove(w);
