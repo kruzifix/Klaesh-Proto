@@ -16,6 +16,11 @@ namespace Klaesh.Game.Input
             _targetState = targetState;
         }
 
+        public override void Enter()
+        {
+            ExecuteAndSendJob(_job);
+        }
+
         public override void Exit()
         {
             _job.OnComplete -= OnJobComplete;

@@ -15,25 +15,25 @@ using UnityEngine;
 
 namespace Klaesh.Game.Input
 {
-    public class EntitySelectedInputState : AbstractInputState
+    public class EntityMovementInputState : AbstractInputState
     {
         private IGameManager _gm;
         private IHexMap _map;
 
         private IHexNav _navField;
 
-        public Entity Entity { get; }
+        private Entity Entity { get; }
 
         private HexMovementComp _moveComp;
 
-        public EntitySelectedInputState(InputStateMachine context, Entity entity)
+        public EntityMovementInputState(InputStateMachine context, Entity entity)
             : base(context)
         {
             Entity = entity;
             _moveComp = entity.GetComponent<HexMovementComp>();
 
-            _gm = ServiceLocator.Instance.GetService<IGameManager>();
-            _map = ServiceLocator.Instance.GetService<IHexMap>();
+            _gm = _locator.GetService<IGameManager>();
+            _map = _locator.GetService<IHexMap>();
 
             _navField = _map.GetNav(new HexNavSettings(_moveComp.Position, _moveComp.jumpHeight));
         }
@@ -50,7 +50,7 @@ namespace Klaesh.Game.Input
                 tile.SetColor(tile.HasEntityOnTop ? Colors.TileOccupied : Colors.TileDistances[dist - 1]);
             }
 
-            ServiceLocator.Instance.GetService<IMessageBus>().Publish(new FocusCameraMessage(this, originTile.GetTop()));
+            _bus.Publish(new FocusCameraMessage(this, originTile.GetTop()));
         }
 
         public override void Exit()
@@ -87,8 +87,6 @@ namespace Klaesh.Game.Input
                 var job = new MoveUnitJob(Entity, coordPath);
 
                 Context.SetState(new WaitForJobState(Context, job, new IdleInputState(Context)));
-
-                ExecuteAndSendJob(job);
                 return;
             }
             Debug.LogFormat("[EntitySelected Input] can't move there. aborting movement");
@@ -103,39 +101,12 @@ namespace Klaesh.Game.Input
 
             if (_gm.IsPartOfActiveSquad(entity))
             {
-                var moveComp = entity.GetComponent<HexMovementComp>();
-                if (moveComp != null && moveComp.MovementLeft > 0)
+                if (entity.CanMove())
                 {
-                    Context.SetState(new EntitySelectedInputState(Context, entity));
+                    Context.SetState(new EntityMovementInputState(Context, entity));
                     return;
                 }
             }
-
-            // ATTAC other unit?
-            var weapon = Entity.GetComponent<WeaponComp>();
-            if (weapon == null)
-                return;
-            // can other be attacked?
-            var otherVitality = entity.GetComponent<VitalityComp>();
-            if (otherVitality == null)
-                return;
-            // is it in the enemy squad?
-            if (entity.GetModule<SquadMember>() == null)
-                return;
-
-            // check range
-            var pos = entity.GetComponent<HexPosComp>().Position;
-            if (HexCubeCoord.Distance(_moveComp.Position, pos) > weapon.range)
-                return;
-            if (weapon.UsesLeft <= 0)
-                return;
-
-            // TODO: CONSIDER HEIGHT DIFFERENCE!!!
-
-            // ATACK!
-            var job = new AttackUnitJob(Entity, entity);
-            Context.SetState(new WaitForJobState(Context, job, new IdleInputState(Context)));
-            ExecuteAndSendJob(job);
         }
 
         public override void OnEnter(GameObject go)
@@ -147,7 +118,18 @@ namespace Klaesh.Game.Input
                 if (reachable && dist == 0)
                     return;
 
-                tile.SetColor(reachable ? Colors.ValidMovementTarget : Colors.InValidMovementTarget);
+                if (reachable)
+                {
+                    // highlight path
+                    foreach (var c in _navField.PathToOrigin(tile.Position).Reverse().Skip(1))
+                    {
+                        _map.GetTile(c).SetColor(Colors.ValidMovementTarget);
+                    }
+                }
+                else
+                    tile.SetColor(Colors.InValidMovementTarget);
+
+                //tile.SetColor(reachable ? Colors.ValidMovementTarget : Colors.InValidMovementTarget);
             });
         }
 
@@ -160,7 +142,18 @@ namespace Klaesh.Game.Input
                 if (reachable && dist == 0)
                     return;
 
-                tile.SetColor(reachable ? Colors.TileDistances[dist.Value - 1] : Color.white);
+                //tile.SetColor(reachable ? Colors.TileDistances[dist.Value - 1] : Color.white);
+                if (reachable)
+                {
+                    foreach (var c in _navField.PathToOrigin(tile.Position).Reverse().Skip(1))
+                    {
+                        var t = _map.GetTile(c);
+                        int d = _navField.GetDistance(t.Position).Value;
+                        t.SetColor(t.HasEntityOnTop ? Colors.TileOccupied : Colors.TileDistances[d - 1]);
+                    }
+                }
+                else
+                    tile.SetColor(Color.white);
             });
         }
     }

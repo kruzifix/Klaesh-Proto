@@ -1,4 +1,7 @@
-﻿using Klaesh.GameEntity.Component;
+﻿using Klaesh.Core;
+using Klaesh.Game;
+using Klaesh.Game.Input;
+using Klaesh.GameEntity.Component;
 using Klaesh.UI;
 using Klaesh.Utility;
 using UnityEngine;
@@ -8,9 +11,12 @@ namespace Klaesh.GameEntity.Widget
 {
     public class EntityWidget : ViewModelBehaviour
     {
+        private static IGameManager _gm;
+
         private RectTransform _rt;
         private HexMovementComp _moveComp;
         private VitalityComp _vitalityComp;
+        private WeaponComp _weaponComp;
 
         public Entity Target { get; private set; }
 
@@ -24,9 +30,16 @@ namespace Klaesh.GameEntity.Widget
         public GameObject vitalityGroup;
         public Text vitalityText;
 
+        [Header("Weapon")]
+        public GameObject weaponGroup;
+        public Text weaponInfoText;
+
         protected override void OnAwake()
         {
             _rt = GetComponent<RectTransform>();
+
+            if (_gm == null)
+                _gm = ServiceLocator.Instance.GetService<IGameManager>();
         }
 
         public void SetTarget(Entity target)
@@ -52,17 +65,47 @@ namespace Klaesh.GameEntity.Widget
                 OnHealthChanged();
             }
 
+            _weaponComp = Target.GetComponent<WeaponComp>();
+            weaponGroup.SetActive(false);
+            if (_weaponComp != null)
+            {
+                _weaponComp.StatusChanged += OnWeaponStatusChanged;
+                UpdateWeapon();
+            }
+
             nameText.text = Target.name;
         }
 
         private void OnMovementChanged()
         {
             movementText.text = $"{_moveComp.MovementLeft}/{_moveComp.maxDistance}";
+            UpdateWeapon();
         }
 
         private void OnHealthChanged()
         {
-            vitalityText.text = $"{_vitalityComp.Health}/{_vitalityComp.maxHealth}";
+            vitalityText.text =  _vitalityComp.Health > 0 ? $"{_vitalityComp.Health}/{_vitalityComp.maxHealth}" : "dead";
+        }
+
+        private void OnWeaponStatusChanged()
+        {
+            UpdateWeapon();
+        }
+
+        private void UpdateWeapon()
+        {
+            bool showButton = _gm.HomeSquadActive && _gm.IsPartOfActiveSquad(Target) && Target.CanAttack();
+
+            weaponGroup.SetActive(showButton);
+            if (showButton)
+            {
+                weaponInfoText.text = $"U: {_weaponComp.UsesLeft} DMG: {_weaponComp.damage}";
+            }
+        }
+
+        public void OnWeaponButtonClicked()
+        {
+            _gm.ProcessInput(InputCode.AttackMode, Target);
         }
 
         public void Update()

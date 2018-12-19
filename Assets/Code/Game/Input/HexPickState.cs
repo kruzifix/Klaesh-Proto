@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Klaesh.Core;
 using Klaesh.Hex;
 using Klaesh.Utility;
 using UnityEngine;
@@ -33,7 +32,7 @@ namespace Klaesh.Game.Input
 
         public override void Exit()
         {
-            var map = ServiceLocator.Instance.GetService<IHexMap>();
+            var map = _locator.GetService<IHexMap>();
             map.DeselectAllTiles();
         }
 

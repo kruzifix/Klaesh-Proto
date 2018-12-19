@@ -16,6 +16,7 @@ namespace Klaesh.GameEntity
         /// <returns></returns>
         Entity CreateEntity(string type, Action<Entity> addModules = null);
         Entity GetEntity(int id);
+        IEnumerable<Entity> GetEntities(Func<Entity, bool> predicate);
 
         void KillEntity(Entity entity);
         void KillEntities(IEnumerable<Entity> entities);
@@ -79,6 +80,11 @@ namespace Klaesh.GameEntity
         {
             // TODO: add dict map cache for fast lookup
             return _entities.FirstOrDefault(e => e.Id == id);
+        }
+
+        public IEnumerable<Entity> GetEntities(Func<Entity, bool> predicate)
+        {
+            return _entities.Where(predicate);
         }
 
         public void KillEntity(Entity entity)

@@ -2,13 +2,19 @@
 
 namespace Klaesh.GameEntity.Component
 {
+    public delegate void WeaponStatusChangedEvent();
+
     public class WeaponComp : MonoBehaviour, INewTurnHandler
     {
+        private int _usesLeft;
+
         public int range = 1;
         public int damage = 1;
         public int usesPerTurn = 1;
 
-        public int UsesLeft { get; private set; }
+        public event WeaponStatusChangedEvent StatusChanged;
+
+        public int UsesLeft { get => _usesLeft; private set { _usesLeft = value; StatusChanged?.Invoke(); } }
 
         public void OnNewTurn()
         {
@@ -17,7 +23,8 @@ namespace Klaesh.GameEntity.Component
 
         public void Use()
         {
-            UsesLeft -= 1;
+            if (UsesLeft > 0)
+                UsesLeft -= 1;
         }
     }
 }

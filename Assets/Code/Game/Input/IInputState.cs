@@ -1,5 +1,6 @@
 ﻿using System;
 using Klaesh.Core;
+using Klaesh.Core.Message;
 using Klaesh.Game.Job;
 using Klaesh.Input;
 using Klaesh.Network;
@@ -24,11 +25,17 @@ namespace Klaesh.Game.Input
 
     public abstract class AbstractInputState : IInputState
     {
+        protected readonly IServiceLocator _locator;
+        protected readonly IMessageBus _bus;
+
         public InputStateMachine Context { get; }
 
         public AbstractInputState(InputStateMachine context)
         {
             Context = context;
+
+            _locator = ServiceLocator.Instance;
+            _bus = _locator.GetService<IMessageBus>();
         }
 
         /// <summary>
@@ -63,10 +70,10 @@ namespace Klaesh.Game.Input
 
         protected void ExecuteAndSendJob(IJob job)
         {
-            var jm = ServiceLocator.Instance.GetService<IJobManager>();
+            var jm = _locator.GetService<IJobManager>();
             jm.AddJob(job);
             jm.ExecuteJobs();
-            ServiceLocator.Instance.GetService<INetworker>().SendData(EventCode.DoJob, job);
+            _locator.GetService<INetworker>().SendData(EventCode.DoJob, job);
         }
     }
 }

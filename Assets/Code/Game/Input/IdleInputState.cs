@@ -21,8 +21,8 @@ namespace Klaesh.Game.Input
         public IdleInputState(InputStateMachine context)
             : base(context)
         {
-            _gm = ServiceLocator.Instance.GetService<IGameManager>();
-            _map = ServiceLocator.Instance.GetService<IHexMap>();
+            _gm = _locator.GetService<IGameManager>();
+            _map = _locator.GetService<IHexMap>();
         }
 
         public override void Enter()
@@ -45,7 +45,7 @@ namespace Klaesh.Game.Input
             {
                 var originCoord = _gm.ActiveSquad.Config.Origin;
 
-                ServiceLocator.Instance.GetService<IMessageBus>().Publish(new FocusCameraMessage(this, _map.GetTile(originCoord).GetTop()));
+                _bus.Publish(new FocusCameraMessage(this, _map.GetTile(originCoord).GetTop()));
 
                 var pickableTiles = _map.Tiles(HexCubeCoord.Ring(originCoord));
 
@@ -70,6 +70,10 @@ namespace Klaesh.Game.Input
                     });
                 Context.SetState(state);
             }
+            else if (code == InputCode.AttackMode && data != null && data is Entity)
+            {
+                Context.SetState(new EntityAttackInputState(Context, data as Entity));
+            }
         }
 
         public override void OnClick(GameObject go)
@@ -85,7 +89,7 @@ namespace Klaesh.Game.Input
                 var moveComp = entity.GetComponent<HexMovementComp>();
                 if (moveComp != null && moveComp.MovementLeft > 0)
                 {
-                    Context.SetState(new EntitySelectedInputState(Context, entity));
+                    Context.SetState(new EntityMovementInputState(Context, entity));
                     return;
                 }
             }
@@ -93,12 +97,12 @@ namespace Klaesh.Game.Input
 
         public void DoHexTile(HexTile tile)
         {
+            _bus.Publish(new FocusCameraMessage(this, tile.GetTop()));
             if (tile.HasEntityOnTop)
             {
                 DoEntity(tile.Entity);
                 return;
             }
-            ServiceLocator.Instance.GetService<IMessageBus>().Publish(new FocusCameraMessage(this, tile.GetTop()));
         }
 
         public override void OnEnter(GameObject go)

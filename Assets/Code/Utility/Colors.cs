@@ -21,6 +21,8 @@ namespace Klaesh.Utility
 
         public static Color HighlightOrange = new Color32(255, 185, 94, 255);
 
+        public static Color AttackTargetTileHighlight = new Color32(180, 56, 237, 255);
+
         static Colors()
         {
             ColorUtility.TryParseHtmlString("#6D80EC", out TileOrigin);
