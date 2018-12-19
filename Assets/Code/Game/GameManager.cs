@@ -140,16 +140,59 @@ namespace Klaesh.Game
             NetRand.Seed(GameConfig.RandomSeed);
 
             // spawn debris on map
-            int debrisCount = NetRand.Range(5, 11);
+            int debrisCount = NetRand.Range(7, 16);
             for (int i = 0; i < debrisCount; i++)
             {
                 // find empty position
                 var pos = NetRand.HexOffset(_map.Columns, _map.Rows);
-                while (_map.GetTile(pos).HasEntityOnTop)
+                var tile = _map.GetTile(pos);
+                while (tile.HasEntityOnTop)
+                {
                     pos = NetRand.HexOffset(_map.Columns, _map.Rows);
+                    tile = _map.GetTile(pos);
+                }
 
-                var deb = _gem.CreateEntity("debris-stone");
+                var deb = _gem.CreateEntity("mountain");
                 deb.GetComponent<HexPosComp>().SetPosition(pos);
+
+                foreach (var dir in HexCubeCoord.Offsets)
+                {
+                    var npos = pos.CubeCoord + dir * 2;
+                    var neighbor = _map.GetTile(npos);
+                    if (neighbor == null || neighbor.HasEntityOnTop)
+                        continue;
+                    if (NetRand.Chance(3, 10))
+                    {
+                        var ndeb = _gem.CreateEntity("mountain");
+                        ndeb.GetComponent<HexPosComp>().SetPosition(npos);
+                    }
+                }
+            }
+
+            // generate forest patches
+            int treeCount = NetRand.Range(7, 16);
+            for (int i = 0; i < debrisCount; i++)
+            {
+                var pos = NetRand.HexOffset(_map.Columns, _map.Rows);
+                var tile = _map.GetTile(pos);
+                while (tile.Terrain != HexTerrain.Plain || tile.HasEntityOnTop)
+                {
+                    pos = NetRand.HexOffset(_map.Columns, _map.Rows);
+                    tile = _map.GetTile(pos);
+                }
+
+                tile.Terrain = HexTerrain.Forest;
+
+                foreach (var dir in HexCubeCoord.Offsets)
+                {
+                    var neighbor = _map.GetTile(pos.CubeCoord + dir);
+                    if (neighbor == null || neighbor.Terrain != HexTerrain.Plain || neighbor.HasEntityOnTop)
+                        continue;
+                    if (NetRand.Chance(3, 10))
+                    {
+                        neighbor.Terrain = HexTerrain.Forest;
+                    }
+                }
             }
 
             TurnNumber = 0;

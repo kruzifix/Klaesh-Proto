@@ -148,7 +148,7 @@ Light:
     m_Type: 1
     m_Resolution: -1
     m_CustomResolution: -1
-    m_Strength: 1
+    m_Strength: 0.56
     m_Bias: 0.05
     m_NormalBias: 0.4
     m_NearPlane: 0.2
@@ -382,9 +382,9 @@ MonoBehaviour:
   moveLerpConst: 0.05
   zoomLerpConst: 0.3
   minDistance: 8
-  maxDistance: 12
-  minYaw: -40
-  maxYaw: 40
+  maxDistance: 20
+  minYaw: -30
+  maxYaw: 90
   minPitch: 40
   maxPitch: 60
   startYaw: 0
@@ -896,7 +896,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 637412a24359b3542afc944818d4cc5a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useServer: 1
 --- !u!114 &1594118080
 MonoBehaviour:
   m_ObjectHideFlags: 0

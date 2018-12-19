@@ -1,6 +1,4 @@
-﻿using System.Net;
-using Klaesh.Game;
-using Klaesh.Game.Message;
+﻿using Klaesh.Game.Message;
 using Klaesh.Network;
 using UnityEngine;
 using UnityEngine.UI;
@@ -66,6 +64,11 @@ namespace Klaesh.UI.Window
 
             StatusLabel.text = $"Connecting to {url}";
             StatusLabel.color = Color.white;
+        }
+
+        public void OnMapGenClick()
+        {
+            _bus.Publish(new Navigate(this, typeof(MapGenWindow)));
         }
     }
 }

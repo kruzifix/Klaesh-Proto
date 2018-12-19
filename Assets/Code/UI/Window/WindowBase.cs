@@ -2,7 +2,7 @@
 {
     public class WindowBase : ViewModelBehaviour
     {
-        protected void Close()
+        public void Close()
         {
             var nav = _locator.GetService<INavigator>();
             nav.CloseCurrentWindow();

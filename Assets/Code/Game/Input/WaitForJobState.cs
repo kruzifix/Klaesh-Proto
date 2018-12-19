@@ -28,6 +28,8 @@ namespace Klaesh.Game.Input
 
         private void OnJobComplete(IJob job)
         {
+            job.OnComplete -= OnJobComplete;
+
             Context.SetState(_targetState);
         }
     }

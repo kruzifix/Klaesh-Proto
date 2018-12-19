@@ -67,8 +67,6 @@ namespace Klaesh.Game.Job
             endTile.Entity = Entity;
 
             movement.Position = Path.Last();
-            // TODO: FIX this
-            // later tiles can have more movement requirement!!!
             movement.MovementLeft -= Path.Count;
 
             bus.Publish(new FocusCameraMessage(this, endTile.GetTop()));
@@ -110,6 +108,7 @@ namespace Klaesh.Game.Job
 
             anim.SetTrigger("move");
             anim.SetFloat("heightDiff", heightDiff);
+
             yield return null;
 
             while (!anim.GetCurrentAnimatorStateInfo(0).IsName("Idle"))

@@ -39,5 +39,14 @@ namespace Klaesh.Utility
             int r = Range(0, maxRow);
             return new HexOffsetCoord(c, r);
         }
+
+        /// <summary>
+        /// Returns true in probability / precision cases.
+        /// Example: Chance(3, 10) => 3 in 10 => 30%
+        /// </summary>
+        public static bool Chance(int probability, int precision)
+        {
+            return probability < Range(0, precision);
+        }
     }
 }

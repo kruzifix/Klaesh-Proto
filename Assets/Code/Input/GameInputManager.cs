@@ -9,6 +9,7 @@ namespace Klaesh.Input
         GameObject CurrentHover { get; }
 
         void RegisterProcessor(IGameInputProcessor proc);
+        void DeRegisterProcessor(IGameInputProcessor proc);
 
         void OnEnter(GameObject go);
         void OnExit(GameObject go);
@@ -34,6 +35,11 @@ namespace Klaesh.Input
         public void RegisterProcessor(IGameInputProcessor proc)
         {
             _processors.Add(proc);
+        }
+
+        public void DeRegisterProcessor(IGameInputProcessor proc)
+        {
+            _processors.Remove(proc);
         }
 
         public void OnEnter(GameObject go)

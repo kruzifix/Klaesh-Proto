@@ -28,15 +28,15 @@ It should connect to the local server and you can test your stuff! awesome!
 
 
 ## TODO
-- You can reduce your startup time if you configure your web server to host .unityweb files using gzip compression.
-
+- move camera with wasd?
 - action point system?
-
 - add EntityWidget as Field to Entity Monobehaviour? or make an additional component for that? who knows..
-
 - Hextile Properties (forest, etc.) -> HexNav has to consider these rules!
-
+- Pushen und Pullen!!! => Shape editor für Unity!!
 - Fog of War!
+
+## Notes
+- You can reduce your startup time if you configure your web server to host .unityweb files using gzip compression.
 
 ## NICE TA HAVE
 - Give Orders over multiple turns (longer walk path)
