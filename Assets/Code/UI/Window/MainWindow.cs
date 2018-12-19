@@ -1,4 +1,5 @@
-﻿using Klaesh.Game;
+﻿using System.Net;
+using Klaesh.Game;
 using Klaesh.Game.Message;
 using Klaesh.Network;
 using UnityEngine;
@@ -10,7 +11,13 @@ namespace Klaesh.UI.Window
     {
         private INetworker _networker;
 
+        [Header("Connect")]
+        public GameObject ConnectGroup;
+        public InputField IpInput;
         public Button ConnectButton;
+
+        [Header("Status")]
+        public GameObject StatusGroup;
         public Text StatusLabel;
         public Text WaitingLabel;
 
@@ -19,9 +26,8 @@ namespace Klaesh.UI.Window
             _networker = _locator.GetService<INetworker>();
             _networker.Connected += OnConnection;
 
-            ConnectButton.gameObject.SetActive(true);
-            StatusLabel.gameObject.SetActive(false);
-            WaitingLabel.gameObject.SetActive(false);
+            ConnectGroup.SetActive(true);
+            StatusGroup.SetActive(false);
 
             AddSubscription(_bus.Subscribe<GameStartedMessage>(OnGameStarted));
         }
@@ -47,15 +53,18 @@ namespace Klaesh.UI.Window
         {
             // TODO: get from current webgl context/provider?
             // or from config file!
-            string url = "ws://localhost:3000";
+            string ip = IpInput.text;
+            if (string.IsNullOrWhiteSpace(ip))
+                ip = "localhost";
+            string url = $"ws://{ip.Trim()}:3000";
 
             _networker.ConnectTo(url);
 
-            ConnectButton.gameObject.SetActive(false);
-            StatusLabel.gameObject.SetActive(true);
+            ConnectGroup.SetActive(false);
+            StatusGroup.SetActive(true);
             WaitingLabel.gameObject.SetActive(false);
 
-            StatusLabel.text = "Connecting to Server";
+            StatusLabel.text = $"Connecting to {url}";
             StatusLabel.color = Color.white;
         }
     }

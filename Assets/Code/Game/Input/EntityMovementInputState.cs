@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Klaesh.Core;
-using Klaesh.Core.Message;
+﻿using System.Linq;
 using Klaesh.Game.Job;
 using Klaesh.GameEntity;
 using Klaesh.GameEntity.Component;
-using Klaesh.GameEntity.Module;
 using Klaesh.Hex;
 using Klaesh.Hex.Navigation;
-using Klaesh.Network;
 using Klaesh.Utility;
 using UnityEngine;
 
@@ -56,6 +50,14 @@ namespace Klaesh.Game.Input
         public override void Exit()
         {
             _map.DeselectAllTiles();
+        }
+
+        public override void ProcessInput(InputCode code, object data)
+        {
+            if (code == InputCode.AttackMode && data != null && data is Entity)
+            {
+                Context.SetState(new EntityAttackInputState(Context, data as Entity));
+            }
         }
 
         public override void OnClick(GameObject go)
@@ -128,8 +130,6 @@ namespace Klaesh.Game.Input
                 }
                 else
                     tile.SetColor(Colors.InValidMovementTarget);
-
-                //tile.SetColor(reachable ? Colors.ValidMovementTarget : Colors.InValidMovementTarget);
             });
         }
 
@@ -142,7 +142,6 @@ namespace Klaesh.Game.Input
                 if (reachable && dist == 0)
                     return;
 
-                //tile.SetColor(reachable ? Colors.TileDistances[dist.Value - 1] : Color.white);
                 if (reachable)
                 {
                     foreach (var c in _navField.PathToOrigin(tile.Position).Reverse().Skip(1))
