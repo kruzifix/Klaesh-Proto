@@ -25,6 +25,8 @@ namespace Klaesh.Hex
 
         int Version { get; }
 
+        IHexCoord Center { get; }
+
         void BuildMap();
         void ClearMap();
 
@@ -32,17 +34,12 @@ namespace Klaesh.Hex
         HexTile GetTile(IHexCoord coord);
         void GetTiles(IEnumerable<IHexCoord> coords, List<HexTile> tiles);
 
-        IEnumerable<HexTile> Tiles(IEnumerable<IHexCoord> coords);
+        void RemoveTile(IHexCoord coord);
 
-        //List<HexTile> GetNeighbors(IHexCoord origin);
-        //List<HexTile> GetNeighbors(IHexCoord origin, int maxDist);
-        //void GetNeighbors(IHexCoord origin, int maxDist, List<HexTile> tiles);
+        IEnumerable<HexTile> Tiles(IEnumerable<IHexCoord> coords);
 
         void StateChanged();
         IHexNav GetNav(HexNavSettings settings);
-
-        //List<Tuple<HexTile, int>> GetReachableTiles(IHexCoord origin, int maxDistance, int maxHeightDifference);
-        //List<HexTile> GetPathTo(HexTile target, List<Tuple<HexTile, int>> reachableTiles, int maxHeightDifference);
 
         void DeselectAllTiles();
     }
@@ -76,6 +73,8 @@ namespace Klaesh.Hex
         public HexMapGenParams GenParams => genParams;
 
         public int Version { get; private set; } = 0;
+
+        public IHexCoord Center { get; private set; }
 
         private HexTile[,] _tiles;
 
@@ -130,6 +129,8 @@ namespace Klaesh.Hex
                 }
             }
 
+            Center = new HexOffsetCoord(Columns / 2, Rows / 2);
+
             StateChanged();
 
             _bus.Publish(new HexMapInitializedMessage(this, this));
@@ -164,6 +165,17 @@ namespace Klaesh.Hex
                 if (tile != null)
                     tiles.Add(GetTile(c));
             }
+        }
+
+        public void RemoveTile(IHexCoord coord)
+        {
+            var offset = coord.OffsetCoord;
+            var tile = _tiles[offset.row, offset.col];
+            if (tile == null)
+                return;
+            // OBACHT, Entities!
+            Destroy(tile.gameObject);
+            _tiles[offset.row, offset.col] = null;
         }
 
         public IEnumerable<HexTile> Tiles(IEnumerable<IHexCoord> coords)
@@ -214,91 +226,13 @@ namespace Klaesh.Hex
             return new HexNav(this, settings);
         }
 
-        //public List<Tuple<HexTile, int>> GetReachableTiles(IHexCoord origin, int maxDistance, int maxHeightDifference)
-        //{
-        //    var result = new List<Tuple<HexTile, int>>();
-        //    var queue = new Queue<HexCubeCoord>();
-        //    queue.Enqueue(origin.CubeCoord);
-
-        //    var lookedAt = new Dictionary<HexCubeCoord, int>();
-        //    lookedAt.Add(origin.CubeCoord, 0);
-
-        //    while (queue.Count > 0)
-        //    {
-        //        var current = queue.Dequeue();
-        //        var tile = GetTile(current);
-        //        if (tile == null)
-        //            continue;
-        //        int distFromOrigin = lookedAt[current];
-        //        if (distFromOrigin > 0)
-        //            result.Add(Tuple.Create(tile, distFromOrigin));
-
-        //        distFromOrigin += 1;
-
-        //        if (distFromOrigin > maxDistance)
-        //            continue;
-
-        //        var neighbors = GetNeighbors(current);
-        //        foreach (var n in neighbors)
-        //        {
-        //            if (n.HasEntityOnTop)
-        //                continue;
-        //            int heightDiff = Mathf.Abs(n.Height - tile.Height);
-        //            if (heightDiff > maxHeightDifference)
-        //                continue;
-
-        //            if (lookedAt.ContainsKey(n.Position))
-        //            {
-        //                int previousDist = lookedAt[n.Position];
-        //                if (previousDist <= distFromOrigin)
-        //                    continue;
-
-        //                lookedAt[n.Position] = distFromOrigin;
-        //            }
-        //            else
-        //            {
-        //                lookedAt.Add(n.Position, distFromOrigin);
-        //            }
-
-        //            queue.Enqueue(n.Position);
-        //        }
-        //    }
-
-        //    return result;
-        //}
-
-        //public List<HexTile> GetPathTo(HexTile target, List<Tuple<HexTile, int>> reachableTiles, int maxHeightDifference)
-        //{
-        //    var path = new List<HexTile>();
-
-        //    var current = reachableTiles.Where(t => t.Item1 == target).First();
-        //    path.Add(current.Item1);
-
-        //    while (current.Item2 > 1)
-        //    {
-        //        var neighbors = GetNeighbors(current.Item1.Position);
-
-        //        int targetDist = current.Item2 - 1;
-        //        current = reachableTiles.Where(t =>
-        //            t.Item2 == targetDist &&
-        //            Mathf.Abs(t.Item1.Height - current.Item1.Height) <= maxHeightDifference &&
-        //            neighbors.Contains(t.Item1)
-        //        ).First();
-        //        path.Add(current.Item1);
-        //    }
-
-        //    path.Reverse();
-
-        //    return path;
-        //}
-
         public void DeselectAllTiles()
         {
             for (int r = 0; r < mapRows; r++)
             {
                 for (int c = 0; c < mapColumns; c++)
                 {
-                    _tiles[r, c].SetColor(Color.white);
+                    _tiles[r, c]?.SetColor(Color.white);
                 }
             }
         }

@@ -46,7 +46,27 @@ namespace Klaesh.Utility
         /// </summary>
         public static bool Chance(int probability, int precision)
         {
-            return probability < Range(0, precision);
+            return Range(0, precision) < probability;
+        }
+
+        public static int Dice(int sides)
+        {
+            return Range(1, sides + 1);
+        }
+
+        public static int Dice(int times, int sides)
+        {
+            int sum = 0;
+            for (int i = 0; i < times; i++)
+                sum += Dice(sides);
+            return sum;
+        }
+
+        public static T Enum<T>()
+            where T : System.Enum
+        {
+            var values = System.Enum.GetValues(typeof(T));
+            return (T)values.GetValue(Range(0, values.Length));
         }
     }
 }

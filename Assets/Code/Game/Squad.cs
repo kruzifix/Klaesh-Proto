@@ -82,11 +82,12 @@ namespace Klaesh.Game
             ent.GetComponent<HexMovementComp>().SetPosition(position);
             ent.GetComponent<ModelColorizer>().Colorize(Config.Color);
 
-            var map = ServiceLocator.Instance.GetService<IHexMap>();
-            var center = map.GetTile(map.Columns / 2, map.Rows / 2);
-            var dir = center.GetTop() - ent.transform.position;
-            dir.y = 0;
-            ent.transform.rotation = Quaternion.LookRotation(dir);
+            //var map = ServiceLocator.Instance.GetService<IHexMap>();
+            //var center = map.GetTile(map.Columns / 2, map.Rows / 2);
+            //var dir = center.GetTop() - ent.transform.position;
+            //dir.y = 0;
+            //ent.transform.rotation = Quaternion.LookRotation(dir);
+            ent.transform.rotation = Quaternion.Euler(0, Random.value * 360f, 0);
 
             Members.Add(ent);
             AliveMembers.Add(ent);

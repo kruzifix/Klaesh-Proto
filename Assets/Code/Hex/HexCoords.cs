@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using UnityEngine;
 
 namespace Klaesh.Hex
 {
@@ -160,30 +161,41 @@ namespace Klaesh.Hex
         }
 
         public static HexCubeCoord[] Offsets = {
-            new HexCubeCoord(-1, 1, 0),
-            new HexCubeCoord(0, 1, -1),
-            new HexCubeCoord(1, 0, -1),
-            new HexCubeCoord(1, -1, 0),
-            new HexCubeCoord(0, -1, 1),
-            new HexCubeCoord(-1, 0, 1)
+            new HexCubeCoord(-1, 1, 0), // west
+            new HexCubeCoord(-1, 0, 1), // northwest
+            new HexCubeCoord(0, -1, 1), // northeast
+            new HexCubeCoord(1, -1, 0), // east
+            new HexCubeCoord(1, 0, -1), // southeast
+            new HexCubeCoord(0, 1, -1) // southwest
         };
 
-        public static HexCubeCoord Offset(HexDirection dir, int dist)
+        public static HexCubeCoord Offset(HexDirection dir, int dist = 1)
         {
             return Offsets[(int)dir] * dist;
         }
 
-        public static IEnumerable<IHexCoord> Ring(IHexCoord origin, int minDist = 1, int maxDist = 1)
+        public static IEnumerable<IHexCoord> Ring(IHexCoord origin, int radius = 1)
         {
-            var cubeOrigin = origin.CubeCoord;
+            var coord = origin.CubeCoord + Offset(HexDirection.SouthEast, radius);
 
-            for (int d = minDist; d <= maxDist; d++)
+            for (int i = 0; i < 6; i++)
             {
-                foreach (var o in Offsets)
+                for (int j = 0; j < radius; j++)
                 {
-                    var coord = cubeOrigin + o * d;
                     yield return coord;
+                    coord += Offset((HexDirection)i);
                 }
+            }
+        }
+
+        public static IEnumerable<IHexCoord> Spiral(IHexCoord origin, int radius = 1)
+        {
+            yield return origin.CubeCoord;
+
+            for (int i = 1; i <= radius; i++)
+            {
+                foreach (var c in Ring(origin, i))
+                    yield return c;
             }
         }
     }

@@ -1,6 +1,7 @@
 ﻿using Klaesh.Core;
 using Klaesh.Game;
 using Klaesh.Game.Input;
+using Klaesh.Game.Message;
 using Klaesh.GameEntity.Component;
 using Klaesh.UI;
 using Klaesh.Utility;
@@ -40,6 +41,16 @@ namespace Klaesh.GameEntity.Widget
 
             if (_gm == null)
                 _gm = ServiceLocator.Instance.GetService<IGameManager>();
+        }
+
+        protected override void Init()
+        {
+            AddSubscription(_bus.Subscribe<TurnBoundaryMessage>(OnTurnBoundary));
+        }
+
+        private void OnTurnBoundary(TurnBoundaryMessage msg)
+        {
+            UpdateWeapon();
         }
 
         public void SetTarget(Entity target)
