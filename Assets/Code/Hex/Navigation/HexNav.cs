@@ -53,7 +53,7 @@ namespace Klaesh.Hex.Navigation
                 var pos = frontLine.Dequeue();
                 var posDist = GetDistance(pos);
 
-                foreach (var tile in Map.Tiles(HexCubeCoord.Ring(pos).Cast<IHexCoord>()))
+                foreach (var tile in Map.Tiles(HexFun.Ring(pos).Cast<IHexCoord>()))
                 {
                     if (tile.HasEntityOnTop)
                         continue;
@@ -108,7 +108,7 @@ namespace Klaesh.Hex.Navigation
 
                 yield return pos;
 
-                foreach (var neighbor in HexCubeCoord.Ring(pos))
+                foreach (var neighbor in HexFun.Ring(pos))
                 {
                     var coord = neighbor.CubeCoord;
                     if (visited.Contains(coord))
@@ -136,7 +136,7 @@ namespace Klaesh.Hex.Navigation
 
             while (dist > 0)
             {
-                foreach (var neighbor in HexCubeCoord.Ring(coord))
+                foreach (var neighbor in HexFun.Ring(coord))
                 {
                     var neighborDist = GetDistance(neighbor);
                     if (neighborDist == null || neighborDist >= dist)

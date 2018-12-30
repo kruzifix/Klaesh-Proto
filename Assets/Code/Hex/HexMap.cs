@@ -32,11 +32,13 @@ namespace Klaesh.Hex
 
         HexTile GetTile(int col, int row);
         HexTile GetTile(IHexCoord coord);
-        void GetTiles(IEnumerable<IHexCoord> coords, List<HexTile> tiles);
+        //void GetTiles(IEnumerable<IHexCoord> coords, List<HexTile> tiles);
 
         void RemoveTile(IHexCoord coord);
 
         IEnumerable<HexTile> Tiles(IEnumerable<IHexCoord> coords);
+        // because C# is blöd and won't implicitly cast IEnumerable<HexCubeCoord> to IEnumerable<IHexCoord> 
+        IEnumerable<HexTile> Tiles(IEnumerable<HexCubeCoord> coords);
 
         void StateChanged();
         IHexNav GetNav(HexNavSettings settings);
@@ -157,15 +159,15 @@ namespace Klaesh.Hex
             return GetTile(offset.col, offset.row);
         }
 
-        public void GetTiles(IEnumerable<IHexCoord> coords, List<HexTile> tiles)
-        {
-            foreach(var c in coords)
-            {
-                var tile = GetTile(c);
-                if (tile != null)
-                    tiles.Add(GetTile(c));
-            }
-        }
+        //public void GetTiles(IEnumerable<IHexCoord> coords, List<HexTile> tiles)
+        //{
+        //    foreach(var c in coords)
+        //    {
+        //        var tile = GetTile(c);
+        //        if (tile != null)
+        //            tiles.Add(GetTile(c));
+        //    }
+        //}
 
         public void RemoveTile(IHexCoord coord)
         {
@@ -188,33 +190,43 @@ namespace Klaesh.Hex
             }
         }
 
-        public List<HexTile> GetNeighbors(IHexCoord origin)
+        public IEnumerable<HexTile> Tiles(IEnumerable<HexCubeCoord> coords)
         {
-            return GetNeighbors(origin, 1);
-        }
-
-        public List<HexTile> GetNeighbors(IHexCoord origin, int maxDist)
-        {
-            var tiles = new List<HexTile>();
-            GetNeighbors(origin, maxDist, tiles);
-            return tiles;
-        }
-
-        public void GetNeighbors(IHexCoord origin, int maxDist, List<HexTile> tiles)
-        {
-            var center = origin.CubeCoord;
-
-            for (int i = 1; i <= maxDist; i++)
+            foreach (var c in coords)
             {
-                foreach (var offset in HexCubeCoord.Offsets)
-                {
-                    var c = (center + offset * i);
-                    var tile = GetTile(c);
-                    if (tile != null)
-                        tiles.Add(tile);
-                }
+                var tile = GetTile(c);
+                if (tile != null)
+                    yield return tile;
             }
         }
+
+        //public List<HexTile> GetNeighbors(IHexCoord origin)
+        //{
+        //    return GetNeighbors(origin, 1);
+        //}
+
+        //public List<HexTile> GetNeighbors(IHexCoord origin, int maxDist)
+        //{
+        //    var tiles = new List<HexTile>();
+        //    GetNeighbors(origin, maxDist, tiles);
+        //    return tiles;
+        //}
+
+        //public void GetNeighbors(IHexCoord origin, int maxDist, List<HexTile> tiles)
+        //{
+        //    var center = origin.CubeCoord;
+
+        //    for (int i = 1; i <= maxDist; i++)
+        //    {
+        //        foreach (var offset in HexCubeCoord.Offsets)
+        //        {
+        //            var c = (center + offset * i);
+        //            var tile = GetTile(c);
+        //            if (tile != null)
+        //                tiles.Add(tile);
+        //        }
+        //    }
+        //}
 
         public void StateChanged()
         {

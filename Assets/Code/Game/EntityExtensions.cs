@@ -66,7 +66,7 @@ namespace Klaesh.Game
             return gem.GetEntities(e =>
                 e.IsAttackable() &&
                 e.GetModule<SquadMember>().Squad != squad &&
-                HexCubeCoord.Distance(e.GetComponent<HexPosComp>().Position, pos) <= weapon.range
+                HexFun.Distance(e.GetComponent<HexPosComp>().Position, pos) <= weapon.range
             ).ToList();
         }
 

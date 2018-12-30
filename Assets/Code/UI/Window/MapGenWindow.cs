@@ -68,9 +68,11 @@ namespace Klaesh.UI.Window
 
             var game = _config;
             game.RandomSeed = _seed++;
+            game.MapConfig.NoiseOffset = game.RandomSeed;
             Debug.Log($"generating map for seed {game.RandomSeed}");
             if (!MapGenerator.Generate(_config, _map, _gem, out List<Squad> _squads))
             {
+                Debug.Log($"map from seed {game.RandomSeed} unusable. regenerating...");
                 Generate();
             }
         }
@@ -100,19 +102,5 @@ namespace Klaesh.UI.Window
                 jep += NetRand.Chance(probability, precision) ? 1 : 0;
             return jep * 1f / runs;
         }
-
-        //private bool EntityInRange(int minCol, int maxCol, int minRow, int maxRow)
-        //{
-        //    for (int c = minCol; c <= maxCol; c++)
-        //    {
-        //        for(int r = minRow; r <= maxRow; r++)
-        //        {
-        //            var tile = _map.GetTile(c, r);
-        //            if (tile != null && tile.HasEntityOnTop)
-        //                return true;
-        //        }
-        //    }
-        //    return false;
-        //}
     }
 }

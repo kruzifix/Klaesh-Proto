@@ -106,7 +106,7 @@ namespace Klaesh.GameEntity
         public void KillAll()
         {
             _entities.Clear();
-            if (gameObject != null)
+            if (transform != null)
                 transform.DestroyAllChildrenImmediate();
         }
     }

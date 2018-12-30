@@ -38,7 +38,7 @@ namespace Klaesh
             {
                 foreach (var e in s.Members)
                 {
-                    blacklist.UnionWith(HexCubeCoord.Ring(e.GetComponent<HexPosComp>().Position).Select(c => c.OffsetCoord));
+                    blacklist.UnionWith(HexFun.Ring(e.GetComponent<HexPosComp>().Position).Select(c => c.OffsetCoord));
                 }
             }
 
@@ -46,7 +46,8 @@ namespace Klaesh
             NetRand.Seed(game.RandomSeed);
 
             // hole in the middle
-            var center = _map.Center.CubeCoord + HexCubeCoord.Offset(HexDirection.West);
+            var center = _map.Center.CubeCoord + HexFun.Offset(HexDirection.West);
+            /*
             //for (int i = 0; i < 2; i++)
             {
                 var pos = center;// + HexCubeCoord.Offset(NetRand.Enum<HexDirection>(), 1);
@@ -60,6 +61,10 @@ namespace Klaesh
                     if (NetRand.Chance(7, 10))
                         _map.RemoveTile(c);
             }
+            */
+            foreach (var c in HexFun.Polymino(center, 9))
+                //_map.GetTile(c)?.SetColor(Color.blue);
+                _map.RemoveTile(c);
 
             // cut of corners with no altar
             // hard code this for now
@@ -93,7 +98,7 @@ namespace Klaesh
                 var deb = _gem.CreateEntity("mountain");
                 deb.GetComponent<HexPosComp>().SetPosition(pos);
 
-                foreach (var npos in HexCubeCoord.Ring(pos, 2))
+                foreach (var npos in HexFun.Ring(pos, 2))
                 {
                     var neighbor = _map.GetTile(npos);
                     if (neighbor == null || blacklist.Contains(npos.OffsetCoord) || neighbor.HasEntityOnTop)
@@ -120,7 +125,7 @@ namespace Klaesh
 
                 tile.Terrain = HexTerrain.Forest;
 
-                foreach (var npos in HexCubeCoord.Ring(pos))
+                foreach (var npos in HexFun.Ring(pos))
                 {
                     var neighbor = _map.GetTile(npos);
                     if (neighbor == null || neighbor.Terrain != HexTerrain.Plain || neighbor.HasEntityOnTop)
@@ -140,7 +145,7 @@ namespace Klaesh
 
             var target = otherAltar;
             int minDist = int.MaxValue;
-            foreach (var n in HexCubeCoord.Ring(otherAltar))
+            foreach (var n in HexFun.Ring(otherAltar))
             {
                 var dist = nav.GetDistance(n);
                 if (dist == null)

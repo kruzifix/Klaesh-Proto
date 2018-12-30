@@ -45,7 +45,7 @@ namespace Klaesh.Game.Input
 
                 _bus.Publish(new FocusCameraMessage(this, _map.GetTile(originCoord).GetTop()));
 
-                var pickableTiles = _map.Tiles(HexCubeCoord.Ring(originCoord));
+                var pickableTiles = _map.Tiles(HexFun.Ring(originCoord));
 
                 var state = new HexPickState(Context, pickableTiles, (tile) =>
                     {
