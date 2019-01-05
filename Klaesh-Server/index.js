@@ -1,3 +1,4 @@
+const url = require('url')
 const express = require('express')
 const app = express()
 const server = require('http').Server(app)
@@ -55,7 +56,11 @@ function startGame(game) {
     for (let i = 0; i < game.players.length; i++) {
         game.config.home_squad = i
         // todo: handle disconnect here!
-        clients[game.players[i]].socket.send(makeMsg('gamestart', game.config))
+        const pid = game.players[i]
+        // KI GAME
+        if (pid == -1)
+            continue;
+        clients[pid].socket.send(makeMsg('gamestart', game.config))
     }
     delete game.config.home_squad
 
@@ -133,6 +138,12 @@ function onEndTurn(userId, code, data) {
     // end current turn and start next
     game.turnNumber += 1
     game.activeSquad = (game.activeSquad + 1) % game.players.length
+
+    // KI GAME, advance to real player
+    while (game.players[game.activeSquad] == -1) {
+        game.activeSquad = (game.activeSquad + 1) % game.players.length
+    }
+
     gameBroadcast(game, makeMsg('startturn', {
         turn_num: game.turnNumber,
         active_squad: game.activeSquad
@@ -167,7 +178,7 @@ function handleMsg(userId, code, data) {
     }
 }
 
-wss.on('connection', socket => {
+wss.on('connection', (socket, req) => {
     const id = getId('client')
     clients[id] = {
         id: id,
@@ -177,14 +188,22 @@ wss.on('connection', socket => {
 
     console.log('client connected! id: ' + id)
 
-    clientsSearchingForGame.push(id)
+    const params = url.parse(req.url, true)
+    if (params.query.ki !== undefined) {
+        console.log('starting ki game!')
 
-    if (clientsSearchingForGame.length >= 2) {
-        const player2 = clientsSearchingForGame.pop()
-        const player1 = clientsSearchingForGame.pop()
-
-        const game = createGame(player1, player2)
+        const game = createGame(id, -1)
         startGame(game)
+    } else {
+        clientsSearchingForGame.push(id)
+
+        if (clientsSearchingForGame.length >= 2) {
+            const player2 = clientsSearchingForGame.pop()
+            const player1 = clientsSearchingForGame.pop()
+
+            const game = createGame(player1, player2)
+            startGame(game)
+        }
     }
 
     socket.on('message', msg => {

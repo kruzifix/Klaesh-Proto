@@ -97,14 +97,18 @@ namespace Klaesh.Game.Job
 
             var targetRot = Quaternion.LookRotation(dir, Vector3.up);
             var currentRot = transform.rotation;
+            Debug.Log($"[MoveUnitJob] currentRot: {currentRot}  targetRot: {targetRot}");
+            // BUUUUUUUG
             while (currentRot != targetRot)
             {
                 currentRot = Quaternion.RotateTowards(currentRot, targetRot, 6);
+                Debug.Log($"[MoveUnitJob] IN LOOP currentRot: {currentRot}  targetRot: {targetRot}");
 
                 transform.rotation = currentRot;
 
                 yield return null;
             }
+            Debug.Log($"[MoveUnitJob] AFTER LOOP");
 
             anim.SetTrigger("move");
             anim.SetFloat("heightDiff", heightDiff);

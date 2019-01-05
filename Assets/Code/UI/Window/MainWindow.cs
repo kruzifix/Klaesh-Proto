@@ -47,14 +47,14 @@ namespace Klaesh.UI.Window
             WaitingLabel.gameObject.SetActive(true);
         }
 
-        public void OnStartGame()
+        public void OnStartGame(bool ki)
         {
             // TODO: get from current webgl context/provider?
             // or from config file!
             string ip = IpInput.text;
             if (string.IsNullOrWhiteSpace(ip))
                 ip = "localhost";
-            string url = $"ws://{ip.Trim()}:3000";
+            string url = $"ws://{ip.Trim()}:3000" + (ki ? "?ki" : "");
 
             _networker.ConnectTo(url);
 
