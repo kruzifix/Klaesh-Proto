@@ -3,36 +3,23 @@ const express = require('express')
 const app = express()
 const server = require('http').Server(app)
 
-const dir = 'D:\\Klaesh-Proto-Build'
+const idgen = require('./idgen.js')
+
+const dir = 'C:\\Dev\\Klaesh-Proto-Build'
 //const dir = 'D:\\Klaesh-Proto-Build-Dev'
 
 app.use(express.static(dir))
 
-const board = require('./board.json')
-
-function makeMsg(eventCode, data) {
-    return JSON.stringify({
-        code: eventCode,
-        data: JSON.stringify(data)
-    })
-}
-
 const WebSocket = require('ws')
 const wss = new WebSocket.Server({ server })
 
-const idBuffer = {}
-function getId(type) {
-    if (!(type in idBuffer))
-        idBuffer[type] = 0
-    return idBuffer[type]++
-}
-
+const board = require('./board.json')
 const clients = {}
 const clientsSearchingForGame = []
 const games = []
 
 function createGame(player1, player2) {
-    const gid = getId('game')
+    const gid = idgen('game')
     const game = {
         id: gid,
         config: board,
@@ -46,6 +33,13 @@ function createGame(player1, player2) {
     game.config.map.noffset = game.randomSeed
 
     return game
+}
+
+function makeMsg(eventCode, data) {
+    return JSON.stringify({
+        code: eventCode,
+        data: JSON.stringify(data)
+    })
 }
 
 function startGame(game) {
@@ -179,7 +173,7 @@ function handleMsg(userId, code, data) {
 }
 
 wss.on('connection', (socket, req) => {
-    const id = getId('client')
+    const id = idgen('client')
     clients[id] = {
         id: id,
         socket: socket,
@@ -237,15 +231,6 @@ wss.on('connection', (socket, req) => {
         }
     })
 })
-
-// wss.on('connection', function connection(ws, req) {
-
-//     const parameters = url.parse(req.url, true);
-
-//     ws.uid = wss.getUniqueID();
-//     ws.chatRoom = {uid: parameters.query.myCustomID};
-//     ws.hereMyCustomParameter = parameters.query.myCustomParam;
-// }
 
 server.listen(3000, () => {
     console.log('listening on *:3000')
