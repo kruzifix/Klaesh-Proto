@@ -20,6 +20,8 @@ namespace Klaesh.Game
         List<Entity> Members { get; }
         List<Entity> AliveMembers { get; }
 
+        List<Card> HandCards { get; }
+
         void CreateMembers(IEntityManager man);
         void AddMember(IEntityManager gem, IHexCoord position, string entityId);
     }
@@ -34,9 +36,13 @@ namespace Klaesh.Game
         public List<Entity> Members { get; private set; }
         public List<Entity> AliveMembers { get; private set; }
 
+        public List<Card> HandCards { get; private set; }
+
         public Squad(ISquadConfiguration config)
         {
             Config = config;
+
+            HandCards = new List<Card>();
 
             var bus = ServiceLocator.Instance.GetService<IMessageBus>();
             _token = bus.Subscribe<EntityKilledMessage>(OnEntityKilled);
