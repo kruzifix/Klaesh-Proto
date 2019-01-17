@@ -16,8 +16,6 @@ namespace Klaesh.UI.Window
         public Text TurnNumberLabel;
         public Text DebugInfoText;
 
-        public GameObject RecruitmentButtonGroup;
-
         protected override void Init()
         {
             _gameManager = _locator.GetService<IGameManager>();
@@ -43,8 +41,6 @@ namespace Klaesh.UI.Window
         {
             EndTurnButton.interactable = active;
             EndTurnButtonText.text = active ? "End Turn" : "Enemy's Turn";
-
-            RecruitmentButtonGroup.SetActive(active);
 
             TurnNumberLabel.text = $"Turn: {_gameManager.TurnNumber}";
 

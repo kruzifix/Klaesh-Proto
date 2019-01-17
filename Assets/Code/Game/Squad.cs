@@ -10,6 +10,7 @@ using Klaesh.Core;
 using Klaesh.Utility;
 using Klaesh.Core.Message;
 using Klaesh.GameEntity.Message;
+using Klaesh.Game.Cards;
 
 namespace Klaesh.Game
 {
@@ -20,7 +21,7 @@ namespace Klaesh.Game
         List<Entity> Members { get; }
         List<Entity> AliveMembers { get; }
 
-        List<Card> HandCards { get; }
+        ICardDeck Deck { get; }
 
         void CreateMembers(IEntityManager man);
         void AddMember(IEntityManager gem, IHexCoord position, string entityId);
@@ -36,13 +37,13 @@ namespace Klaesh.Game
         public List<Entity> Members { get; private set; }
         public List<Entity> AliveMembers { get; private set; }
 
-        public List<Card> HandCards { get; private set; }
+        public ICardDeck Deck { get; }
 
-        public Squad(ISquadConfiguration config)
+        public Squad(ISquadConfiguration config, CardDeckConfig deckConfig)
         {
             Config = config;
 
-            HandCards = new List<Card>();
+            Deck = new CardDeck(this, deckConfig.GetCards());
 
             var bus = ServiceLocator.Instance.GetService<IMessageBus>();
             _token = bus.Subscribe<EntityKilledMessage>(OnEntityKilled);

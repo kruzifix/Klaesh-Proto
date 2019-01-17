@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Klaesh.Game;
+using Klaesh.Game.Cards;
 using Klaesh.Game.Config;
 using Klaesh.GameEntity;
 using Klaesh.GameEntity.Component;
@@ -22,12 +23,17 @@ namespace Klaesh
             _map.GenParams.noiseScale = game.Map.NoiseScale;
             _map.GenParams.heightScale = game.Map.HeightScale;
 
+            // Initialize Random with seed!
+            NetRand.Seed(game.RandomSeed);
+
             _map.BuildMap();
+
+            var deckConfig = Resources.Load<CardDeckConfig>("Basic_Deck");
 
             _squads = new List<Squad>();
             foreach (var config in game.Squads)
             {
-                var squad = new Squad(config);
+                var squad = new Squad(config, deckConfig);
                 squad.CreateMembers(_gem);
 
                 _squads.Add(squad);
@@ -41,9 +47,6 @@ namespace Klaesh
                     blacklist.UnionWith(HexFun.Ring(e.GetComponent<HexPosComp>().Position).Select(c => c.OffsetCoord));
                 }
             }
-
-            // Initialize Random with seed!
-            NetRand.Seed(game.RandomSeed);
 
             // hole in the middle
             var center = _map.Center.CubeCoord + HexFun.Offset(HexDirection.West);

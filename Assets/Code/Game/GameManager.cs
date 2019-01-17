@@ -22,6 +22,8 @@ namespace Klaesh.Game
         int TurnNumber { get; }
         int ActiveSquadIndex { get; }
         ISquad ActiveSquad { get; }
+        ISquad HomeSquad { get; }
+
         bool HomeSquadActive { get; }
 
         IGameConfiguration GameConfig { get; }
@@ -51,9 +53,15 @@ namespace Klaesh.Game
 
         private StartTurnData _nextTurnData;
 
+        // TWEAK data
+        private const int cardsHandStartSize = 3;
+        private const int cardsHandMaximumSize = 4;
+
         public int TurnNumber { get; private set; }
         public int ActiveSquadIndex { get; private set; }
         public ISquad ActiveSquad => _squads?[ActiveSquadIndex] ?? null;
+        public ISquad HomeSquad => _squads?[GameConfig.HomeSquadId] ?? null;
+
         public bool HomeSquadActive => ActiveSquadIndex == GameConfig.HomeSquadId;
 
         public IGameConfiguration GameConfig { get; private set; }
@@ -126,6 +134,8 @@ namespace Klaesh.Game
                 (GameConfig as GameConfiguration).RandomSeed += 1;
             }
 
+            _squads.ForEach(s => s.Deck.MaximumHandSize = cardsHandMaximumSize);
+
             TurnNumber = 0;
             TurnEnded = true;
             _nextTurnData = null;
@@ -169,6 +179,21 @@ namespace Klaesh.Game
             _inputMachine.SetState(HomeSquadActive ? new IdleInputState(_inputMachine) : null);
 
             TurnEnded = false;
+
+            // CARDS!
+            if (TurnNumber == 1)
+            {
+                foreach (var s in _squads)
+                {
+                    for (int i = 0; i < cardsHandStartSize; i++)
+                        s.Deck.DrawCard();
+                }
+            }
+            else
+            {
+                // draw one at the start of your turn
+                ActiveSquad.Deck.DrawCard();
+            }
 
             var handler = new List<INewTurnHandler>();
             ActiveSquad.AliveMembers.ForEach(ent => handler.AddRange(ent.GetComponents<INewTurnHandler>()));
