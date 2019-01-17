@@ -15,3 +15,4 @@ MonoBehaviour:
   Name: Knight
   Description: Spawns a Knight unit. Has Melee attack.
   Art: {fileID: 21300000, guid: 92e1d13fea9de004baaf7cb255632913, type: 3}
+  EntityId: knight

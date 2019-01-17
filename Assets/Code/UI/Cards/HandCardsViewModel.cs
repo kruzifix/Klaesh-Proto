@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Klaesh.Game;
 using Klaesh.Game.Cards;
+using Klaesh.Game.Input;
 using Klaesh.Game.Message;
 using UnityEngine;
 
@@ -68,6 +67,7 @@ namespace Klaesh.UI.Cards
         public void OnHandCardClicked(CardViewModel cvm)
         {
             Debug.Log($"[HandCardsViewModel] On Card clicked! {cvm.Data.Id} {cvm.Data.Data.Name}");
+            _gameManager.ProcessInput(InputCode.Card, cvm.Data);
         }
     }
 }

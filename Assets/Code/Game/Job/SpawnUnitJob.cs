@@ -14,6 +14,9 @@ namespace Klaesh.Game.Job
         [JsonProperty("entity")]
         public string EntityId { get; set; }
 
+        [JsonProperty("card_id")]
+        public int CardId { get; set; }
+
         public override void StartJob()
         {
             var em = ServiceLocator.Instance.GetService<IEntityManager>();
@@ -24,6 +27,8 @@ namespace Klaesh.Game.Job
             var bus = ServiceLocator.Instance.GetService<IMessageBus>();
             var map = ServiceLocator.Instance.GetService<IHexMap>();
             bus.Publish(new FocusCameraMessage(this, map.GetTile(Position).GetTop()));
+
+            gm.UseCard(CardId);
 
             Completed();
         }

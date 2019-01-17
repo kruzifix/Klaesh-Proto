@@ -14,6 +14,7 @@ using Klaesh.Game.Job;
 using Klaesh.Game.Input;
 using Klaesh.Game.Message;
 using Klaesh.Input;
+using Klaesh.Game.Cards;
 
 namespace Klaesh.Game
 {
@@ -38,6 +39,8 @@ namespace Klaesh.Game
         bool IsPartOfActiveSquad(Entity entity);
 
         Entity ResolveEntityRef(SquadEntityRefData data);
+
+        void UseCard(int cardId);
     }
 
     public class GameManager : ManagerBehaviour, IGameManager//, IPickHandler<GameEntity.GameEntity>, IPickHandler<HexTile>
@@ -261,6 +264,11 @@ namespace Klaesh.Game
         public void ProcessInput(InputCode code, object data)
         {
             _inputMachine.ProcessInput(code, data);
+        }
+
+        public void UseCard(int cardId)
+        {
+            ActiveSquad.Deck.UseCard(cardId);
         }
     }
 }

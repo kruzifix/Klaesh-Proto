@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Klaesh.Game.Cards;
 using Klaesh.Game.Job;
 using Klaesh.GameEntity;
 using Klaesh.GameEntity.Component;
@@ -39,15 +40,50 @@ namespace Klaesh.Game.Input
 
         public override void ProcessInput(InputCode code, object data)
         {
-            if (code == InputCode.RecruitUnit && data != null && data is string)
+            //if (code == InputCode.RecruitUnit && data != null && data is string)
+            //{
+            //    var originCoord = _gm.ActiveSquad.Config.Origin;
+
+            //    _bus.Publish(new FocusCameraMessage(this, _map.GetTile(originCoord).GetTop()));
+
+            //    var pickableTiles = _map.Tiles(HexFun.Ring(originCoord));
+
+            //    var state = new HexPickState(Context, pickableTiles, (tile) =>
+            //        {
+            //            if (tile.HasEntityOnTop)
+            //                return;
+            //            // spawn unit at that tile
+            //            var job = new SpawnUnitJob
+            //            {
+            //                Position = tile.Position.OffsetCoord,
+            //                EntityId = data as string
+            //            };
+
+            //            ExecuteAndSendJob(job);
+
+            //            // callback
+            //            Context.SetState(this);
+            //        }, () =>
+            //        {
+            //            Context.SetState(this);
+            //        });
+            //    Context.SetState(state);
+            //} else
+            if (code == InputCode.AttackMode && data != null && data is Entity)
             {
-                var originCoord = _gm.ActiveSquad.Config.Origin;
+                Context.SetState(new EntityAttackInputState(Context, data as Entity));
+            }
+            else if (code == InputCode.Card && data != null && data is Card card)
+            {
+                if (card.Data is SpawnUnitCardData spawnUnitData)
+                {
+                    var originCoord = _gm.ActiveSquad.Config.Origin;
 
-                _bus.Publish(new FocusCameraMessage(this, _map.GetTile(originCoord).GetTop()));
+                    _bus.Publish(new FocusCameraMessage(this, _map.GetTile(originCoord).GetTop()));
 
-                var pickableTiles = _map.Tiles(HexFun.Ring(originCoord));
+                    var pickableTiles = _map.Tiles(HexFun.Ring(originCoord));
 
-                var state = new HexPickState(Context, pickableTiles, (tile) =>
+                    var state = new HexPickState(Context, pickableTiles, (tile) =>
                     {
                         if (tile.HasEntityOnTop)
                             return;
@@ -55,7 +91,8 @@ namespace Klaesh.Game.Input
                         var job = new SpawnUnitJob
                         {
                             Position = tile.Position.OffsetCoord,
-                            EntityId = data as string
+                            EntityId = spawnUnitData.EntityId,
+                            CardId = card.Id
                         };
 
                         ExecuteAndSendJob(job);
@@ -66,11 +103,13 @@ namespace Klaesh.Game.Input
                     {
                         Context.SetState(this);
                     });
-                Context.SetState(state);
-            }
-            else if (code == InputCode.AttackMode && data != null && data is Entity)
-            {
-                Context.SetState(new EntityAttackInputState(Context, data as Entity));
+                    Context.SetState(state);
+                }
+                else if (card.Data is TerraformCardData terraformData)
+                {
+                    // get tiles in range of my units
+
+                }
             }
         }
 

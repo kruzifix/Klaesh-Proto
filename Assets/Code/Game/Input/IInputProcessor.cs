@@ -2,9 +2,9 @@
 {
     public enum InputCode
     {
-        RecruitUnit,
+        //RecruitUnit,
         AttackMode,
-        CardInput
+        Card
     }
 
     public interface IInputProcessor

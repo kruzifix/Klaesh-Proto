@@ -15,3 +15,4 @@ MonoBehaviour:
   Name: Skeleton
   Description: Spawns a Skeleton unit with a ranged attack.
   Art: {fileID: 21300000, guid: daa2a5a3b1767a44f946df3b580ba686, type: 3}
+  EntityId: skeleton

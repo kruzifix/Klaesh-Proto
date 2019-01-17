@@ -70,7 +70,7 @@ HomeSquadActive: {_gameManager.HomeSquadActive}
 
         public void OnRecruitUnit(string entity)
         {
-            _gameManager.ProcessInput(InputCode.RecruitUnit, entity);
+            //_gameManager.ProcessInput(InputCode.RecruitUnit, entity);
         }
     }
 }
