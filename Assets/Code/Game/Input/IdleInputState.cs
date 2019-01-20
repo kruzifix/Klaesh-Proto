@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Klaesh.Game.Cards;
 using Klaesh.Game.Job;
@@ -40,35 +41,6 @@ namespace Klaesh.Game.Input
 
         public override void ProcessInput(InputCode code, object data)
         {
-            //if (code == InputCode.RecruitUnit && data != null && data is string)
-            //{
-            //    var originCoord = _gm.ActiveSquad.Config.Origin;
-
-            //    _bus.Publish(new FocusCameraMessage(this, _map.GetTile(originCoord).GetTop()));
-
-            //    var pickableTiles = _map.Tiles(HexFun.Ring(originCoord));
-
-            //    var state = new HexPickState(Context, pickableTiles, (tile) =>
-            //        {
-            //            if (tile.HasEntityOnTop)
-            //                return;
-            //            // spawn unit at that tile
-            //            var job = new SpawnUnitJob
-            //            {
-            //                Position = tile.Position.OffsetCoord,
-            //                EntityId = data as string
-            //            };
-
-            //            ExecuteAndSendJob(job);
-
-            //            // callback
-            //            Context.SetState(this);
-            //        }, () =>
-            //        {
-            //            Context.SetState(this);
-            //        });
-            //    Context.SetState(state);
-            //} else
             if (code == InputCode.AttackMode && data != null && data is Entity)
             {
                 Context.SetState(new EntityAttackInputState(Context, data as Entity));
@@ -77,38 +49,11 @@ namespace Klaesh.Game.Input
             {
                 if (card.Data is SpawnUnitCardData spawnUnitData)
                 {
-                    var originCoord = _gm.ActiveSquad.Config.Origin;
-
-                    _bus.Publish(new FocusCameraMessage(this, _map.GetTile(originCoord).GetTop()));
-
-                    var pickableTiles = _map.Tiles(HexFun.Ring(originCoord));
-
-                    var state = new HexPickState(Context, pickableTiles, (tile) =>
-                    {
-                        if (tile.HasEntityOnTop)
-                            return;
-                        // spawn unit at that tile
-                        var job = new SpawnUnitJob
-                        {
-                            Position = tile.Position.OffsetCoord,
-                            EntityId = spawnUnitData.EntityId,
-                            CardId = card.Id
-                        };
-
-                        ExecuteAndSendJob(job);
-
-                        // callback
-                        Context.SetState(this);
-                    }, () =>
-                    {
-                        Context.SetState(this);
-                    });
-                    Context.SetState(state);
+                    DoSpawnUnit(card, spawnUnitData);
                 }
                 else if (card.Data is TerraformCardData terraformData)
                 {
-                    // get tiles in range of my units
-
+                    DoTerraForm(card, terraformData);
                 }
             }
         }
@@ -162,6 +107,72 @@ namespace Klaesh.Game.Input
 
                 tile.SetColor(Color.white);
             });
+        }
+
+        private void DoSpawnUnit(Card card, SpawnUnitCardData data)
+        {
+            var originCoord = _gm.ActiveSquad.Config.Origin;
+
+            _bus.Publish(new FocusCameraMessage(this, _map.GetTile(originCoord).GetTop()));
+
+            var pickableTiles = _map.Tiles(HexFun.Ring(originCoord));
+
+            var state = new HexPickState(Context, pickableTiles, (tile) =>
+            {
+                if (tile.HasEntityOnTop)
+                    return;
+                // spawn unit at that tile
+                var job = new SpawnUnitJob
+                {
+                    Position = tile.Position.OffsetCoord,
+                    EntityId = data.EntityId,
+                    CardId = card.Id
+                };
+
+                ExecuteAndSendJob(job);
+
+                // callback
+                Context.SetState(this);
+            }, () =>
+            {
+                Context.SetState(this);
+            });
+            Context.SetState(state);
+        }
+
+        private void DoTerraForm(Card card, TerraformCardData data)
+        {
+            // get tiles in range of my units
+            var tiles = new HashSet<HexCubeCoord>();
+
+            var gm = _locator.GetService<IGameManager>();
+            foreach (var mem in gm.HomeSquad.AliveMembers)
+            {
+                var pos = mem.GetComponent<HexPosComp>().Position;
+
+                tiles.UnionWith(HexFun.Spiral(pos, 2));
+            }
+
+            var pickableTiles = _map.Tiles(tiles);
+
+            var state = new HexPickState(Context, pickableTiles, (tile) =>
+            {
+                var job = new TerraformJob
+                {
+                     Origin = tile.Position,
+                     Changes = new List<Tuple<HexCubeCoord, int>>{
+                         Tuple.Create(new HexCubeCoord(0, 0, 0), data.amount)
+                     },
+                     CardId = card.Id
+                };
+
+                // callback
+                Context.SetState(new WaitForJobState(Context, job, this));
+            }, () =>
+            {
+                Context.SetState(this);
+            });
+            Context.SetState(state);
         }
     }
 }

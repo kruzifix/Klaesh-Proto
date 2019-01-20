@@ -15,3 +15,4 @@ MonoBehaviour:
   Name: Raise!
   Description: Raises a small area of the terrain.
   Art: {fileID: 21300000, guid: baa848f4a095662488c1c628090ea871, type: 3}
+  amount: 1

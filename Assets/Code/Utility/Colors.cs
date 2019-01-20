@@ -23,6 +23,9 @@ namespace Klaesh.Utility
 
         public static Color AttackTargetTileHighlight = new Color32(180, 56, 237, 255);
 
+        public static Color TerraformRaise = new Color32(244, 110, 41, 255);
+        public static Color TerraformLower = new Color32(0, 131, 211, 255);
+
         static Colors()
         {
             ColorUtility.TryParseHtmlString("#6D80EC", out TileOrigin);

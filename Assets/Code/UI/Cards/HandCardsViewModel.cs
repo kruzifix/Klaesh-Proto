@@ -14,6 +14,9 @@ namespace Klaesh.UI.Cards
 
         public CardViewModel CardPrefab;
 
+        [Header("Show cards of Homesquad and they are clickable")]
+        public bool homeSquadCards = true;
+
         protected override void Init()
         {
             _gameManager = _locator.GetService<IGameManager>();
@@ -31,13 +34,18 @@ namespace Klaesh.UI.Cards
             _cards.Clear();
         }
 
+        private bool DoCard(ICardDeck deck)
+        {
+            return homeSquadCards ? (deck.Owner == _gameManager.HomeSquad) : (deck.Owner != _gameManager.HomeSquad);
+        }
+
         private void OnCardDrawn(CardDrawnMessage msg)
         {
             // spawn card
             // TODO: do something with caching here? so gameobject aren't spawned and destroyed all the time
 
             var deck = msg.Sender as ICardDeck;
-            if (deck.Owner == _gameManager.HomeSquad)
+            if (DoCard(deck))
             {
                 Debug.Log($"[HandCardsViewModel] drew card {msg.Value.Id} {msg.Value.Data.Name}");
                 var vm = Instantiate(CardPrefab, transform);
@@ -50,7 +58,7 @@ namespace Klaesh.UI.Cards
         private void OnCardUsed(CardUsedMessage msg)
         {
             var deck = msg.Sender as ICardDeck;
-            if (deck.Owner == _gameManager.HomeSquad)
+            if (DoCard(deck))
             {
                 foreach (var vm in _cards)
                 {
@@ -66,7 +74,9 @@ namespace Klaesh.UI.Cards
 
         public void OnHandCardClicked(CardViewModel cvm)
         {
-            Debug.Log($"[HandCardsViewModel] On Card clicked! {cvm.Data.Id} {cvm.Data.Data.Name}");
+            if (!homeSquadCards)
+                return;
+
             _gameManager.ProcessInput(InputCode.Card, cvm.Data);
         }
     }

@@ -10,7 +10,8 @@ namespace Klaesh.Game.Cards
         public string Description;
         public Sprite Art;
 
-        //[Header("Terraform Data")]
+        [Header("Terraform Data")]
+        public int amount;
 
         string ICardData.Name => Name;
         string ICardData.Description => Description;

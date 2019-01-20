@@ -28,7 +28,7 @@ namespace Klaesh.Hex
         public GameObject modifierGroup;
 
         public HexCubeCoord Position { get; set; }
-        public int Height { get => _height; set { _height = value; _map.StateChanged(); } }
+        public int Height { get => _height; set { _height = value; Refresh(); _map.StateChanged(); } }
 
         public HexTerrain Terrain { get => _terrain; set { _terrain = value; Refresh(); _map.StateChanged(); } }
 
