@@ -520,7 +520,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Version: 0.5'
+  m_Text: 'Version: 0.7'
 --- !u!222 &661098593
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -546,7 +546,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &687267264
 RectTransform:
   m_ObjectHideFlags: 0

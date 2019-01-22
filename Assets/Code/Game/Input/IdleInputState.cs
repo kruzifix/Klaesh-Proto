@@ -51,9 +51,9 @@ namespace Klaesh.Game.Input
                 {
                     DoSpawnUnit(card, spawnUnitData);
                 }
-                else if (card.Data is TerraformCardData terraformData)
+                else if (card.Data is TerraformCardData)
                 {
-                    DoTerraForm(card, terraformData);
+                    Context.SetState(new TerraformInputState(Context, card));
                 }
             }
         }
@@ -140,37 +140,37 @@ namespace Klaesh.Game.Input
             Context.SetState(state);
         }
 
-        private void DoTerraForm(Card card, TerraformCardData data)
-        {
-            // get tiles in range of my units
-            var tiles = new HashSet<HexCubeCoord>();
+        //private void DoTerraForm(Card card, TerraformCardData data)
+        //{
+        //    // get tiles in range of my units
+        //    var tiles = new HashSet<HexCubeCoord>();
 
-            var gm = _locator.GetService<IGameManager>();
-            foreach (var mem in gm.HomeSquad.AliveMembers)
-            {
-                var pos = mem.GetComponent<HexPosComp>().Position;
+        //    var gm = _locator.GetService<IGameManager>();
+        //    foreach (var mem in gm.HomeSquad.AliveMembers)
+        //    {
+        //        var pos = mem.GetComponent<HexPosComp>().Position;
 
-                tiles.UnionWith(HexFun.Spiral(pos, 2));
-            }
+        //        tiles.UnionWith(HexFun.Spiral(pos, 2));
+        //    }
 
-            var pickableTiles = _map.Tiles(tiles);
+        //    var pickableTiles = _map.Tiles(tiles);
 
-            var state = new HexPickState(Context, pickableTiles, (tile) =>
-            {
-                var job = new TerraformJob
-                {
-                     Origin = tile.Position,
-                     Changes = data.GetTerrainChanges(),
-                     CardId = card.Id
-                };
+        //    var state = new HexPickState(Context, pickableTiles, (tile) =>
+        //    {
+        //        var job = new TerraformJob
+        //        {
+        //             Origin = tile.Position,
+        //             Changes = data.GetTerrainChanges(),
+        //             CardId = card.Id
+        //        };
 
-                // callback
-                Context.SetState(new WaitForJobState(Context, job, this));
-            }, () =>
-            {
-                Context.SetState(this);
-            });
-            Context.SetState(state);
-        }
+        //        // callback
+        //        Context.SetState(new WaitForJobState(Context, job, this));
+        //    }, () =>
+        //    {
+        //        Context.SetState(this);
+        //    });
+        //    Context.SetState(state);
+        //}
     }
 }
