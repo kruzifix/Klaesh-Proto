@@ -64,6 +64,9 @@ namespace Klaesh.Hex
             var mscale = modifierGroup.transform.localScale;
             mscale.y = 1f / scale.y;
             modifierGroup.transform.localScale = mscale;
+
+            if (HasEntityOnTop)
+                Entity.transform.position = GetTop();
         }
 
         public void SetColor(Color color)

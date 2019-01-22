@@ -11,6 +11,14 @@ using UnityEngine;
 
 namespace Klaesh.Game.Job
 {
+    public struct TerrainChange
+    {
+        [JsonProperty("c")]
+        public HexOffsetCoord coord;
+        [JsonProperty("a")]
+        public int amount;
+    }
+
     public class TerraformJob : AbstractJob
     {
         private ICoroutineStarter _starter;
@@ -19,7 +27,7 @@ namespace Klaesh.Game.Job
         public HexCubeCoord Origin { get; set; }
 
         [JsonProperty("changes")]
-        public List<Tuple<HexCubeCoord, int>> Changes { get; set; }
+        public List<TerrainChange> Changes { get; set; }
 
         [JsonProperty("card_id")]
         public int CardId { get; set; }
@@ -42,14 +50,15 @@ namespace Klaesh.Game.Job
 
             bus.Publish(new FocusCameraMessage(this, map.GetTile(Origin).GetTop()));
 
-            var tiles = Changes.Select(c => Tuple.Create(map.GetTile(Origin + c.Item1), c.Item2)).ToList();
+            var tiles = Changes
+                .Select(c => Tuple.Create(map.GetTile(Origin + c.coord.CubeCoord), c.amount))
+                .Where(t => t.Item1 != null)
+                .ToList();
             foreach (var t in tiles)
             {
                 t.Item1.SetColor(t.Item2 > 0 ? Colors.TerraformRaise : Colors.TerraformLower);
                 yield return new WaitForSeconds(0.1f);
             }
-
-            yield return new WaitForSeconds(0.3f);
 
             // TODO: play animation here?
             foreach (var t in tiles)
@@ -57,9 +66,11 @@ namespace Klaesh.Game.Job
                 var tile = t.Item1;
                 tile.Height = Mathf.Max(tile.Height + t.Item2, 3);
                 tile.SetColor(Color.white);
+
                 // TODO: spawn particles!
                 yield return new WaitForSeconds(0.1f);
             }
+            yield return null;
 
             Completed();
         }

@@ -15,4 +15,18 @@ MonoBehaviour:
   Name: Lower
   Description: Lowers a small area.
   Art: {fileID: 21300000, guid: a64a6f4b085a0c0459153d6ca4fd9a42, type: 3}
-  amount: -1
+  Tiles:
+  - coord: {x: 0, y: 0}
+    amount: -2
+  - coord: {x: -1, y: -1}
+    amount: -1
+  - coord: {x: 0, y: -1}
+    amount: -1
+  - coord: {x: 1, y: 0}
+    amount: -1
+  - coord: {x: 0, y: 1}
+    amount: -1
+  - coord: {x: -1, y: 1}
+    amount: -1
+  - coord: {x: -1, y: 0}
+    amount: -1

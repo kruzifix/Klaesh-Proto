@@ -160,9 +160,7 @@ namespace Klaesh.Game.Input
                 var job = new TerraformJob
                 {
                      Origin = tile.Position,
-                     Changes = new List<Tuple<HexCubeCoord, int>>{
-                         Tuple.Create(new HexCubeCoord(0, 0, 0), data.amount)
-                     },
+                     Changes = data.GetTerrainChanges(),
                      CardId = card.Id
                 };
 
