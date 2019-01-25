@@ -4,9 +4,9 @@
 
 ## Setup:
 - Download & Install UnityHub
-- Install Unity 2018.3.0f2
+- Install Unity 2018.3.2f1
 - Clone repo
-- Start project with Unity version 2018.3.0f2
+- Start project with Unity version 2018.3.2f1
 
 ## Server:
 To run the server locally:
